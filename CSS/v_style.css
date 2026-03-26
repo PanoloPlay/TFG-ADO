@@ -1,0 +1,5 @@
+:root {
+  /*--color-v: #HEX;*/
+  --color-test:#000;
+}
+/*para usarlo usar es: var(--color-v)*/
