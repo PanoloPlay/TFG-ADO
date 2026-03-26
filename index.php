@@ -15,7 +15,7 @@
         <meta name="description" content="Trabajo Final de Grado de Óscar, Ahmad y David">
 
         <!-- Enlace al favicon de la página -->
-        <link rel="icon" href="./IMG/favicon.png" type="image/png">
+        <link rel="icon" href="./IMG/app_icons/favicon.png" type="image/png">
 
         <!-- Enlace a la hoja de estilos de Bootstrap y a la hoja de estilos personalizada -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
@@ -38,7 +38,7 @@
                         </div>
                         <div class="col-1">
                             <div class="logo">
-                                <img src="./IMG/icon.png" alt="Logo de la página">
+                                <img src="./IMG/app_icons/icon.png" alt="Logo de la página">
                             </div>
                         </div>
                     </div>
