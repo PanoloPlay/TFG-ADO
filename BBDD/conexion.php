@@ -18,6 +18,6 @@
     catch (PDOException) {
             
         // header("Location: ../index.php?Error=Error_Al_Cargar");
-        die();
+        die("Error al conectar con la base de datos");
     }
 ?>

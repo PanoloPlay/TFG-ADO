@@ -196,4 +196,40 @@ CREATE TABLE Administadores (
   FOREIGN KEY (id_usuario, nickname) REFERENCES Usuarios(id_usuario, nickname)
 ) ENGINE=InnoDB;
 
+-- ----------------------------
+-- ListaDeseos
+-- ----------------------------
+CREATE TABLE ListaDeseos (
+  id_Wishlist VARCHAR(45) NOT NULL,
+  id_usuario INT NOT NULL,
+  nickname VARCHAR(45) NOT NULL,
+  id_juego INT NOT NULL,
+  nombre_juego VARCHAR(100) NOT NULL,
+  PRIMARY KEY (id_Wishlist),
+  INDEX (id_juego, nombre_juego),
+  INDEX (id_usuario, nickname),
+  FOREIGN KEY (id_usuario, nickname) REFERENCES Usuarios(id_usuario, nickname)
+    ON DELETE NO ACTION ON UPDATE NO ACTION,
+  FOREIGN KEY (id_juego, nombre_juego) REFERENCES Juegos(id_juego, nombre_juego)
+    ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB;
+
+-- ----------------------------
+-- Biblioteca
+-- ----------------------------
+CREATE TABLE Biblioteca (
+  id_Biblioteca VARCHAR(45) NOT NULL,
+  id_usuario INT NOT NULL,
+  nickname VARCHAR(45) NOT NULL,
+  id_juego INT NOT NULL,
+  nombre_juego VARCHAR(100) NOT NULL,
+  PRIMARY KEY (id_Biblioteca),
+  INDEX (id_juego, nombre_juego),
+  INDEX (id_usuario, nickname),
+  FOREIGN KEY (id_usuario, nickname) REFERENCES Usuarios(id_usuario, nickname)
+    ON DELETE NO ACTION ON UPDATE NO ACTION,
+  FOREIGN KEY (id_juego, nombre_juego) REFERENCES Juegos(id_juego, nombre_juego)
+    ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB;
+
 SET FOREIGN_KEY_CHECKS=1;
