@@ -16,7 +16,7 @@
 
 <!-- <link rel="stylesheet" href="../CSS/x.css"> -->
 
-<!-- <script src="../JS/x.js" defer></script> -->
+<script src="../JS/scriptTienda.js" defer></script>
 
 <!-- FIN - Estilos personalizados para esta página y scripts -->
 
