@@ -15,31 +15,105 @@
                 </a>
 
                 <nav class="site-nav">
-                    <a href="../">Tienda</a>
-                    <a href="../support.php">Soporte</a>
+                    <div class="dropdown">
+                        <a class="chip dropdown-toggle d-flex align-items-center gap-2" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <span class="material-symbols-outlined">add_business</span>
+                            Tienda
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark">
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center gap-2" href="./">
+                                    <span class="material-symbols-outlined">store</span>
+                                    Página principal
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center gap-2" href="../MAIN/new_releases.php">
+                                    <span class="material-symbols-outlined">new_releases</span>
+                                    Últimos lanzamientos
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center gap-2" href="../MAIN/categories.php">
+                                    <span class="material-symbols-outlined">shoppingmode</span>
+                                    Categorías
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center gap-2" href="../MAIN/offers.php">
+                                    <span class="material-symbols-outlined">percent_discount</span>
+                                    Ofertas
+                                </a>
+                            </li>
+                        </ul> 
+                    </div>
+                    <a href="../s">Soporte</a>
                 </nav>
 
                 <div class="site-actions">
                     <?php if (!empty($_SESSION['id_usuario'])): ?>
 
                         <div class="dropdown">
-                            <a class="chip dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <?= e($_SESSION['nickname']) ?>
-                            </a>
-
+                            <a class="chip dropdown-toggle d-flex align-items-center gap-2" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <img src="../IMG/usuarios/<?= e($_SESSION['nickname']) ?>.png" 
+                                    alt="Perfil" 
+                                    width="24" 
+                                    height="24" 
+                                    class="rounded-circle" 
+                                    style="object-fit: cover;"
+                                    onerror="this.onerror=null; this.parentElement.innerHTML='<span class=\'material-symbols-outlined\'>account_circle</span>' + ' <?= e($_SESSION['nickname']) ?>';">
+                            <?= e($_SESSION['nickname']) ?>
+                        </a>
                             <ul class="dropdown-menu dropdown-menu-dark">
-                                <li><a class="dropdown-item" href="../MAIN/profile.php">Mi Perfil</a></li>
-                                <li><a class="dropdown-item" href="../MAIN/library.php">Biblioteca</a></li>
-                                <li><a class="dropdown-item" href="../MAIN/friends.php">Amigos</a></li>
-                                <li><a class="dropdown-item" href="../MAIN/settings.php">Configuración</a></li>
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-center gap-2" href="../MAIN/profile.php">
+                                        <span class="material-symbols-outlined">person</span>
+                                        Mi Perfil
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-center gap-2" href="../MAIN/library.php">
+                                        <span class="material-symbols-outlined">library_books</span>
+                                        Biblioteca
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-center gap-2" href="../MAIN/friends.php">
+                                        <span class="material-symbols-outlined">group</span>
+                                        Amigos
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-center gap-2" href="../MAIN/wishlist.php">
+                                        <span class="material-symbols-outlined">bookmark_add</span>
+                                        Lista de deseados
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-center gap-2" href="../MAIN/settings-profile.php">
+                                        <span class="material-symbols-outlined">settings</span>
+                                        Configuración
+                                    </a>
+                                </li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="../AUTH/logout.php">Cerrar Sesión</a></li>
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-center gap-2" href="../AUTH/logout.php">
+                                        <span class="material-symbols-outlined">logout</span>
+                                        Cerrar Sesión
+                                    </a>
+                                </li>
                             </ul>
                         </div>
 
                     <?php else: ?>
-                        <a class="chip" href="../AUTH/login.php">Entrar</a>
-                        <a class="chip chip--soft" href="../AUTH/register.php">Registro</a>
+                        <a class="chip d-inline-flex align-items-center gap-2" href="../AUTH/login.php">
+                            <span class="material-symbols-outlined">login</span>
+                            Iniciar sesión
+                        </a>
+                        <a class="chip chip-soft d-inline-flex align-items-center gap-2" href="../AUTH/register.php">
+                            <span class="material-symbols-outlined">person_add</span>
+                            Registro
+                        </a>
                     <?php endif; ?>
                 </div>
             </div>
