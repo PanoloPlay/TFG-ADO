@@ -38,4 +38,4 @@ Si quieres correr este proyecto en tu máquina, sigue estos pasos:
 
 1. **Clona el repositorio:**
    ```bash
-   git clone [https://github.com/PanoloPlay/TFG-ADO.git](https://github.com/PanoloPlay/TFG-ADO.git)
+   git clone https://github.com/PanoloPlay/TFG-ADO.git
