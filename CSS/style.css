@@ -125,13 +125,6 @@
     background: linear-gradient(180deg, var(--color-greyneutral-4), var(--color-greyneutral-5));
 }
 
-/* html, body {
-    margin: 10px; 
-    height: calc(100% - 10px);
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: transparent transparent;
-} */
 /* Ajustes para la barra de desplazamiento (scrollbar) */
 
 
