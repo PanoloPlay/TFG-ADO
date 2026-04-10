@@ -2,12 +2,16 @@
     </head>
     <!-- Inicio de la sección del cuerpo del documento HTML -->
     <body class="site-body">
-        <div>
+
+        <?php require_once '../GENERAL/avatar_helpers.php'; ?>
+
         <!-- Encabezado del sitio web -->
         <header class="site-header">
             <div class="site-header__inner">
                 <a class="site-brand" href="./">
-                    <span class="site-brand__mark"><img src="../IMG/app_icons/loto-color.svg"  width="40" height="50"></span>
+                    <span class="site-brand__mark">
+                        <img src="../IMG/app_icons/loto-color.svg" width="40" height="50" alt="Hestia's Lotus">
+                    </span>
                     <span class="site-brand__text">
                         <strong>Hestia's Lotus</strong>
                         <small>TFG-ADO</small>
@@ -45,25 +49,34 @@
                                     Ofertas
                                 </a>
                             </li>
-                        </ul> 
+                        </ul>
                     </div>
                     <a href="../s">Soporte</a>
                 </nav>
 
                 <div class="site-actions">
                     <?php if (!empty($_SESSION['id_usuario'])): ?>
+                        <?php
+                            $headerNickname = $_SESSION['nickname'] ?? '';
+                            $headerAvatarData = getProfileAvatarData($headerNickname);
+                        ?>
 
                         <div class="dropdown">
                             <a class="chip dropdown-toggle d-flex align-items-center gap-2" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <img src="../IMG/usuarios/<?= e($_SESSION['nickname']) ?>.png" 
-                                    alt="Perfil" 
-                                    width="24" 
-                                    height="24" 
-                                    class="rounded-circle" 
-                                    style="object-fit: cover;"
-                                    onerror="this.onerror=null; this.parentElement.innerHTML='<span class=\'material-symbols-outlined\'>account_circle</span>' + ' <?= e($_SESSION['nickname']) ?>';">
-                            <?= e($_SESSION['nickname']) ?>
-                        </a>
+                                <div
+                                    class="header-avatar-fallback <?= e($headerAvatarData['avatarClass']) ?>"
+                                    <?php if (!empty($headerAvatarData['avatarPath'])): ?>
+                                        style="background-image: url('<?= e($headerAvatarData['avatarPath']) ?>');"
+                                    <?php endif; ?>
+                                >
+                                    <?php if (empty($headerAvatarData['avatarPath'])): ?>
+                                        <?= e($headerAvatarData['initial']) ?>
+                                    <?php endif; ?>
+                                </div>
+
+                                <?= e($headerNickname) ?>
+                            </a>
+
                             <ul class="dropdown-menu dropdown-menu-dark">
                                 <li>
                                     <a class="dropdown-item d-flex align-items-center gap-2" href="../MAIN/profile.php">
@@ -118,6 +131,7 @@
                 </div>
             </div>
         </header>
+
         <!-- Contenedor de la página -->
         <main class="site-main__shell">
             <div style="margin: 10px; height: calc(100% - 10px); overflow-y: auto; scrollbar-width: thin; scrollbar-color: transparent transparent;">

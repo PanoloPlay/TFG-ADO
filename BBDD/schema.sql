@@ -1,3 +1,8 @@
+-- ----------------------------
+-- TFG - ADO - Tienda de Videojuegos
+-- ----------------------------
+-- Mantener este Script en el Github y por favor no borrar el script del Github
+-- Lo digo porque asi puedo seguir un control de versiones de la BBDD
 SET FOREIGN_KEY_CHECKS=0;
 DROP DATABASE IF EXISTS TFG_ADO_Tienda_Videojuegos;
 CREATE DATABASE TFG_ADO_Tienda_Videojuegos CHARACTER SET utf8mb4;
@@ -24,6 +29,12 @@ CREATE TABLE Usuarios (
   clave_acceso VARCHAR(255) NOT NULL,
   fecha_registro DATETIME NOT NULL,
   descripcion TEXT,
+  visibilidad ENUM(
+    'publico',
+    'privado',
+    'solo_amigos',
+    'amigos_de_amigos'
+  ) NOT NULL DEFAULT 'publico',
   id_idioma_principal CHAR(4) NOT NULL,
   id_idioma_secundario CHAR(4),
   PRIMARY KEY (id_usuario, nickname),

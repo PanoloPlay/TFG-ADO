@@ -17,6 +17,7 @@
         <!-- Enlace a las hojas de estilo y fuentes -->
         <link rel="stylesheet" href="../CSS/v_style.css">
         <link rel="stylesheet" href="../CSS/style.css">
+        <link rel="stylesheet" href="../CSS/avatar.css">
 
         <!-- Enlace a jQuery para facilitar la manipulación del DOM y la realización de peticiones AJAX -->
         <script src="../DEPENDENCIES/jquery-4.0.0.js"></script>
