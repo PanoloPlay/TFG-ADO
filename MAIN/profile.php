@@ -115,8 +115,16 @@ if (!$perfilNoEncontrado && $usuario) {
                 </div>
                 <?php else: ?>
                     <p class="profile-bio">
-                        <?= e($usuario['descripcion'] ?: 'Sin descripción todavía.') ?>
-                    </p>
+                        <?php if($usuario['descripcion'] <= 198): ?>
+                            <?= e($usuario['descripcion'] ?: '') ?>
+                            </p>
+                        <?php else: ?>
+                            <?= e(mb_substr($usuario['descripcion'], 0, 198, 'UTF-8')) . '...' ?>
+                            </p>
+                            <span class="material-symbols-outlined">expand_more</span>
+                            Ver más Información.
+                        <?php endif; ?>
+    
                 </div>
                     <div class="profile-badges">
                         <span>
@@ -326,11 +334,9 @@ if (!$perfilNoEncontrado && $usuario) {
                 <?php endif; ?>
             </article>
         </section>
-
     <?php endif; ?>
-
 <?php endif; ?>
-</main>
-
-</body>
-</html>
+<?php
+require_once '../GENERAL/[main_END - footer].php';
+require_once '../GENERAL/[Page_END].php';
+?>
