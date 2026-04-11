@@ -200,8 +200,12 @@
 
 .profile-badges {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-end;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.other-badges {
+    display: flex;
     gap: 10px;
 }
 

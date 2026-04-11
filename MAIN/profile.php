@@ -123,14 +123,16 @@ if (!$perfilNoEncontrado && $usuario) {
                             <span class="material-symbols-outlined">mail</span>
                             <?= e($usuario['correo']) ?>
                         </span>
-                        <span>
-                            <span class="material-symbols-outlined">schedule</span>
-                            Registrado: <?= e($fechaRegistro) ?>
-                        </span>
-                        <span>
-                            <span class="material-symbols-outlined">translate</span>
-                            Idioma: <?= e($usuario['id_idioma_principal']) ?>
-                        </span>
+                        <div class="other-badges">
+                            <span>
+                                <span class="material-symbols-outlined">schedule</span>
+                                Registrado: <?= e($fechaRegistro) ?>
+                            </span>
+                            <span>
+                                <span class="material-symbols-outlined">translate</span>
+                                Idioma: <?= e($usuario['id_idioma_principal']) ?>
+                            </span>
+                        </div>
                     </div>
                 <?php endif; ?>
             </div>
