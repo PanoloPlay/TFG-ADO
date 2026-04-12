@@ -231,7 +231,7 @@ if (!$perfilNoEncontrado && $usuario) {
                         <span class="material-symbols-outlined">grid_view</span>
                         Biblioteca reciente
                     </h2>
-                    <a href="#" class="panel-link">Ver todo</a>
+                    <a href="./library.php" class="panel-link">Ver todo</a>
                 </div>
 
                 <?php if (!empty($data['biblioteca'])): ?>
