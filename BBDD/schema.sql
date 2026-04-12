@@ -187,10 +187,9 @@ CREATE TABLE Categorias_Juego (
   categoria VARCHAR(45) NOT NULL,
   id_juego INT NOT NULL,
   nombre_juego VARCHAR(100) NOT NULL,
+  PRIMARY KEY (id_categoria, id_juego),
   INDEX (id_categoria, categoria),
   INDEX (id_juego, nombre_juego),
-  UNIQUE (id_juego),
-  UNIQUE (id_categoria),
   FOREIGN KEY (id_categoria, categoria) REFERENCES Categorias(id_categoria, categoria),
   FOREIGN KEY (id_juego, nombre_juego) REFERENCES Juegos(id_juego, nombre_juego)
 ) ENGINE=InnoDB;
@@ -211,7 +210,7 @@ CREATE TABLE Administadores (
 -- ListaDeseos
 -- ----------------------------
 CREATE TABLE ListaDeseos (
-  id_Wishlist VARCHAR(45) NOT NULL,
+  id_Wishlist INT NOT NULL AUTO_INCREMENT,
   id_usuario INT NOT NULL,
   nickname VARCHAR(45) NOT NULL,
   id_juego INT NOT NULL,
@@ -229,7 +228,7 @@ CREATE TABLE ListaDeseos (
 -- Biblioteca
 -- ----------------------------
 CREATE TABLE Biblioteca (
-  id_Biblioteca VARCHAR(45) NOT NULL,
+  id_Biblioteca INT NOT NULL AUTO_INCREMENT,
   id_usuario INT NOT NULL,
   nickname VARCHAR(45) NOT NULL,
   id_juego INT NOT NULL,
