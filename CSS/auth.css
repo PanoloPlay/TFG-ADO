@@ -208,18 +208,6 @@ input:focus, select:focus, textarea:focus {
     font-size: .98rem;
 }
 
-@media (max-width: 760px) {
-    .auth-form {
-        grid-template-columns: 1fr;
-    }
-
-    .auth-form > label:first-child,
-    .auth-form > label.full,
-    .auth-form > .btn-primary.full {
-        grid-column: auto;
-    }
-}
-
 /* opciones normales */
 select option {
     background-color: var(--color-greyneutral-3);
