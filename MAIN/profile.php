@@ -1,7 +1,6 @@
 <?php require_once '../GENERAL/[General_REQUIRES].php'; ?>
 <?php
 require_once '../GENERAL/avatar_helpers.php';
-require_once "../GENERAL/auth_guard.php";
 require_once "../BBDD/profile_queries.php";
 
 $idSesion = (int)($_SESSION['id_usuario'] ?? 0);
