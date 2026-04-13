@@ -29,7 +29,7 @@
 
                             <ul class="dropdown-menu dropdown-menu-dark">
                                 <li><a class="dropdown-item" href="../MAIN/profile.php">Mi Perfil</a></li>
-                                <li><a class="dropdown-item" href="../MAIN/library.php">Biblioteca</a></li>
+                                <li><a class="dropdown-item" href="../PHP/library.php">Biblioteca</a></li>
                                 <li><a class="dropdown-item" href="../MAIN/friends.php">Amigos</a></li>
                                 <li><a class="dropdown-item" href="../MAIN/settings.php">Configuración</a></li>
                                 <li><hr class="dropdown-divider"></li>

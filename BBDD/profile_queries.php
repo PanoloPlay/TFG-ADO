@@ -222,3 +222,81 @@ function getProfilePageData(PDO $BBDD, int $idUsuario, string $nickname): array
 
     return $data;
 }
+
+// Query que obtiene todos los juegos de la biblioteca de un usuario
+function getAllLibraryGames(PDO $BBDD, int $idUsuario, string $nickname): array
+{
+    $query = $BBDD->prepare("
+        SELECT
+            J.id_juego,
+            J.nombre_juego,
+            J.descripcion,
+            J.desarrollador,
+            J.fecha_publicacion,
+            J.precio,
+            J.descuento
+        FROM Biblioteca B
+        INNER JOIN Juegos J
+            ON B.id_juego = J.id_juego
+           AND B.nombre_juego = J.nombre_juego
+        WHERE B.id_usuario = ? AND B.nickname = ?
+        ORDER BY J.fecha_publicacion DESC
+    ");
+    $query->execute([$idUsuario, $nickname]);
+
+    return $query->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// Query que obtiene todas las categorías disponibles
+function getAllCategories(PDO $BBDD): array
+{
+    $query = $BBDD->prepare("
+        SELECT DISTINCT
+            id_categoria,
+            categoria
+        FROM Categorias
+        ORDER BY categoria ASC
+    ");
+    $query->execute();
+
+    return $query->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// Obtiene los juegos de la biblioteca de un usuario filtrados por categorías
+function getLibraryGamesByCategories(PDO $BBDD, int $idUsuario, string $nickname, array $categorias): array
+{
+    // Comprobamos que el array de categorías no esté vacío para evitar errores durante la query
+    if (empty($categorias)) {
+        return [];
+    }
+
+    // Creamos una cadena de placeholders para la cantidad de categorías recibidas
+    $placeholders = implode(',', array_fill(0, count($categorias), '?'));
+    $params = array_merge([$idUsuario, $nickname], $categorias);
+
+    // La query selecciona los juegos de la biblioteca del usuario que pertenecen a las categorías especificadas
+    $query = $BBDD->prepare("
+        SELECT DISTINCT
+            J.id_juego,
+            J.nombre_juego,
+            J.descripcion,
+            J.desarrollador,
+            J.fecha_publicacion,
+            J.precio,
+            J.descuento
+        FROM Biblioteca B
+        INNER JOIN Juegos J
+            ON B.id_juego = J.id_juego
+           AND B.nombre_juego = J.nombre_juego
+        INNER JOIN Categorias_Juego CJ
+            ON J.id_juego = CJ.id_juego
+           AND J.nombre_juego = CJ.nombre_juego
+        WHERE B.id_usuario = ? 
+          AND B.nickname = ?
+          AND CJ.id_categoria IN ({$placeholders})
+        ORDER BY J.fecha_publicacion DESC
+    ");
+    $query->execute($params);
+
+    return $query->fetchAll(PDO::FETCH_ASSOC);
+}
