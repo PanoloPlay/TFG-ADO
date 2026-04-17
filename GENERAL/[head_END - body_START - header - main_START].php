@@ -85,7 +85,7 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item d-flex align-items-center gap-2" href="../PHP/library.php">
+                                    <a class="dropdown-item d-flex align-items-center gap-2" href="../MAIN/MainLibrary.php">
                                         <span class="material-symbols-outlined">library_books</span>
                                         Biblioteca
                                     </a>
