@@ -1,0 +1,145 @@
+
+/* Generado por IA [TEMPORAL] Cambiar cuando se quiera*/
+.game-grid-library {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+.game-card-library {
+    grid-template-columns: 70px 1fr;
+    gap: 16px;
+    padding: 16px;
+}
+
+.game-card-library .game-thumb {
+    width: 70px;
+    height: 70px;
+}
+
+.game-developer {
+    margin: 0 0 8px;
+    color: var(--color-greyneutral-11);
+    font-size: .9rem;
+}
+
+.game-description {
+    margin: 0 0 12px;
+    color: var(--color-slate-12);
+    font-size: .85rem;
+    line-height: 1.5;
+}
+
+.filter-section {
+    margin-bottom: 24px;
+    padding: 20px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--color-greyneutral-7);
+}
+
+.filter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.filter-header h3 {
+    margin: 0;
+    font-size: 1rem;
+}
+
+.btn-clear-filters {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--color-greyneutral-7);
+    color: var(--color-greyneutral-11);
+    font-size: .9rem;
+    cursor: pointer;
+    transition: .18s ease;
+}
+
+.btn-clear-filters:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--color-greyneutral-6);
+    color: var(--color-slate-12);
+}
+
+.btn-clear-filters span {
+    font-size: 1rem;
+}
+
+.filter-categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.checkbox-filter {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--color-greyneutral-7);
+    cursor: pointer;
+    transition: .18s ease;
+}
+
+.checkbox-filter:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: var(--color-greyneutral-6);
+}
+
+.checkbox-filter input[type="checkbox"] {
+    cursor: pointer;
+    accent-color: var(--color-blue-10);
+}
+
+.checkbox-filter input[type="checkbox"]:checked + span {
+    color: var(--color-blue-11);
+    font-weight: 500;
+}
+
+.game-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 12px;
+    color: var(--color-slate-12);
+    font-size: .9rem;
+}
+
+.game-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.game-meta span.material-symbols-outlined {
+    font-size: 1rem;
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    text-align: center;
+    color: var(--color-greyneutral-11);
+}
+
+.empty-state span.material-symbols-outlined {
+    font-size: 3rem;
+    margin-bottom: 16px;
+}
+
+.empty-state p {
+    margin: 0;
+    font-size: 1.1rem;
+}
