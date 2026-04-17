@@ -126,18 +126,6 @@
                     <strong>Ofertas</strong>
                     <small>Juegos con descuento</small>
                 </a>
-
-                <a href="#" class="quick-card">
-                    <span class="material-symbols-outlined">library_books</span>
-                    <strong>Biblioteca</strong>
-                    <small>Tu colección</small>
-                </a>
-
-                <a href="#" class="quick-card">
-                    <span class="material-symbols-outlined">group</span>
-                    <strong>Amigos</strong>
-                    <small>Conecta y juega</small>
-                </a>
             </div>
         </article>
 
