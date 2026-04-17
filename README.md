@@ -18,7 +18,7 @@ Prueba la aplicación aquí 🏗️ (enlace)
 
 ### ✨ Características Principales
 
-* 🏗️
+* 🏗️...
 
 ---
 
@@ -26,9 +26,7 @@ Prueba la aplicación aquí 🏗️ (enlace)
 
 | Frontend | Backend | Base de Datos | Otros |
 | :--- | :--- | :--- | :--- |
-| 🏗️ | 🏗️ | SQL | 🏗️ |
-
-*(Nota: Modifica esta tabla con las tecnologías reales que estás usando).*
+| CSS(3) / Bootstrapv(5.3) | PHP(8.0) / JS(2025) | SQL(10.4.32-MariaDB) | HTML(5) |
 
 ---
 
@@ -37,5 +35,24 @@ Prueba la aplicación aquí 🏗️ (enlace)
 Si quieres correr este proyecto en tu máquina, sigue estos pasos:
 
 1. **Clona el repositorio:**
+   
+   Clona el proyecto en htdocs de xampp
+
    ```bash
    git clone https://github.com/PanoloPlay/TFG-ADO.git
+2. **Importa la BBDD en xampp**
+   Ruta del schema.sql
+   - /BBDD/schema.sql
+
+
+   ```bash
+   https://github.com/PanoloPlay/TFG-ADO/blob/main/BBDD/schema.sql
+3. **Importa las datos de prueba de la BBDD**
+   
+   Ruta del test-data.sql
+   - /BBDD/test-data.sql
+   ```bash
+   https://github.com/PanoloPlay/TFG-ADO/blob/main/BBDD/test-data.sql
+F. **Final**
+
+De momento con lo anterior funcionara la web.
