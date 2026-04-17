@@ -41,13 +41,14 @@ Si quieres correr este proyecto en tu máquina, sigue estos pasos:
    ```bash
    git clone https://github.com/PanoloPlay/TFG-ADO.git
 2. **Importa la BBDD en xampp**
+
    Ruta del schema.sql
    - /BBDD/schema.sql
 
 
    ```bash
    https://github.com/PanoloPlay/TFG-ADO/blob/main/BBDD/schema.sql
-3. **Importa las datos de prueba de la BBDD**
+4. **Importa las datos de prueba de la BBDD**
    
    Ruta del test-data.sql
    - /BBDD/test-data.sql
