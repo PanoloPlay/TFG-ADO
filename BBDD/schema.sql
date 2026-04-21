@@ -83,16 +83,18 @@ CREATE TABLE IdiomasJuego (
 -- ----------------------------
 CREATE TABLE Valoraciones (
   id_valoracion INT NOT NULL AUTO_INCREMENT,
-  id_juego INT NOT NULL,
   nombre_juego VARCHAR(100) NOT NULL,
+  nickname VARCHAR(50) NOT nULL,
   id_idioma_comentario CHAR(4) NOT NULL,
   valoracion ENUM('positiva', 'negativa') NOT NULL,
   comentario VARCHAR(500),
   PRIMARY KEY (id_valoracion),
   INDEX (id_idioma_comentario),
-  INDEX (id_juego, nombre_juego),
+  INDEX (nombre_juego),
+  INDEX (nickname),
   FOREIGN KEY (id_idioma_comentario) REFERENCES Idiomas(id_idioma),
-  FOREIGN KEY (id_juego, nombre_juego) REFERENCES Juegos(id_juego, nombre_juego)
+  FOREIGN KEY (nombre_juego) REFERENCES Juegos(nombre_juego)
+  FOREIGN KEY (nickname) REFERENCES Usuarios(nickname)
 ) ENGINE=InnoDB;
 
 -- ----------------------------
