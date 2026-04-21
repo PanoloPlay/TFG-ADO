@@ -5,6 +5,8 @@ var formData;
 var response;
 var data;
 
+var gameName;
+
 var game;
 var bought;
 var userReview;
@@ -243,8 +245,10 @@ async function checkField_4(value_1, value_2, value_3, value_4, value_5, action)
 
 async function getAllData() {
     sesionValue = $("#hdnSession").data('value');
+    gameName = params.get("nameGame");
+    gameName = gameName.replaceAll("_", " ");
 
-    if (params.get("nameGame") === null) {
+    if (gameName === null) {
 
         let errorParam =  document.createElement("div");
         errorParam.className = "error-message";
@@ -269,26 +273,27 @@ async function getAllData() {
         return false;
     }
 
-    game = await checkField_1(params.get("nameGame"), "get_game");
+    game = await checkField_1(gameName, "get_game");
     if (!game) {
         
-        window.location.href = './game.php?error=GameNotFound';
+        //window.location.href = './game.php?error=GameNotFound';
+        return false;
     }
     console.log(game);
 
     if (sesionValue) {
 
-        bought = await checkField_2(params.get("nameGame"), sesionValue, "check_bought");
+        bought = await checkField_2(gameName, sesionValue, "check_bought");
         console.log(bought);
 
-        userReview = await checkField_2(params.get("nameGame"), sesionValue, "user_comment");
+        userReview = await checkField_2(gameName, sesionValue, "user_comment");
         console.log(userReview);
     }
 
-    comments = await checkField_1(params.get("nameGame"), "get_comments");
+    comments = await checkField_1(gameName, "get_comments");
     console.log(comments);
 
-    positive = await checkField_1(params.get("nameGame"), "positive");
+    positive = await checkField_1(gameName, "positive");
     console.log(positive);
 
     return true;
@@ -318,32 +323,37 @@ async function setUpGameInfo() {
 
         if (positive == null) {
 
-            document.getElementById("game-rating").textContent = "Valoraciones Positivas: 0.00%";
+            document.getElementById("game-rating").textContent = "Valoraciones muy negativas";
             document.getElementById("game-rating").className = "game-rating-terrible";
         }
         else {
 
             let porcentage = (positive.length / comments.length) * 100;
-            document.getElementById("game-rating").textContent = "Valoraciones Positivas: " + porcentage.toFixed(2) + "%";
+            
 
             if (porcentage > 80) {
 
+                document.getElementById("game-rating").textContent = "Valoraciones muy positivas";
                 document.getElementById("game-rating").className = "game-rating-excellent";
             }
             else if (porcentage > 60) {
 
+                document.getElementById("game-rating").textContent = "Valoraciones positivas";
                 document.getElementById("game-rating").className = "game-rating-good";
             }
             else if (porcentage > 40) {
 
+                document.getElementById("game-rating").textContent = "Valoraciones variadas";
                 document.getElementById("game-rating").className = "game-rating-neutral";
             }
             else if (porcentage > 20) {
 
+                document.getElementById("game-rating").textContent = "Valoraciones negativas";
                 document.getElementById("game-rating").className = "game-rating-bad";
             }
             else {
 
+                document.getElementById("game-rating").textContent = "Valoraciones muy negativas";
                 document.getElementById("game-rating").className = "game-rating-terrible";
             }
         }
@@ -534,7 +544,7 @@ async function buyGame() {
 async function submitComment() {
     console.log("Comentario enviado: " + document.querySelector(".comment-input").value);
     let commentValue = document.querySelector(".comment-input").value;
-    let comment = await checkField_4(params.get("nameGame"), sesionValue, "positiva", commentValue , "create_comment");
+    let comment = await checkField_4(gameName, sesionValue, "positiva", commentValue , "create_comment");
 }
 
 async function editComment() {
