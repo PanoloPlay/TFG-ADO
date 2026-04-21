@@ -14,8 +14,9 @@ var comments;
 var positive;
 
 $(window).on("load", async function() {
-    await getAllData();
-    await setUp();
+    if (await getAllData()) {
+        await setUp();
+    }
 });
 
 async function checkField_1(value_1, action) {
@@ -186,69 +187,16 @@ async function checkField_4(value_1, value_2, value_3, value_4, action) {
     }
 }
 
-async function checkField_4(value_1, value_2, value_3, value_4, value_5, action) {
-
-    if (!value_1.trim()) {
-
-        return null;
-    }
-
-    if (!value_2.trim()) {
-
-        return null;
-    }
-
-    if (!value_3.trim()) {
-
-        return null;
-    }
-
-    if (!value_4.trim()) {
-
-        return null;
-    }
-
-    if (!value_5.trim()) {
-
-        return null;
-    }
-
-    formData = new FormData();
-    formData.append("value_1", value_1);
-    formData.append("value_2", value_2);
-    formData.append("value_3", value_3);
-    formData.append("value_4", value_4);
-    formData.append("value_5", value_5);
-    formData.append("action", action);
-
-    try {
-        response = await fetch("../AJAX/gameData.php", {
-            method: "POST",
-            body: formData
-        });
-
-        if ((data = await response.json()) != "No data found!") {
-
-            return data;
-        }
-        else {
-
-            return null;
-        }
-    }
-    catch (error) {
-
-        console.log(error);
-        return null;
-    }
-}
 
 async function getAllData() {
     sesionValue = $("#hdnSession").data('value');
     gameName = params.get("nameGame");
-    gameName = gameName.replaceAll("_", " ");
 
-    if (gameName === null) {
+    if (gameName != null) {
+
+        gameName = gameName.replaceAll("_", " ");
+    }
+    else {
 
         let errorParam =  document.createElement("div");
         errorParam.className = "error-message";
@@ -276,18 +224,20 @@ async function getAllData() {
     game = await checkField_1(gameName, "get_game");
     if (!game) {
         
-        //window.location.href = './game.php?error=GameNotFound';
+        window.location.href = './game.php?error=GameNotFound';
         return false;
     }
     console.log(game);
 
-    if (sesionValue) {
+    if (sesionValue != null) {
 
         bought = await checkField_2(gameName, sesionValue, "check_bought");
         console.log(bought);
 
-        userReview = await checkField_2(gameName, sesionValue, "user_comment");
-        console.log(userReview);
+        if (bought != null) {
+            userReview = await checkField_2(gameName, sesionValue, "user_comment");
+            console.log(userReview);
+        }
     }
 
     comments = await checkField_1(gameName, "get_comments");
@@ -323,7 +273,7 @@ async function setUpGameInfo() {
 
         if (positive == null) {
 
-            document.getElementById("game-rating").textContent = "Valoraciones muy negativas";
+            document.getElementById("game-rating").textContent = "Valoraciones muy negativas (" + comments.length + ")";
             document.getElementById("game-rating").className = "game-rating-terrible";
         }
         else {
@@ -333,27 +283,27 @@ async function setUpGameInfo() {
 
             if (porcentage > 80) {
 
-                document.getElementById("game-rating").textContent = "Valoraciones muy positivas";
+                document.getElementById("game-rating").textContent = "Valoraciones muy positivas (" + comments.length + ")";
                 document.getElementById("game-rating").className = "game-rating-excellent";
             }
             else if (porcentage > 60) {
 
-                document.getElementById("game-rating").textContent = "Valoraciones positivas";
+                document.getElementById("game-rating").textContent = "Valoraciones positivas (" + comments.length + ")";
                 document.getElementById("game-rating").className = "game-rating-good";
             }
             else if (porcentage > 40) {
 
-                document.getElementById("game-rating").textContent = "Valoraciones variadas";
+                document.getElementById("game-rating").textContent = "Valoraciones variadas (" + comments.length + ")";
                 document.getElementById("game-rating").className = "game-rating-neutral";
             }
             else if (porcentage > 20) {
 
-                document.getElementById("game-rating").textContent = "Valoraciones negativas";
+                document.getElementById("game-rating").textContent = "Valoraciones negativas (" + comments.length + ")";
                 document.getElementById("game-rating").className = "game-rating-bad";
             }
             else {
 
-                document.getElementById("game-rating").textContent = "Valoraciones muy negativas";
+                document.getElementById("game-rating").textContent = "Valoraciones muy negativas (" + comments.length + ")";
                 document.getElementById("game-rating").className = "game-rating-terrible";
             }
         }
@@ -384,7 +334,7 @@ function setUpPurchaseSection() {
         downloadButton.textContent = "Descargar";
 
         downloadButton.addEventListener("click", function() {
-            window.location.href = './game.php?error=changeURLInLine377';
+            window.location.href = './game.php?error=changeURLInLine337';
         });
 
         purchaseSection.appendChild(downloadButton);
@@ -450,13 +400,13 @@ async function setUpComments() {
             userComments.appendChild(newP);
 
             let commentInput = document.createElement("textarea");
-            commentInput.className = "comment-input";
+            commentInput.id = "comment-input-new";
             commentInput.placeholder = "Escribe tu comentario aquí...";
 
             userComments.appendChild(commentInput);
 
             let submitButton = document.createElement("button");
-            submitButton.className = "submit-comment-button";
+            submitButton.id = "submit-comment-button";
             submitButton.textContent = "Enviar comentario";
 
             submitButton.addEventListener("click", submitComment);
@@ -473,23 +423,34 @@ async function setUpComments() {
             userComments.appendChild(newP);
 
             let commentInput = document.createElement("textarea");
-            commentInput.className = "comment-input";
+            commentInput.id = "comment-input";
             commentInput.placeholder = "Escribe tu comentario aquí...";
             commentInput.value = userReview[0]['comentario'];
+            commentInput.disabled = true;
 
             userComments.appendChild(commentInput);
 
             let editButton = document.createElement("button");
-            editButton.className = "edit-comment-button";
-            editButton.textContent = "Guardar cambios";
+            editButton.id = "edit-comment-button";
+            editButton.textContent = "Editar";
 
             editButton.addEventListener("click", editComment);
 
             userComments.appendChild(editButton);
 
+            let saveButton = document.createElement("button");
+            saveButton.id = "save-comment-button";
+            saveButton.textContent = "Guardar cambios";
+            saveButton.disabled = true;
+
+            saveButton.addEventListener("click", saveComment);
+
+            userComments.appendChild(saveButton);
+
             let deleteButton = document.createElement("button");
-            deleteButton.className = "delete-comment-button";
+            deleteButton.id = "delete-comment-button";
             deleteButton.textContent = "Borrar comentario";
+            deleteButton.disabled = true;
 
             deleteButton.addEventListener("click", deleteComment);
 
@@ -539,18 +500,47 @@ async function setUpComments() {
 
 async function buyGame() {
     console.log("Comprar juego: " + game[0]['nombre_juego']);
+    let buy_bought = await checkField_2(gameName, sesionValue, "buy_game");
+    bought = await checkField_2(gameName, sesionValue, "check_bought");
+    await setUpPurchaseSection();
+    await setUpComments();
 }
 
 async function submitComment() {
-    console.log("Comentario enviado: " + document.querySelector(".comment-input").value);
-    let commentValue = document.querySelector(".comment-input").value;
-    let comment = await checkField_4(gameName, sesionValue, "positiva", commentValue , "create_comment");
+    console.log("Comentario enviado: " + document.querySelector("#comment-input-new").value);
+    let commentValue = document.querySelector("#comment-input-new").value;
+    let comment = await checkField_4(gameName, sesionValue, "negativa", commentValue, "create_comment");
+    userReview = await checkField_2(gameName, sesionValue, "user_comment");
+    comments = await checkField_1(gameName, "get_comments");
+    positive = await checkField_1(gameName, "positive");
+    await setUpGameInfo();
+    await setUpComments();
 }
 
-async function editComment() {
-    console.log("Comentario editado: " + document.querySelector(".comment-input").value);
+async function saveComment() {
+    console.log("Comentario editado: " + document.querySelector("#comment-input").value);
+    let commentValue = document.querySelector("#comment-input").value;
+    let comment = await checkField_4(gameName, sesionValue, "positiva", commentValue, "update_comment");
+    userReview = await checkField_2(gameName, sesionValue, "user_comment");
+    comments = await checkField_1(gameName, "get_comments");
+    positive = await checkField_1(gameName, "positive");
+    await setUpGameInfo();
+    await setUpComments();
 }
 
 async function deleteComment() {
     console.log("Comentario borrado");
+    let comment = await checkField_2(gameName, sesionValue, "update_comment");
+    userReview = await checkField_2(gameName, sesionValue, "delete_comment");
+    comments = await checkField_1(gameName, "get_comments");
+    positive = await checkField_1(gameName, "positive");
+    await setUpGameInfo();
+    await setUpComments();
+}
+
+async function editComment() {
+    console.log("editar");
+    document.getElementById("comment-input").disabled = !document.getElementById("comment-input").disabled;
+    document.getElementById("save-comment-button").disabled = !document.getElementById("save-comment-button").disabled;
+    document.getElementById("delete-comment-button").disabled = !document.getElementById("delete-comment-button").disabled;
 }

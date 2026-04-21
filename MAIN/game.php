@@ -17,6 +17,10 @@
     }
 ?>
 
+<?php
+    
+?>
+
 <div id="error-section">
 </div>
 
