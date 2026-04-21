@@ -67,10 +67,10 @@ INSERT INTO IdiomasJuego (id_idioma_juego, id_juego, nombre_juego, id_idioma) VA
 -- ----------------------------
 -- Inserciones de Valoraciones (ID manual)
 -- ----------------------------
-INSERT INTO Valoraciones (id_valoracion, id_juego, nombre_juego, id_idioma_comentario, valoracion, comentario) VALUES
-(1, 1, 'Undertale', 'ES', 'negativa', 'No esta en español, me cago en ti TOBIFOOOOOX'),
-(2, 2, 'Hollow Knight: Silksong', 'EN', 'positiva', 'Increíble historia, gráficos impresionantes.'),
-(3, 3, 'Subnautica', 'ES', 'positiva', 'Diversión pura, un clásico moderno.');
+INSERT INTO Valoraciones (id_valoracion, nombre_juego, nickname, id_idioma_comentario, valoracion, comentario) VALUES
+(1, 'Undertale', 'PanoloPlay',  'ES', 'negativa', 'No esta en español, me cago en ti TOBIFOOOOOX'),
+(2, 'Hollow Knight: Silksong', 'PanoloPlay',  'EN', 'positiva', 'Increíble historia, gráficos impresionantes.'),
+(3, 'Subnautica', 'PanoloPlay', 'ES', 'positiva', 'Diversión pura, un clásico moderno.');
 
 -- ----------------------------
 -- Inserciones de Logros (ID manual)
