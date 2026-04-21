@@ -74,6 +74,8 @@ document.addEventListener('DOMContentLoaded', function () {
     function verificarJuegosVisibles() {
         const juegosVisibles = Array.from(gameCards).some(card => card.style.display !== 'none');
 
+        gameGrid.style.display = '';
+
         if (!juegosVisibles) {
             mostrarSinResultados();
         } else {
