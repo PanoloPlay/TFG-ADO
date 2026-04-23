@@ -7,6 +7,8 @@ var data;
 
 var gameName;
 
+var like = true;
+
 var game;
 var bought;
 var userReview;
@@ -227,24 +229,19 @@ async function getAllData() {
         window.location.href = './game.php?error=GameNotFound';
         return false;
     }
-    console.log(game);
 
     if (sesionValue != null) {
 
         bought = await checkField_2(gameName, sesionValue, "check_bought");
-        console.log(bought);
 
         if (bought != null) {
             userReview = await checkField_2(gameName, sesionValue, "user_comment");
-            console.log(userReview);
         }
     }
 
     comments = await checkField_1(gameName, "get_comments");
-    console.log(comments);
 
     positive = await checkField_1(gameName, "positive");
-    console.log(positive);
 
     return true;
 }
@@ -405,6 +402,28 @@ async function setUpComments() {
 
             userComments.appendChild(commentInput);
 
+            let likeButton = document.createElement("button");
+            likeButton.id = "like-button";
+
+            let likeSpan = document.createElement("span");
+            likeSpan.id = "likeDislike";
+            likeSpan.className = "material-symbols-outlined";
+
+            if (like) {
+                likeButton.className = "like";
+                likeSpan.textContent = "thumb_up";
+            }
+            else {
+                likeButton.className = "dislike";
+                likeSpan.textContent = "thumb_down";
+            }
+
+            likeButton.appendChild(likeSpan);
+
+            userComments.appendChild(likeButton);
+
+            likeButton.addEventListener("click", likeDislike);
+
             let submitButton = document.createElement("button");
             submitButton.id = "submit-comment-button";
             submitButton.textContent = "Enviar comentario";
@@ -429,6 +448,30 @@ async function setUpComments() {
             commentInput.disabled = true;
 
             userComments.appendChild(commentInput);
+
+            let likeButton = document.createElement("button");
+            likeButton.id = "like-button-new";
+
+            let likeSpan = document.createElement("span");
+            likeSpan.id = "likeDislike";
+            likeSpan.className = "material-symbols-outlined";
+
+            if (like) {
+                likeButton.className = "like";
+                likeSpan.textContent = "thumb_up";
+            }
+            else {
+                likeButton.className = "dislike";
+                likeSpan.textContent = "thumb_down";
+            }
+
+            likeButton.disabled = true;
+
+            likeButton.appendChild(likeSpan);
+
+            userComments.appendChild(likeButton);
+
+            likeButton.addEventListener("click", likeDislike);
 
             let editButton = document.createElement("button");
             editButton.id = "edit-comment-button";
@@ -499,7 +542,6 @@ async function setUpComments() {
 }
 
 async function buyGame() {
-    console.log("Comprar juego: " + game[0]['nombre_juego']);
     let buy_bought = await checkField_2(gameName, sesionValue, "buy_game");
     bought = await checkField_2(gameName, sesionValue, "check_bought");
     await setUpPurchaseSection();
@@ -507,9 +549,15 @@ async function buyGame() {
 }
 
 async function submitComment() {
-    console.log("Comentario enviado: " + document.querySelector("#comment-input-new").value);
+    let rating
+    if (like) {
+        rating = "positiva";
+    }
+    else {
+        rating = "negativa";
+    }
     let commentValue = document.querySelector("#comment-input-new").value;
-    let comment = await checkField_4(gameName, sesionValue, "negativa", commentValue, "create_comment");
+    let comment = await checkField_4(gameName, sesionValue, rating, commentValue, "create_comment");
     userReview = await checkField_2(gameName, sesionValue, "user_comment");
     comments = await checkField_1(gameName, "get_comments");
     positive = await checkField_1(gameName, "positive");
@@ -518,9 +566,15 @@ async function submitComment() {
 }
 
 async function saveComment() {
-    console.log("Comentario editado: " + document.querySelector("#comment-input").value);
+    let rating
+    if (like) {
+        rating = "positiva";
+    }
+    else {
+        rating = "negativa";
+    }
     let commentValue = document.querySelector("#comment-input").value;
-    let comment = await checkField_4(gameName, sesionValue, "positiva", commentValue, "update_comment");
+    let comment = await checkField_4(gameName, sesionValue, rating, commentValue, "update_comment");
     userReview = await checkField_2(gameName, sesionValue, "user_comment");
     comments = await checkField_1(gameName, "get_comments");
     positive = await checkField_1(gameName, "positive");
@@ -529,7 +583,6 @@ async function saveComment() {
 }
 
 async function deleteComment() {
-    console.log("Comentario borrado");
     let comment = await checkField_2(gameName, sesionValue, "update_comment");
     userReview = await checkField_2(gameName, sesionValue, "delete_comment");
     comments = await checkField_1(gameName, "get_comments");
@@ -539,8 +592,19 @@ async function deleteComment() {
 }
 
 async function editComment() {
-    console.log("editar");
     document.getElementById("comment-input").disabled = !document.getElementById("comment-input").disabled;
     document.getElementById("save-comment-button").disabled = !document.getElementById("save-comment-button").disabled;
     document.getElementById("delete-comment-button").disabled = !document.getElementById("delete-comment-button").disabled;
+    document.getElementById("like-button-new").disabled = !document.getElementById("like-button-new").disabled;
+}
+
+async function likeDislike() {
+    like = !like;
+    if (like) {
+        document.getElementById("likeDislike").textContent = "thumb_up";
+    }
+    else {
+        document.getElementById("likeDislike").textContent = "thumb_down";
+    }
+    
 }
