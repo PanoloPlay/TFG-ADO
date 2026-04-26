@@ -447,4 +447,141 @@ if (isset($_POST['action']) && $_POST['action'] === 'delete_comment') {
     echo json_encode("No data found!");
     exit();
 }
+
+if (isset($_POST['action']) && $_POST['action'] === 'add_wishlist') {
+
+    if (empty($_SESSION["nickname"])) {
+        echo json_encode("No data found!");
+        exit();
+    }
+
+    if (empty($_POST['value_1']) || empty($_POST['value_2'])) {
+        echo json_encode("No data found!");
+        exit();
+    }
+
+    if ($_SESSION["nickname"] != $_POST['value_2']) {
+        echo json_encode("No data found!");
+        exit();
+    }
+
+    $sql =
+    "SELECT
+        id_usuario,
+        nickname
+    FROM usuarios
+    WHERE nickname = :nick
+    ";
+
+    $stmt = $BBDD->prepare($sql);
+    $stmt->bindParam(":nick", $_POST['value_2']);
+    $stmt->execute();
+
+    if ($stmt->rowCount() != 1) {
+        echo json_encode("No data found!");
+        exit();
+    }
+
+    $user = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $sql =
+    "SELECT
+        id_juego,
+        nombre_juego
+    FROM juegos
+    WHERE nombre_juego = :nmJuego
+    ";
+
+    $stmt = $BBDD->prepare($sql);
+    $stmt->bindParam(":nmJuego", $_POST['value_1']);
+    $stmt->execute();
+
+    $game = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $idUser = $user[0]["id_usuario"];
+    $nickname = $_POST['value_2'];
+
+    $idGame = $game[0]["id_juego"];
+    $nameJuego = $_POST['value_1'];
+    
+    $stmt = $BBDD->prepare("INSERT INTO `listadeseos`(`id_usuario`, `nickname`, `id_juego`, `nombre_juego`) VALUES (:idUser,:nick,:idJuego,:nmJuego)");
+    
+    $stmt->bindParam(":idUser", $idUser);
+    $stmt->bindParam(":nick", $nickname);
+    $stmt->bindParam(":idJuego", $idGame);
+    $stmt->bindParam("nmJuego", $nameJuego);
+    $stmt->execute();
+
+    echo json_encode("No data found!");
+    exit();
+}
+
+if (isset($_POST['action']) && $_POST['action'] === 'remove_wishlist') {
+
+    if (empty($_SESSION["nickname"])) {
+        echo json_encode("No data found!");
+        exit();
+    }
+
+    if (empty($_POST['value_1']) || empty($_POST['value_2'])) {
+        echo json_encode("No data found!");
+        exit();
+    }
+
+    if ($_SESSION["nickname"] != $_POST['value_2']) {
+        echo json_encode("No data found!");
+        exit();
+    }
+
+    $nickname = $_POST['value_2'];
+
+    $nameJuego = $_POST['value_1'];
+    
+    $stmt = $BBDD->prepare("DELETE FROM `listadeseos` WHERE `nombre_juego`=:nmJuego AND `nickname`=:nick");
+    
+    $stmt->bindParam("nmJuego", $nameJuego);
+    $stmt->bindParam(":nick", $nickname);
+    
+    $stmt->execute();
+
+    echo json_encode("No data found!");
+    exit();
+}
+
+if (isset($_POST['action']) && $_POST['action'] === 'get_wishlist') {
+
+    if (empty($_SESSION["nickname"])) {
+        echo json_encode("No data found!");
+        exit();
+    }
+
+    if (empty($_POST['value_1']) || empty($_POST['value_2'])) {
+        echo json_encode("No data found!");
+        exit();
+    }
+
+    if ($_SESSION["nickname"] != $_POST['value_2']) {
+        echo json_encode("No data found!");
+        exit();
+    }
+
+    $nickname = $_POST['value_2'];
+
+    $nameJuego = $_POST['value_1'];
+    
+    $stmt = $BBDD->prepare("SELECT * FROM `listadeseos` WHERE `nombre_juego`=:nmJuego AND `nickname`=:nick");
+    
+    $stmt->bindParam("nmJuego", $nameJuego);
+    $stmt->bindParam(":nick", $nickname);
+    
+    $stmt->execute();
+
+    if ($stmt->rowCount() > 0) {
+        echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+        exit();
+    } else {
+        echo json_encode("No data found!");
+        exit();
+    }
+}
 ?>

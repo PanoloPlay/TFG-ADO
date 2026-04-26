@@ -3,7 +3,7 @@
 <?php require_once '../GENERAL/[html_START - head_START].php'; ?>
 
 <script src="../JS/checkIfXExists.js" defer></script>
-<script src="../JS/game.js" defer></script>
+<script src="../JS/wishlist.js" defer></script>
 
 <?php require_once '../GENERAL/[head_END - body_START - header - main_START].php'; ?>
 
@@ -18,26 +18,8 @@
     }
 ?>
 
-<?php
-    
-?>
-
-<div id="error-section">
-</div>
-
-<h1 id="big-game-title" class="game-title"></h1>
-<aside class="game-hero">
-    <p id="game-description"></p>
-    <p id="game-developer"></p>
-    <p id="game-release-date"></p>
-    <p id="game-rating" class="game-rating_X"></p>
-</aside>
-
-<div id="purchase-section">
-</div>
-
-<div id="comment-section">
-</div>
+<h6>Mi lista de deseos</h6>
+<p id="count-wishgames"></p>
 
 <?php require_once '../GENERAL/[main_END - footer].php'; ?>
 

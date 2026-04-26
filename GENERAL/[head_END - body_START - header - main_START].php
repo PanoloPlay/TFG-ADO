@@ -32,26 +32,26 @@
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item d-flex align-items-center gap-2" href="../MAIN/new_releases.php">
+                                <a class="dropdown-item d-flex align-items-center gap-2" href="../MAIN/shop-new.php">
                                     <span class="material-symbols-outlined">new_releases</span>
                                     Últimos lanzamientos
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item d-flex align-items-center gap-2" href="../MAIN/categories.php">
+                                <a class="dropdown-item d-flex align-items-center gap-2" href="../MAIN/shop-category.php">
                                     <span class="material-symbols-outlined">shoppingmode</span>
                                     Categorías
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item d-flex align-items-center gap-2" href="../MAIN/offers.php">
+                                <a class="dropdown-item d-flex align-items-center gap-2" href="../MAIN/shop-offers.php">
                                     <span class="material-symbols-outlined">percent_discount</span>
                                     Ofertas
                                 </a>
                             </li>
                         </ul>
                     </div>
-                    <a href="../s">Soporte</a>
+                    <a href="../MAIN/support.php">Soporte</a>
                 </nav>
 
                 <div class="site-actions">
