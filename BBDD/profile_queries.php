@@ -247,6 +247,29 @@ function getAllLibraryGames(PDO $BBDD, int $idUsuario, string $nickname): array
     return $query->fetchAll(PDO::FETCH_ASSOC);
 }
 
+// Query que obtiene todos los juegos de la lista de deseos de un usuario
+function getAllWishlistGames(PDO $BBDD, int $idUsuario, string $nickname): array
+{
+    $query = $BBDD->prepare("
+        SELECT
+            J.id_juego,
+            J.nombre_juego,
+            J.desarrollador,
+            J.fecha_publicacion,
+            J.precio,
+            J.descuento
+        FROM ListaDeseos L
+        INNER JOIN Juegos J
+            ON L.id_juego = J.id_juego
+           AND L.nombre_juego = J.nombre_juego
+        WHERE L.id_usuario = ? AND L.nickname = ?
+        ORDER BY J.fecha_publicacion DESC
+    ");
+    $query->execute([$idUsuario, $nickname]);
+
+    return $query->fetchAll(PDO::FETCH_ASSOC);
+}
+
 // Query que obtiene todas las categorías disponibles
 function getAllCategories(PDO $BBDD): array
 {
