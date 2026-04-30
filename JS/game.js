@@ -5,12 +5,17 @@ var gameName;
 
 var like = true;
 
+var userLanguages;
+
 var game;
 var bought;
 var userReview;
 var comments;
 var positive;
 var wishlist;
+var categories;
+
+var commentFilterMode = 0;
 
 $(window).on("load", async function() {
     if (await getAllData()) {
@@ -74,6 +79,10 @@ async function getAllData() {
 
     wishlist = await checkField_2(gameName, sesionValue, "get_wishlist", "../AJAX/gameData.php");
 
+    userLanguages = await checkField_2(gameName, sesionValue, "get_languages", "../AJAX/gameData.php");
+
+    categories = await checkField_1(gameName, "get_game_categories", "../AJAX/gameData.php");
+
     return true;
 }
 
@@ -85,11 +94,29 @@ async function setUp() {
     let date = new Date(game[0]['fecha_publicacion']);
     document.getElementById("game-release-date").textContent = "Fecha de publicación: " + date.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
 
+    setUpGameCategories();
+
     setUpGameInfo();
     setUpPurchaseSection();
     setUpComments();
 }
 
+async function setUpGameCategories() {
+
+    let categorySection = document.getElementById("game-categories");
+    categorySection.innerHTML = "";
+
+    for (let pos = 0; pos < categories.length; pos++) {
+
+        let categoryButton = document.createElement("button");
+        categoryButton.className = "category-button"
+        categoryButton.textContent = categories[pos]["categoria"];
+
+        categoryButton.addEventListener("click", goToShopFilterByCategory);
+        
+        categorySection.appendChild(categoryButton);
+    }
+}
 async function setUpGameInfo() {
     
     if (comments == null) {
@@ -138,7 +165,7 @@ async function setUpGameInfo() {
     }
 }
 
-function setUpPurchaseSection() {
+async function setUpPurchaseSection() {
 
     let purchaseSection = document.getElementById("purchase-section");
     purchaseSection.innerHTML = "";
@@ -162,7 +189,7 @@ function setUpPurchaseSection() {
         downloadButton.textContent = "Descargar";
 
         downloadButton.addEventListener("click", function() {
-            window.location.href = './game.php?error=changeURLInLine165';
+            window.location.href = './game.php?error=changeURLInLine192';
         });
 
         purchaseSection.appendChild(downloadButton);
@@ -178,7 +205,7 @@ function setUpPurchaseSection() {
         let price = document.createElement("div");
         price.className = "game-price";
 
-        if (game[0]['descuento'] == 0) {
+        if (game[0]['descuento'] == 0 || game[0]['descuento'] == null) {
             
             price.textContent = game[0]['precio'] + "€";
         }
@@ -365,7 +392,52 @@ async function setUpComments() {
         commentsSection.appendChild(noComments);
     }
     else {
+
+        let filterButton = document.createElement("button");
+        filterButton.id = "filter-comment-button";
+
+        if (commentFilterMode == 0) {
+            filterButton.textContent = "Filtro: Todos los comentarios";
+        }
+        else if (commentFilterMode == 1) {
+            filterButton.textContent = "Filtro: Comentarios de tu idioma";
+        }
+        else if (commentFilterMode == 2) {
+            filterButton.textContent = "Filtro: Comentarios positivos de tu idioma";
+        }
+        else if (commentFilterMode == 3) {
+            filterButton.textContent = "Filtro: Comentarios negativos de tu idioma";
+        }
+        else if (commentFilterMode == 4) {
+            filterButton.textContent = "Filtro: Comentarios positivos";
+        }
+        else if (commentFilterMode == 5) {
+            filterButton.textContent = "Filtro: Comentarios negativos";
+        }
+
+        filterButton.addEventListener("click", filterComments);
+
+        commentsSection.appendChild(filterButton);
+
         for (let i = 0; i < comments.length; i++) {
+
+            if (userLanguages != null) {
+                if (commentFilterMode == 1 && (userLanguages[0]['id_idioma_principal'] != comments[i]['id_idioma_comentario'] && userLanguages[0]['id_idioma_secundario'] != comments[i]['id_idioma_comentario'])) {
+                    continue;
+                }
+                else if (commentFilterMode == 2 && ((userLanguages[0]['id_idioma_principal'] != comments[i]['id_idioma_comentario'] && userLanguages[0]['id_idioma_secundario'] != comments[i]['id_idioma_comentario']) || comments[i]['valoracion'] == "negativa")) {
+                    continue;
+                }
+                else if (commentFilterMode == 3 && ((userLanguages[0]['id_idioma_principal'] != comments[i]['id_idioma_comentario'] && userLanguages[0]['id_idioma_secundario'] != comments[i]['id_idioma_comentario']) || comments[i]['valoracion'] == "positiva")) {
+                    continue;
+                }
+                else if (commentFilterMode == 4 && (comments[i]['valoracion'] == "negativa")) {
+                    continue;
+                }
+                else if (commentFilterMode == 5 && (comments[i]['valoracion'] == "positiva")) {
+                    continue;
+                }
+            }
 
             let comment = document.createElement("div");
             comment.className = "comment";
@@ -375,6 +447,12 @@ async function setUpComments() {
             commentUser.textContent = comments[i]['nickname'];
 
             comment.appendChild(commentUser);
+
+            let commentFecha = document.createElement("p");
+            commentFecha.className = "comment-user";
+            commentFecha.textContent = "Fecha publicación: " + comments[i]['fechaPublicacion'];
+
+            comment.appendChild(commentFecha);
 
             let commentRating = document.createElement("p");
             commentRating.className = "comment-rating";
@@ -477,4 +555,36 @@ async function removeToWishlist() {
     let comment = await checkField_2(gameName, sesionValue, "remove_wishlist", "../AJAX/gameData.php");
     wishlist = await checkField_2(gameName, sesionValue, "get_wishlist", "../AJAX/gameData.php");
     await setUpPurchaseSection();
+}
+
+async function filterComments() {
+    
+
+    if (commentFilterMode < 0 || commentFilterMode >= 5) {
+
+        await (commentFilterMode = 0);
+    }
+    else {
+        if (sesionValue == null && commentFilterMode < 4) {
+            await (commentFilterMode = 4);
+        } 
+        else {
+            await (commentFilterMode++);
+        }
+    }
+    await setUpComments();
+}
+
+async function pauseVideoIfPlaying() {
+    
+    let videos = await document.getElementsByClassName("video-carousel");
+    for (let pos = 0; pos < videos.length; pos++) {
+
+        videos[pos].pause();
+    }
+}
+
+async function goToShopFilterByCategory() {
+
+    window.location.href = './game.php?error=changeURLInLine585';
 }

@@ -133,7 +133,8 @@ if (isset($_POST['action']) && $_POST['action'] === 'get_comments') {
         nombre_juego,
         id_idioma_comentario,
         valoracion,
-        comentario
+        comentario,
+        fechaPublicacion
     FROM Valoraciones
     WHERE 
         nombre_juego = ?
@@ -175,6 +176,69 @@ if (isset($_POST['action']) && $_POST['action'] === 'positive') {
 
     $stmt = $BBDD->prepare($sql);
     $stmt->bindValue(1, $_POST['value_1']);
+    $stmt->execute();
+
+    if ($stmt->rowCount() > 0) {
+        echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+        exit();
+    } else {
+        echo json_encode("No data found!");
+        exit();
+    }
+}
+
+if (isset($_POST['action']) && $_POST['action'] === 'negative') {
+
+    if (empty($_POST['value_1'])) {
+        echo json_encode("No data found!");
+        exit();
+    }
+
+    $sql = 
+    "SELECT
+        nickname,
+        nombre_juego,
+        id_idioma_comentario,
+        valoracion,
+        comentario
+    FROM Valoraciones
+    WHERE 
+        nombre_juego = ?
+        AND valoracion = 'negativa'
+    ";
+
+    $stmt = $BBDD->prepare($sql);
+    $stmt->bindValue(1, $_POST['value_1']);
+    $stmt->execute();
+
+    if ($stmt->rowCount() > 0) {
+        echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+        exit();
+    } else {
+        echo json_encode("No data found!");
+        exit();
+    }
+}
+
+if (isset($_POST['action']) && $_POST['action'] === 'get_languages') {
+
+    if (empty($_SESSION["nickname"])) {
+        echo json_encode("No data found!");
+        exit();
+    }
+
+    if (empty($_POST['value_1']) || empty($_POST['value_2'])) {
+        echo json_encode("No data found!");
+        exit();
+    }
+
+    if ($_SESSION["nickname"] != $_POST['value_2']) {
+        echo json_encode("No data found!");
+        exit();
+    }
+
+    $stmt = $BBDD->prepare("SELECT `nickname`, `id_idioma_principal`, `id_idioma_secundario` FROM `usuarios` WHERE `nickname` = :nick");
+    $stmt->bindValue(":nick", $_POST['value_2']);
     $stmt->execute();
 
     if ($stmt->rowCount() > 0) {
@@ -324,12 +388,15 @@ if (isset($_POST['action']) && $_POST['action'] === 'create_comment') {
 
         $rating = $_POST['value_3'];
 
-        $stmt = $BBDD->prepare("INSERT INTO `valoraciones`(`nombre_juego`, `nickname`, `id_idioma_comentario`, `valoracion`, `comentario`) VALUES (:nmJuego, :nick, :idMainLanguage, :rating, :comment)");
+        $currentTime = date('Y-m-d H:i:s');
+
+        $stmt = $BBDD->prepare("INSERT INTO `valoraciones`(`nombre_juego`, `nickname`, `id_idioma_comentario`, `valoracion`, `comentario`, `fechaPublicacion`) VALUES (:nmJuego, :nick, :idMainLanguage, :rating, :comment, :currentTime)");
         $stmt->bindParam(":nmJuego", $nameJuego);
         $stmt->bindParam(":nick", $nickname);
         $stmt->bindParam(":idMainLanguage", $idUserMainLanguage);
         $stmt->bindParam(":rating", $rating);
         $stmt->bindParam(":comment", $comment);
+        $stmt->bindParam(":currentTime", $currentTime);
         $stmt->execute();
     }
 
@@ -573,6 +640,30 @@ if (isset($_POST['action']) && $_POST['action'] === 'get_wishlist') {
     
     $stmt->bindParam("nmJuego", $nameJuego);
     $stmt->bindParam(":nick", $nickname);
+    
+    $stmt->execute();
+
+    if ($stmt->rowCount() > 0) {
+        echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+        exit();
+    } else {
+        echo json_encode("No data found!");
+        exit();
+    }
+}
+
+if (isset($_POST['action']) && $_POST['action'] === 'get_game_categories') {
+
+    if (empty($_POST['value_1'])) {
+        echo json_encode("No data found!");
+        exit();
+    }
+
+    $nameJuego = $_POST['value_1'];
+    
+    $stmt = $BBDD->prepare("SELECT `categoria` FROM `categorias_juego` WHERE `nombre_juego`=:nmJuego");
+    
+    $stmt->bindParam("nmJuego", $nameJuego);
     
     $stmt->execute();
 
