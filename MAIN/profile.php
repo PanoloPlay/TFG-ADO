@@ -1,6 +1,5 @@
 <?php require_once '../GENERAL/[General_REQUIRES].php'; ?>
 <?php
-require_once '../GENERAL/avatar_helpers.php';
 require_once "../BBDD/profile_queries.php";
 
 $idSesion = (int)($_SESSION['id_usuario'] ?? 0);
@@ -69,7 +68,7 @@ if (!$perfilNoEncontrado && $usuario) {
 
 <?php require_once '../GENERAL/[html_START - head_START].php'; ?>
 
-<link rel="stylesheet" href="../CSS/auth.css">
+
 <link rel="stylesheet" href="../CSS/profile.css">
 
 <?php require_once '../GENERAL/[head_END - body_START - header - main_START].php'; ?>

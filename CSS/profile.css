@@ -1,9 +1,4 @@
-.site-body {
-    background:
-        radial-gradient(circle at top, rgba(59, 158, 255, 0.12), transparent 34%),
-        linear-gradient(180deg, var(--color-greyneutral-1), var(--color-greyneutral-2));
-    color: var(--color-slate-12);
-}
+
 
 .profile-topbar {
     position: sticky;

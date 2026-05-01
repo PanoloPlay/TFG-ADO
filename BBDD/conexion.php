@@ -9,12 +9,12 @@
     // cambiar al suvir a AWS, el usuatrio y contraseña de la base de datos
     $BBDD_User = "root";
     $BBDD_Password = "";
-    $DNS = "mysql:dbname=$BBDD_Name;host=$BBDD_Host";
+    $DNS = "mysql:dbname=$BBDD_Name;host=$BBDD_Host;charset=utf8mb4";
         
     try {
             
         $BBDD = new PDO($DNS, $BBDD_User, $BBDD_Password);
-        $BBDD->exec("SET NAMES utf8mb4");
+        $BBDD->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     } 
     catch (PDOException) {
             

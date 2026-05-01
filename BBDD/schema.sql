@@ -89,6 +89,7 @@ CREATE TABLE Valoraciones (
   id_idioma_comentario CHAR(4) NOT NULL,
   valoracion ENUM('positiva', 'negativa') NOT NULL,
   comentario VARCHAR(500),
+  fechaPublicacion datetime NOT NULL,
   PRIMARY KEY (id_valoracion),
   INDEX (id_idioma_comentario),
   INDEX (nombre_juego),

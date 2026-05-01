@@ -1,5 +1,4 @@
 <?php
-require_once "../BBDD/conexion.php";
 
 function getIdiomas() {
     global $BBDD;

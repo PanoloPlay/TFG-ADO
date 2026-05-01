@@ -2,11 +2,12 @@
     position: sticky;
     top: 0;
     z-index: 40;
+    width: 100%;
     border-bottom: 1px solid var(--color-greyneutral-7);
-    background: rgba(6, 10, 14, 0.92);
+    background: var(--color-greyneutral-1);
     backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
 }
-
 .site-header__inner {
     width: min(1280px, calc(100% - 32px));
     margin: 0 auto;
@@ -123,16 +124,192 @@
 .chip-soft {
     background: linear-gradient(180deg, var(--color-greyneutral-4), var(--color-greyneutral-5));
 }
+/* ------[Estilo input y select]-------*/
+input[type="text"],
+input[type="search"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="date"],
+textarea,
+select {
+    width: 100%;
+    padding: 11px 14px;
+    border-radius: 4px;
+    border: 1px solid var(--color-greyneutral-7);
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--color-slate-12);
+    font: inherit;
+    outline: none;
+    transition: border-color .15s ease, background .15s ease, box-shadow .15s ease;
+    box-sizing: border-box;
+}
 
-/* html, body {
-    margin: 10px; 
-    height: calc(100% - 10px);
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: transparent transparent;
-} */
-/* Ajustes para la barra de desplazamiento (scrollbar) */
+input::placeholder,
+textarea::placeholder {
+    color: var(--color-greyneutral-10);
+}
 
+input:hover,
+textarea:hover,
+select:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--color-greyneutral-8);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: rgba(26, 159, 255, 0.55);
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 0 0 3px rgba(26, 159, 255, 0.12);
+}
+
+/* Textarea */
+textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+/* Select */
+select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding-right: 42px;
+    background-image:
+        linear-gradient(45deg, transparent 50%, var(--color-greyneutral-11) 50%),
+        linear-gradient(135deg, var(--color-greyneutral-11) 50%, transparent 50%);
+    background-position:
+        calc(100% - 18px) calc(50% - 3px),
+        calc(100% - 12px) calc(50% - 3px);
+    background-size: 6px 6px, 6px 6px;
+    background-repeat: no-repeat;
+}
+
+/* Opciones del select */
+select option {
+    background: var(--color-greyneutral-2);
+    color: var(--color-slate-12);
+}
+
+/* Disabled */
+input:disabled,
+textarea:disabled,
+select:disabled {
+    opacity: .55;
+    cursor: not-allowed;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+/* Contenedor opcional */
+.form-field {
+    display: grid;
+    gap: 8px;
+}
+
+.form-field label {
+    color: var(--color-greyneutral-12);
+    font-size: .92rem;
+}
+/* ------[Estilo checkbox]-------*/
+.checkbox-filter {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--color-greyneutral-7);
+    color: var(--color-slate-12);
+    cursor: pointer;
+    user-select: none;
+    transition: background .15s ease, border-color .15s ease, transform .15s ease;
+    font-size: .9rem;
+}
+
+/* ocultamos checkbox nativo */
+.checkbox-filter input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    border: 1px solid var(--color-greyneutral-8);
+    background: var(--color-greyneutral-4);
+    display: grid;
+    place-content: center;
+    cursor: pointer;
+    transition: all .15s ease;
+}
+
+/* check interno */
+.checkbox-filter input[type="checkbox"]::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    transform: scale(0);
+    transition: transform .12s ease;
+    background: var(--color-blue-9);
+    border-radius: 2px;
+}
+
+/* estado activo */
+.checkbox-filter input[type="checkbox"]:checked {
+    border-color: var(--color-blue-9);
+    background: rgba(59, 158, 255, 0.15);
+}
+
+.checkbox-filter input[type="checkbox"]:checked::before {
+    transform: scale(1);
+}
+
+/* hover general */
+.checkbox-filter:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--color-greyneutral-8);
+    transform: translateY(-1px);
+}
+
+/* texto */
+.checkbox-filter span {
+    color: var(--color-slate-12);
+}
+
+/* estado activo del label */
+.checkbox-filter:has(input:checked) {
+    border-color: rgba(59, 158, 255, 0.35);
+    background: rgba(59, 158, 255, 0.08);
+}
+/* Ajustes para la barra de desplazamiento (scrollbar)  y tamaño web*/
+
+html, body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+}
+
+.site-body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+
+    color: var(--color-slate-12);
+
+    background-color: var(--color-greyneutral-1);
+    background-image:
+        radial-gradient(circle at top, rgba(59, 158, 255, 0.12), transparent 40%),
+        linear-gradient(180deg, var(--color-greyneutral-1), var(--color-greyneutral-2));
+
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+}
+/* Para que se ajuste bien */
+main, .site-main, .site-main__shell {
+    flex: 1 0 auto;
+    min-height: auto;
+}
 
 /* Scrollbar */
 html::-webkit-scrollbar,
