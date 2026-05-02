@@ -35,13 +35,18 @@ if (!function_exists('getProfileAvatarData')) {
                 $rutaFs = $baseFs . $nombre . '.' . $ext;
 
                 if (is_file($rutaFs)) {
-                    $data['avatarPath'] = $webBase . rawurlencode($nombre) . '.' . $ext;
+                    clearstatcache(true, $rutaFs);
+                    $version = @filemtime($rutaFs) ?: time();
+
+                    $data['avatarPath'] = $webBase . rawurlencode($nombre) . '.' . $ext . '?v=' . $version;
                     $data['avatarClass'] = 'avatar-0';
                     return $data;
                 }
             }
         }
 
+        $data['avatarClass'] = $avatarClass;
         return $data;
     }
 }
+?>

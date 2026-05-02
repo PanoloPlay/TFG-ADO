@@ -3,8 +3,6 @@
     <!-- Inicio de la sección del cuerpo del documento HTML -->
     <body class="site-body">
 
-        <?php require_once '../GENERAL/avatar_helpers.php'; ?>
-
         <!-- Encabezado del sitio web -->
         <header class="site-header">
             <div class="site-header__inner">

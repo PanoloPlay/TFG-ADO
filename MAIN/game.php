@@ -2,6 +2,8 @@
 
 <?php require_once '../GENERAL/[html_START - head_START].php'; ?>
 
+<link rel="stylesheet" href="../CSS/game.css">
+
 <script src="../JS/checkIfXExists.js" defer></script>
 <script src="../JS/game.js" defer></script>
 
