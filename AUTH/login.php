@@ -37,6 +37,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="../CSS/index.css">
     <link rel="stylesheet" href="../CSS/auth.css">
 
+    <style>
+        html {
+            
+        }
+    </style>
+
 <?php require_once '../GENERAL/[head_END - body_START - header - main_START].php'; ?>
 
         <section class="auth-card">

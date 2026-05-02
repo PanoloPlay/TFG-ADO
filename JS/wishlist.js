@@ -1,5 +1,5 @@
-var sesionValue;
+var userNickname;
 
 async function getAllData() {
-    sesionValue = $("#hdnSession").data('value');
+    userNickname = $("#hdnSession").data('value');
 }

@@ -1,5 +1,5 @@
 let params = new URLSearchParams(document.location.search);
-var sesionValue;
+var userNickname;
 
 var gameName;
 
@@ -25,8 +25,8 @@ $(window).on("load", async function() {
 
 
 async function getAllData() {
-    sesionValue = $("#hdnSession").data('value');
-    gameName = params.get("nameGame");
+    userNickname = $("#hdnSession").data('value');
+    gameName = params.get("name");
 
     if (gameName != null) {
 
@@ -64,12 +64,12 @@ async function getAllData() {
         return false;
     }
 
-    if (sesionValue != null) {
+    if (userNickname != null) {
 
-        bought = await checkField_2(gameName, sesionValue, "check_bought", "../AJAX/gameData.php");
+        bought = await checkField_2(gameName, userNickname, "check_bought", "../AJAX/gameData.php");
 
         if (bought != null) {
-            userReview = await checkField_2(gameName, sesionValue, "user_comment", "../AJAX/gameData.php");
+            userReview = await checkField_2(gameName, userNickname, "user_comment", "../AJAX/gameData.php");
         }
     }
 
@@ -77,9 +77,9 @@ async function getAllData() {
 
     positive = await checkField_1(gameName, "positive", "../AJAX/gameData.php");
 
-    wishlist = await checkField_2(gameName, sesionValue, "get_wishlist", "../AJAX/gameData.php");
+    wishlist = await checkField_2(gameName, userNickname, "get_wishlist", "../AJAX/gameData.php");
 
-    userLanguages = await checkField_2(gameName, sesionValue, "get_languages", "../AJAX/gameData.php");
+    userLanguages = await checkField_2(gameName, userNickname, "get_languages", "../AJAX/gameData.php");
 
     categories = await checkField_1(gameName, "get_game_categories", "../AJAX/gameData.php");
 
@@ -189,7 +189,7 @@ async function setUpPurchaseSection() {
         downloadButton.textContent = "Descargar";
 
         downloadButton.addEventListener("click", function() {
-            window.location.href = './game.php?error=changeURLInLine192';
+            window.location.href = './libraryGame.php?name=' + gameName.replaceAll(" ", "_");
         });
 
         purchaseSection.appendChild(downloadButton);
@@ -472,12 +472,12 @@ async function setUpComments() {
 }
 
 async function buyGame() {
-    let buy_bought = await checkField_2(gameName, sesionValue, "buy_game", "../AJAX/gameData.php");
-    bought = await checkField_2(gameName, sesionValue, "check_bought", "../AJAX/gameData.php");
+    let buy_bought = await checkField_2(gameName, userNickname, "buy_game", "../AJAX/gameData.php");
+    bought = await checkField_2(gameName, userNickname, "check_bought", "../AJAX/gameData.php");
     if (bought) {
         if (wishlist) {
-            let comment = await checkField_2(gameName, sesionValue, "remove_wishlist", "../AJAX/gameData.php");
-            wishlist = await checkField_2(gameName, sesionValue, "get_wishlist", "../AJAX/gameData.php");
+            let comment = await checkField_2(gameName, userNickname, "remove_wishlist", "../AJAX/gameData.php");
+            wishlist = await checkField_2(gameName, userNickname, "get_wishlist", "../AJAX/gameData.php");
         }
     }
     await setUpPurchaseSection();
@@ -493,8 +493,8 @@ async function submitComment() {
         rating = "negativa";
     }
     let commentValue = document.querySelector("#comment-input-new").value;
-    let comment = await checkField_4(gameName, sesionValue, rating, commentValue, "create_comment", "../AJAX/gameData.php");
-    userReview = await checkField_2(gameName, sesionValue, "user_comment", "../AJAX/gameData.php");
+    let comment = await checkField_4(gameName, userNickname, rating, commentValue, "create_comment", "../AJAX/gameData.php");
+    userReview = await checkField_2(gameName, userNickname, "user_comment", "../AJAX/gameData.php");
     comments = await checkField_1(gameName, "get_comments", "../AJAX/gameData.php");
     positive = await checkField_1(gameName, "positive", "../AJAX/gameData.php");
     await setUpGameInfo();
@@ -510,8 +510,8 @@ async function saveComment() {
         rating = "negativa";
     }
     let commentValue = document.querySelector("#comment-input").value;
-    let comment = await checkField_4(gameName, sesionValue, rating, commentValue, "update_comment", "../AJAX/gameData.php");
-    userReview = await checkField_2(gameName, sesionValue, "user_comment", "../AJAX/gameData.php");
+    let comment = await checkField_4(gameName, userNickname, rating, commentValue, "update_comment", "../AJAX/gameData.php");
+    userReview = await checkField_2(gameName, userNickname, "user_comment", "../AJAX/gameData.php");
     comments = await checkField_1(gameName, "get_comments", "../AJAX/gameData.php");
     positive = await checkField_1(gameName, "positive", "../AJAX/gameData.php");
     await setUpGameInfo();
@@ -519,8 +519,8 @@ async function saveComment() {
 }
 
 async function deleteComment() {
-    let comment = await checkField_2(gameName, sesionValue, "update_comment", "../AJAX/gameData.php");
-    userReview = await checkField_2(gameName, sesionValue, "delete_comment", "../AJAX/gameData.php");
+    let comment = await checkField_2(gameName, userNickname, "update_comment", "../AJAX/gameData.php");
+    userReview = await checkField_2(gameName, userNickname, "delete_comment", "../AJAX/gameData.php");
     comments = await checkField_1(gameName, "get_comments", "../AJAX/gameData.php");
     positive = await checkField_1(gameName, "positive", "../AJAX/gameData.php");
     await setUpGameInfo();
@@ -546,14 +546,14 @@ async function likeDislike() {
 }
 
 async function addToWishlist() {
-    let comment = await checkField_2(gameName, sesionValue, "add_wishlist", "../AJAX/gameData.php");
-    wishlist = await checkField_2(gameName, sesionValue, "get_wishlist", "../AJAX/gameData.php");
+    let comment = await checkField_2(gameName, userNickname, "add_wishlist", "../AJAX/gameData.php");
+    wishlist = await checkField_2(gameName, userNickname, "get_wishlist", "../AJAX/gameData.php");
     await setUpPurchaseSection();
 }
 
 async function removeToWishlist() {
-    let comment = await checkField_2(gameName, sesionValue, "remove_wishlist", "../AJAX/gameData.php");
-    wishlist = await checkField_2(gameName, sesionValue, "get_wishlist", "../AJAX/gameData.php");
+    let comment = await checkField_2(gameName, userNickname, "remove_wishlist", "../AJAX/gameData.php");
+    wishlist = await checkField_2(gameName, userNickname, "get_wishlist", "../AJAX/gameData.php");
     await setUpPurchaseSection();
 }
 
@@ -565,7 +565,7 @@ async function filterComments() {
         await (commentFilterMode = 0);
     }
     else {
-        if (sesionValue == null && commentFilterMode < 4) {
+        if (userNickname == null && commentFilterMode < 4) {
             await (commentFilterMode = 4);
         } 
         else {

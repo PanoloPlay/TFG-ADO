@@ -34,11 +34,11 @@
 <div id="carouselExampleIndicators" class="carousel slide w-50">
     <div id="carousel-container" class="carousel-inner">
         <?php
-        if (isset($_GET["nameGame"])) {
+        if (isset($_GET["name"])) {
 
             $active = true;
             $exists = false;
-            $gameName = $_GET["nameGame"];
+            $gameName = $_GET["name"];
             $gameName = str_replace(".", "", $gameName);
             $gameName = str_replace(",", "", $gameName);
             $gameName = str_replace(":", "", $gameName);
