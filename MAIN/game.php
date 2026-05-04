@@ -48,7 +48,7 @@
 
             $gameName = trim($gameName);
 
-            $path = "../VIDEO/" . $gameName . "/*";
+            $path = "../VIDEO/" . $gameName . "/*.*";
             $array = glob($path);
 
             foreach ($array as $value) {
@@ -75,7 +75,7 @@
                 <?php
             }
 
-            $path = "../IMG/juegos/" . $gameName . "/*";
+            $path = "../IMG/juegos/" . $gameName . "/*.*";
             $array = glob($path);
 
             foreach ($array as $value) {
