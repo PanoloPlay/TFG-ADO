@@ -35,9 +35,9 @@ include_once '../GENERAL/auth_guard.php';
         <div id="library-main-body">
             <div id="library-main-all-games">
             </div>
-            <div id="library-main-achievements-recent">
-            </div>
             <div id="library-main-achievements-all">
+            </div>
+            <div id="library-main-achievements-recent">
             </div>
         </div>
     </div>
