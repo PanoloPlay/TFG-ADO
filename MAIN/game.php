@@ -40,6 +40,7 @@
 
             $active = true;
             $exists = false;
+
             $gameName = $_GET["name"];
             $gameName = str_replace(".", "", $gameName);
             $gameName = str_replace(",", "", $gameName);
@@ -111,8 +112,16 @@
                 </button>
                 <?php
             }
+            else {
+                ?>
+                <div class="carousel-item active">
+                    <img src="../IMG/juegos/gamePlaceholderIMG_Large.png" class="d-block w-100" alt="...">
+                </div>
+                <?php
+            }
         }
         ?>
+    </div>
 </div>
 
 <div id="purchase-section">

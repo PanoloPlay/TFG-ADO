@@ -15,6 +15,9 @@ var positive;
 var wishlist;
 var categories;
 
+var commentsSorted;
+var isFiltered = 0;
+
 var commentFilterMode = 0;
 
 $(window).on("load", async function() {
@@ -22,6 +25,16 @@ $(window).on("load", async function() {
         await setUp();
     }
 });
+
+async function orderByDateAsc() {
+    await (commentsSorted = await commentsSorted.sort((a, b) => a.fechaPublicacion.localeCompare(b.fechaPublicacion)));
+    await setUpComments();
+}
+
+async function orderByDateDesc() {
+    await (commentsSorted = await commentsSorted.sort((a, b) => b.fechaPublicacion.localeCompare(a.fechaPublicacion)));
+    await setUpComments();
+}
 
 
 async function getAllData() {
@@ -75,6 +88,8 @@ async function getAllData() {
 
     comments = await checkField_1(gameName, "get_comments", "../AJAX/gameData.php");
 
+    commentsSorted = await checkField_1(gameName, "get_comments", "../AJAX/gameData.php");
+
     positive = await checkField_1(gameName, "positive", "../AJAX/gameData.php");
 
     wishlist = await checkField_2(gameName, userNickname, "get_wishlist", "../AJAX/gameData.php");
@@ -117,6 +132,7 @@ async function setUpGameCategories() {
         categorySection.appendChild(categoryButton);
     }
 }
+
 async function setUpGameInfo() {
     
     if (comments == null) {
@@ -383,7 +399,7 @@ async function setUpComments() {
 
     }
 
-    if (comments == null) {
+    if (commentsSorted == null) {
 
         let noComments = document.createElement("div");
         noComments.className = "no-comments";
@@ -392,49 +408,89 @@ async function setUpComments() {
         commentsSection.appendChild(noComments);
     }
     else {
+        if (userNickname != null && userNickname != "") {
 
-        let filterButton = document.createElement("button");
-        filterButton.id = "filter-comment-button";
+            let filterButtonAll = document.createElement("button");
+            filterButtonAll.id = 0;
+            filterButtonAll.className = "filter-button";
+            filterButtonAll.textContent = "Filtro: Todos los comentarios";
+            filterButtonAll.addEventListener("click", filterComments);
 
-        if (commentFilterMode == 0) {
-            filterButton.textContent = "Filtro: Todos los comentarios";
-        }
-        else if (commentFilterMode == 1) {
-            filterButton.textContent = "Filtro: Comentarios de tu idioma";
-        }
-        else if (commentFilterMode == 2) {
-            filterButton.textContent = "Filtro: Comentarios positivos de tu idioma";
-        }
-        else if (commentFilterMode == 3) {
-            filterButton.textContent = "Filtro: Comentarios negativos de tu idioma";
-        }
-        else if (commentFilterMode == 4) {
-            filterButton.textContent = "Filtro: Comentarios positivos";
-        }
-        else if (commentFilterMode == 5) {
-            filterButton.textContent = "Filtro: Comentarios negativos";
+            commentsSection.appendChild(filterButtonAll);
+
+            let filterButtonLanguage = document.createElement("button");
+            filterButtonLanguage.id = 1;
+            filterButtonLanguage.className = "filter-button";
+            filterButtonLanguage.textContent = "Filtro: Comentarios de tu idioma";
+            filterButtonLanguage.addEventListener("click", filterComments);
+
+            commentsSection.appendChild(filterButtonLanguage);
+
+            let filterButtonPositive = document.createElement("button");
+            filterButtonPositive.id = 2;
+            filterButtonPositive.className = "filter-button";
+            filterButtonPositive.textContent = "Filtro: Comentarios positivos de tu idioma";
+            filterButtonPositive.addEventListener("click", filterComments);
+
+            commentsSection.appendChild(filterButtonPositive);
+
+            let filterButtonNegative = document.createElement("button");
+            filterButtonNegative.id = 3;
+            filterButtonNegative.className = "filter-button";
+            filterButtonNegative.textContent = "Filtro: Comentarios negativos de tu idioma";
+            filterButtonNegative.addEventListener("click", filterComments);
+
+            commentsSection.appendChild(filterButtonNegative);
+
+            let filterButtonPositiveLanguage = document.createElement("button");
+            filterButtonPositiveLanguage.id = 4;
+            filterButtonPositiveLanguage.className = "filter-button";
+            filterButtonPositiveLanguage.textContent = "Filtro: Comentarios positivos";
+            filterButtonPositiveLanguage.addEventListener("click", filterComments);
+
+            commentsSection.appendChild(filterButtonPositiveLanguage);
+
+            let filterButtonNegativeLanguage = document.createElement("button");
+            filterButtonNegativeLanguage.id = 5;
+            filterButtonNegativeLanguage.className = "filter-button";
+            filterButtonNegativeLanguage.textContent = "Filtro: Comentarios negativos";
+            filterButtonNegativeLanguage.addEventListener("click", filterComments);
+
+            commentsSection.appendChild(filterButtonNegativeLanguage);
+
+            let buttonOrderByDateAsc = document.createElement("button");
+            buttonOrderByDateAsc.id = 1;
+            buttonOrderByDateAsc.className = "filter-button";
+            buttonOrderByDateAsc.textContent = "Ordenar: Más antiguos";
+            buttonOrderByDateAsc.addEventListener("click", orderByDateAsc);
+
+            commentsSection.appendChild(buttonOrderByDateAsc);
+
+            let buttonOrderByDateDesc = document.createElement("button");
+            buttonOrderByDateDesc.id = 2;
+            buttonOrderByDateDesc.className = "filter-button";
+            buttonOrderByDateDesc.textContent = "Ordenar: Más recientes";
+            buttonOrderByDateDesc.addEventListener("click", orderByDateDesc);
+
+            commentsSection.appendChild(buttonOrderByDateDesc);
         }
 
-        filterButton.addEventListener("click", filterComments);
-
-        commentsSection.appendChild(filterButton);
-
-        for (let i = 0; i < comments.length; i++) {
+        for (let i = 0; i < commentsSorted.length; i++) {
 
             if (userLanguages != null) {
-                if (commentFilterMode == 1 && (userLanguages[0]['id_idioma_principal'] != comments[i]['id_idioma_comentario'] && userLanguages[0]['id_idioma_secundario'] != comments[i]['id_idioma_comentario'])) {
+                if (commentFilterMode == 1 && (userLanguages[0]['id_idioma_principal'] != commentsSorted[i]['id_idioma_comentario'] && userLanguages[0]['id_idioma_secundario'] != commentsSorted[i]['id_idioma_comentario'])) {
                     continue;
                 }
-                else if (commentFilterMode == 2 && ((userLanguages[0]['id_idioma_principal'] != comments[i]['id_idioma_comentario'] && userLanguages[0]['id_idioma_secundario'] != comments[i]['id_idioma_comentario']) || comments[i]['valoracion'] == "negativa")) {
+                else if (commentFilterMode == 2 && ((userLanguages[0]['id_idioma_principal'] != commentsSorted[i]['id_idioma_comentario'] && userLanguages[0]['id_idioma_secundario'] != commentsSorted[i]['id_idioma_comentario']) || commentsSorted[i]['valoracion'] == "negativa")) {
                     continue;
                 }
-                else if (commentFilterMode == 3 && ((userLanguages[0]['id_idioma_principal'] != comments[i]['id_idioma_comentario'] && userLanguages[0]['id_idioma_secundario'] != comments[i]['id_idioma_comentario']) || comments[i]['valoracion'] == "positiva")) {
+                else if (commentFilterMode == 3 && ((userLanguages[0]['id_idioma_principal'] != commentsSorted[i]['id_idioma_comentario'] && userLanguages[0]['id_idioma_secundario'] != commentsSorted[i]['id_idioma_comentario']) || commentsSorted[i]['valoracion'] == "positiva")) {
                     continue;
                 }
-                else if (commentFilterMode == 4 && (comments[i]['valoracion'] == "negativa")) {
+                else if (commentFilterMode == 4 && (commentsSorted[i]['valoracion'] == "negativa")) {
                     continue;
                 }
-                else if (commentFilterMode == 5 && (comments[i]['valoracion'] == "positiva")) {
+                else if (commentFilterMode == 5 && (commentsSorted[i]['valoracion'] == "positiva")) {
                     continue;
                 }
             }
@@ -444,25 +500,25 @@ async function setUpComments() {
 
             let commentUser = document.createElement("p");
             commentUser.className = "comment-user";
-            commentUser.textContent = comments[i]['nickname'];
+            commentUser.textContent = commentsSorted[i]['nickname'];
 
             comment.appendChild(commentUser);
 
             let commentFecha = document.createElement("p");
             commentFecha.className = "comment-user";
-            commentFecha.textContent = "Fecha publicación: " + comments[i]['fechaPublicacion'];
+            commentFecha.textContent = "Fecha publicación: " + commentsSorted[i]['fechaPublicacion'];
 
             comment.appendChild(commentFecha);
 
             let commentRating = document.createElement("p");
             commentRating.className = "comment-rating";
-            commentRating.textContent = "Valoración: " + comments[i]['valoracion'];
+            commentRating.textContent = "Valoración: " + commentsSorted[i]['valoracion'];
 
             comment.appendChild(commentRating);
 
             let commentText = document.createElement("p");
             commentText.className = "comment-text";
-            commentText.textContent = comments[i]['comentario'];
+            commentText.textContent = commentsSorted[i]['comentario'];
 
             comment.appendChild(commentText);
 
@@ -496,6 +552,13 @@ async function submitComment() {
     let comment = await checkField_4(gameName, userNickname, rating, commentValue, "create_comment", "../AJAX/gameData.php");
     userReview = await checkField_2(gameName, userNickname, "user_comment", "../AJAX/gameData.php");
     comments = await checkField_1(gameName, "get_comments", "../AJAX/gameData.php");
+    commentsSorted = await checkField_1(gameName, "get_comments", "../AJAX/gameData.php");
+    if (isFiltered == 1) {
+        await orderByDateAsc();
+    }
+    else if (isFiltered == 2) {
+        await orderByDateDesc();
+    }
     positive = await checkField_1(gameName, "positive", "../AJAX/gameData.php");
     await setUpGameInfo();
     await setUpComments();
@@ -513,6 +576,13 @@ async function saveComment() {
     let comment = await checkField_4(gameName, userNickname, rating, commentValue, "update_comment", "../AJAX/gameData.php");
     userReview = await checkField_2(gameName, userNickname, "user_comment", "../AJAX/gameData.php");
     comments = await checkField_1(gameName, "get_comments", "../AJAX/gameData.php");
+    commentsSorted = await checkField_1(gameName, "get_comments", "../AJAX/gameData.php");
+    if (isFiltered == 1) {
+        await orderByDateAsc();
+    }
+    else if (isFiltered == 2) {
+        await orderByDateDesc();
+    }
     positive = await checkField_1(gameName, "positive", "../AJAX/gameData.php");
     await setUpGameInfo();
     await setUpComments();
@@ -522,6 +592,13 @@ async function deleteComment() {
     let comment = await checkField_2(gameName, userNickname, "update_comment", "../AJAX/gameData.php");
     userReview = await checkField_2(gameName, userNickname, "delete_comment", "../AJAX/gameData.php");
     comments = await checkField_1(gameName, "get_comments", "../AJAX/gameData.php");
+    commentsSorted = await checkField_1(gameName, "get_comments", "../AJAX/gameData.php");
+    if (isFiltered == 1) {
+        await orderByDateAsc();
+    }
+    else if (isFiltered == 2) {
+        await orderByDateDesc();
+    }
     positive = await checkField_1(gameName, "positive", "../AJAX/gameData.php");
     await setUpGameInfo();
     await setUpComments();
@@ -558,20 +635,9 @@ async function removeToWishlist() {
 }
 
 async function filterComments() {
-    
-
-    if (commentFilterMode < 0 || commentFilterMode >= 5) {
-
-        await (commentFilterMode = 0);
-    }
-    else {
-        if (userNickname == null && commentFilterMode < 4) {
-            await (commentFilterMode = 4);
-        } 
-        else {
-            await (commentFilterMode++);
-        }
-    }
+    commentsSorted = await checkField_1(gameName, "get_comments", "../AJAX/gameData.php");
+    await (isFiltered = 0);
+    await (commentFilterMode = parseInt(this.id));
     await setUpComments();
 }
 
