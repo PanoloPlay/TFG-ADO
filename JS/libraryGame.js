@@ -95,6 +95,14 @@ async function orderByPriceDesc() {
     await (librarySorted = await librarySorted.sort((a, b) => b.precio.localeCompare(a.precio)));
 }
 
+async function orderByPriceAscOld() {
+    await (librarySorted = await librarySorted.sort((a, b) => {let precioA = (a.precio - (a.precio * (a.descuento / 100))); let precioB = (b.precio - (b.precio * (b.descuento / 100))); return precioA.localeCompare(precioB)}));
+}
+
+async function orderByPriceDescOld() {
+    await (librarySorted = await librarySorted.sort((a, b) => {let precioA = (a.precio - (a.precio * (a.descuento / 100))); let precioB = (b.precio - (b.precio * (b.descuento / 100))); return precioB.localeCompare(precioA)}));
+}
+
 async function orderByDiscountAsc() {
     await (librarySorted = await librarySorted.sort((a, b) => a.descuento.localeCompare(b.descuento)));
 }
@@ -418,7 +426,7 @@ async function setUpMainLibraryList() {
         gameList.className = "game-list card";
         gameList.style.margin = "2px";
         gameList.style.width = "250px";
-        gameList.style.height = "300px";
+        gameList.style.height = "280px";
 
         gameList.addEventListener("click", async function() {
             gameName = librarySorted[i]["nombre_juego"];
@@ -465,7 +473,7 @@ async function setUpMainLibraryList() {
             gameListDescripcion.textContent = "Valoraciones positivas: " + librarySorted[i]["valoraciones_positivas"];
         }
         else if (orderType == "Valoración positiva ratio (asc)" || orderType == "Valoración positiva ratio (desc)") {
-            gameListDescripcion.textContent = "Ratio valoración positivas: " + (librarySorted[i]["valoracion_media"] * 100).toFixed(2) + "%";
+            gameListDescripcion.textContent = "Ratio positivas: " + (librarySorted[i]["valoracion_media"] * 100).toFixed(2) + "%";
         }
 
         gameListData.appendChild(gameListDescripcion);
