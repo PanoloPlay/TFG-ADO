@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
     const avatarInput = document.getElementById('avatar');
     const deleteButton = document.getElementById('deleteAvatarBtn');
-    const borrarInput = document.getElementById('borrarAvatarInput');
+    const deleteInput = document.getElementById('deleteAvatarInput');
 
     const previewBoxes = [
         document.getElementById('avatarPreviewBox-184px'),
@@ -45,7 +45,7 @@ function restorePreviewToDefault() {
 
 if (deleteButton) {
     deleteButton.addEventListener('click', function () {
-        if (borrarInput) borrarInput.value = '1';
+        if (deleteInput) deleteInput.value = '1';
         if (avatarInput) avatarInput.value = '';
 
         closeCropper();
@@ -98,7 +98,7 @@ if (deleteButton) {
 
     if (avatarInput) {
         avatarInput.addEventListener('change', function () {
-            if (borrarInput) borrarInput.value = '0';
+            if (deleteInput) deleteInput.value = '0';
 
             const file = this.files && this.files[0];
             if (!file) return;
@@ -140,7 +140,7 @@ if (deleteButton) {
         cancelButton.addEventListener('click', function () {
             closeCropper();
             if (avatarInput) avatarInput.value = '';
-            if (borrarInput) borrarInput.value = '0';
+            if (deleteInput) deleteInput.value = '0';
         });
     }
 
@@ -148,7 +148,7 @@ if (deleteButton) {
         applyButton.addEventListener('click', function () {
             if (!cropper) return;
 
-            if (borrarInput) borrarInput.value = '0';
+            if (deleteInput) deleteInput.value = '0';
 
             const canvas = cropper.getCroppedCanvas({
                 width: 512,
@@ -178,7 +178,7 @@ if (deleteButton) {
 
     if (deleteButton) {
         deleteButton.addEventListener('click', function () {
-            if (borrarInput) borrarInput.value = '1';
+            if (deleteInput) deleteInput.value = '1';
             if (avatarInput) avatarInput.value = '';
 
             closeCropper();

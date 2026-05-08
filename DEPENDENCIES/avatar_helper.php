@@ -1,7 +1,7 @@
 <?php
 
 if (!function_exists('getProfileAvatarData')) {
-    function getProfileAvatarData(string $nickname, string $webBase = '../IMG/usuarios/'): array
+    function getProfileAvatarData(string $nickname, string $webBase = '../MEDIA/IMG/usuarios/'): array
     {
         $nickname = trim($nickname);
 
@@ -21,7 +21,7 @@ if (!function_exists('getProfileAvatarData')) {
         $avatarSeed = crc32($safeNickname);
         $avatarClass = 'avatar-' . (($avatarSeed % 6) + 1);
 
-        $baseFs = __DIR__ . '/../IMG/usuarios/';
+        $baseFs = __DIR__ . '/../MEDIA/IMG/usuarios/';
         $webBase = rtrim($webBase, '/') . '/';
 
         $candidatos = array_unique([

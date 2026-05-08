@@ -492,3 +492,105 @@
         linear-gradient(180deg, var(--color-greyneutral-4), var(--color-greyneutral-5));
     border-color: rgba(26, 159, 255, 0.22);
 }
+.bio-more-btn {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 4px;
+    padding: 10px 12px;
+    gap: 6px;
+}
+.bio-more-btn span{
+    font-size:medium;
+    color: var(--color-greyneutral-12);
+}
+.bio-more-btn:hover span{
+    color: var(--color-slate-12);
+    text-decoration: none;
+}
+.bio-more-btn:hover{
+    background: var(--color-greyneutral-7);
+    text-decoration: none;
+}
+.bio-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(6, 10, 14, 0.72);
+    backdrop-filter: blur(10px);
+}
+
+.bio-modal.open {
+    display: flex;
+}
+
+.bio-modal-content {
+    position: relative;
+    width: min(620px, calc(100% - 24px));
+    max-height: 80vh;
+    padding: 22px 22px 20px;
+    border-radius: 4px;
+    background: linear-gradient(180deg, var(--color-greyneutral-4), var(--color-greyneutral-5));
+    border: 1px solid var(--color-greyneutral-7);
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55);
+    color: var(--color-slate-12);
+
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.bio-modal-content h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex: 0 0 auto;
+}
+
+.bio-modal-body {
+    margin-top: 12px;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding-right: 6px;
+}
+
+.bio-modal-body p {
+    margin: 0;
+    line-height: 1.65;
+    color: var(--color-slate-12);
+    background: var(--color-greyneutral-8);
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+}
+
+.bio-modal-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--color-greyneutral-7);
+    border-radius: 4px;
+    background: rgba(255,255,255,0.03);
+    color: var(--color-greyneutral-11);
+    cursor: pointer;
+    transition: .18s ease;
+    z-index: 2;
+}
+
+.bio-modal-close:hover {
+    background: rgba(255,255,255,0.06);
+    color: var(--color-slate-12);
+}
+
+.bio-modal-close .material-symbols-outlined {
+    font-size: 18px;
+}

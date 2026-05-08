@@ -27,7 +27,7 @@
                                 <?= e($_SESSION['nickname']) ?>
                             </a>
 
-                            <ul class="dropdown-menu dropdown-menu-dark">
+                            <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href="../MAIN/profile.php">Mi Perfil</a></li>
                                 <li><a class="dropdown-item" href="../PHP/library.php">Biblioteca</a></li>
                                 <li><a class="dropdown-item" href="../MAIN/friends.php">Amigos</a></li>

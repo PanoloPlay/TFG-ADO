@@ -29,6 +29,7 @@ CREATE TABLE Usuarios (
   clave_acceso VARCHAR(255) NOT NULL,
   fecha_registro DATETIME NOT NULL,
   descripcion TEXT,
+  clave_amigos INT NOT NULL UNIQUE,
   visibilidad ENUM(
     'publico',
     'privado',
@@ -219,6 +220,7 @@ CREATE TABLE ListaDeseos (
   nickname VARCHAR(45) NOT NULL,
   id_juego INT NOT NULL,
   nombre_juego VARCHAR(100) NOT NULL,
+  numero_orden INT NOT NULL,
   PRIMARY KEY (id_Wishlist),
   INDEX (id_juego, nombre_juego),
   INDEX (id_usuario, nickname),

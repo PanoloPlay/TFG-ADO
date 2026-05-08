@@ -8,7 +8,7 @@
             <div class="site-header__inner">
                 <a class="site-brand" href="./">
                     <span class="site-brand__mark">
-                        <img src="../IMG/app_icons/loto-color.svg" width="40" height="50" alt="Hestia's Lotus">
+                        <img src="../MEDIA/IMG/app_icons/loto-color.svg" width="40" height="50" alt="Hestia's Lotus">
                     </span>
                     <span class="site-brand__text">
                         <strong>Hestia's Lotus</strong>
@@ -22,29 +22,29 @@
                             <span class="material-symbols-outlined">add_business</span>
                             Tienda
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-dark">
+                        <ul class="dropdown-menu">
                             <li>
                                 <a class="dropdown-item d-flex align-items-center gap-2" href="./">
                                     <span class="material-symbols-outlined">store</span>
-                                    Página principal
+                                    <span>Página principal</span>
                                 </a>
                             </li>
                             <li>
                                 <a class="dropdown-item d-flex align-items-center gap-2" href="../MAIN/shop-new.php">
                                     <span class="material-symbols-outlined">new_releases</span>
-                                    Últimos lanzamientos
+                                    <span>Últimos lanzamientos</span>
                                 </a>
                             </li>
                             <li>
                                 <a class="dropdown-item d-flex align-items-center gap-2" href="../MAIN/shop-category.php">
                                     <span class="material-symbols-outlined">shoppingmode</span>
-                                    Categorías
+                                    <span>Categorías</span>
                                 </a>
                             </li>
                             <li>
                                 <a class="dropdown-item d-flex align-items-center gap-2" href="../MAIN/shop-offers.php">
                                     <span class="material-symbols-outlined">percent_discount</span>
-                                    Ofertas
+                                    <span>Ofertas</span>
                                 </a>
                             </li>
                         </ul>
@@ -75,42 +75,42 @@
                                 <?= e($headerNickname) ?>
                             </a>
 
-                            <ul class="dropdown-menu dropdown-menu-dark">
+                            <ul class="dropdown-menu">
                                 <li>
                                     <a class="dropdown-item d-flex align-items-center gap-2" href="../MAIN/profile.php">
                                         <span class="material-symbols-outlined">person</span>
-                                        Mi Perfil
+                                        <span>Mi Perfil</span>
                                     </a>
                                 </li>
                                 <li>
                                     <a class="dropdown-item d-flex align-items-center gap-2" href="../MAIN/Library.php">
                                         <span class="material-symbols-outlined">library_books</span>
-                                        Biblioteca
+                                        <span>Biblioteca</span>
                                     </a>
                                 </li>
                                 <li>
                                     <a class="dropdown-item d-flex align-items-center gap-2" href="../MAIN/friends.php">
                                         <span class="material-symbols-outlined">group</span>
-                                        Amigos
+                                        <span>Amigos</span>
                                     </a>
                                 </li>
                                 <li>
                                     <a class="dropdown-item d-flex align-items-center gap-2" href="../MAIN/wishlist.php">
                                         <span class="material-symbols-outlined">bookmark_add</span>
-                                        Lista de deseados
+                                        <span>Lista de deseados</span>
                                     </a>
                                 </li>
                                 <li>
                                     <a class="dropdown-item d-flex align-items-center gap-2" href="../MAIN/settings-profile.php">
                                         <span class="material-symbols-outlined">settings</span>
-                                        Configuración
+                                        <span>Configuración</span>
                                     </a>
                                 </li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <a class="dropdown-item d-flex align-items-center gap-2" href="../AUTH/logout.php">
                                         <span class="material-symbols-outlined">logout</span>
-                                        Cerrar Sesión
+                                        <span>Cerrar Sesión</span>
                                     </a>
                                 </li>
                             </ul>
@@ -119,11 +119,11 @@
                     <?php else: ?>
                         <a class="chip d-inline-flex align-items-center gap-2" href="../AUTH/login.php">
                             <span class="material-symbols-outlined">login</span>
-                            Iniciar sesión
+                            <span>Iniciar sesión</span>
                         </a>
                         <a class="chip chip-soft d-inline-flex align-items-center gap-2" href="../AUTH/register.php">
                             <span class="material-symbols-outlined">person_add</span>
-                            Registro
+                            <span>Registro</span>
                         </a>
                     <?php endif; ?>
                 </div>

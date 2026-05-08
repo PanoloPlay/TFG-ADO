@@ -1,7 +1,6 @@
 <?php require_once '../GENERAL/[General_REQUIRES].php'; ?>
 
 <?php
-
     $stmt = $BBDD->prepare("
         SELECT
             id_juego,
@@ -19,7 +18,7 @@
     $juegos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     $destacados = array_slice($juegos, 0, 3);
-    $recientes = array_slice($juegos, 3, 5);
+    $recientes = array_slice($juegos, 0, 5);
 ?>
 
 <?php require_once '../GENERAL/[html_START - head_START].php'; ?>
@@ -45,10 +44,12 @@
                             if ($descuento > 0) {
                                 $precioFinal = (float)$juego['precio'] * (1 - ($descuento / 100));
                             }
+
+                            $imgUrl = getGameImageUrl((int)$juego['id_juego'], 'icon');
                         ?>
                         <article class="feature-card">
-                            <div class="feature-card__thumb">
-                                <?= e(mb_substr($juego['nombre_juego'], 0, 1, 'UTF-8')) ?>
+                            <div class="feature-card__thumb"
+                                 style="background-image: url('<?= e($imgUrl) ?>'); background-size: cover; background-position: center; background-repeat: no-repeat;">
                             </div>
                             <div class="feature-card__body">
                                 <h3><?= e($juego['nombre_juego']) ?></h3>
@@ -82,10 +83,12 @@
                         if ($descuento > 0) {
                             $precioFinal = (float)$juego['precio'] * (1 - ($descuento / 100));
                         }
+
+                        $imgUrl = getGameImageUrl((int)$juego['id_juego'], 'wide-cover');
                     ?>
                     <article class="game-card">
-                        <div class="game-card__art">
-                            <?= e(mb_substr($juego['nombre_juego'], 0, 1, 'UTF-8')) ?>
+                        <div class="game-card__art"
+                             style="background-image: url('<?= e($imgUrl) ?>'); background-size: cover; background-position: center; background-repeat: no-repeat;">
                         </div>
 
                         <div class="game-card__info">
@@ -111,35 +114,18 @@
     <section class="section section--split">
         <article class="panel">
             <div class="section__head">
-                <h2>Acceso rápido</h2>
-            </div>
-
-            <div class="quick-grid">
-                <a href="#" class="quick-card">
-                    <span class="material-symbols-outlined">category</span>
-                    <strong>Categorías</strong>
-                    <small>Explora por género</small>
-                </a>
-
-                <a href="#" class="quick-card">
-                    <span class="material-symbols-outlined">local_fire_department</span>
-                    <strong>Ofertas</strong>
-                    <small>Juegos con descuento</small>
-                </a>
-            </div>
-        </article>
-
-        <article class="panel">
-            <div class="section__head">
                 <h2>Recomendado</h2>
             </div>
 
             <?php if ($recientes): ?>
                 <div class="recommend-list">
                     <?php foreach ($recientes as $juego): ?>
+                        <?php
+                            $imgUrl = getGameImageUrl((int)$juego['id_juego'], 'banner');
+                        ?>
                         <div class="recommend-item">
-                            <div class="recommend-item__thumb">
-                                <?= e(mb_substr($juego['nombre_juego'], 0, 1, 'UTF-8')) ?>
+                            <div class="recommend-item__thumb"
+                                 style="background-image: url('<?= e($imgUrl) ?>'); background-size: cover; background-position: center; background-repeat: no-repeat;">
                             </div>
                             <div class="recommend-item__body">
                                 <strong><?= e($juego['nombre_juego']) ?></strong>

@@ -31,7 +31,6 @@ document.addEventListener('DOMContentLoaded', function() {
         link.addEventListener('click', function(e) {
             e.preventDefault(); 
             
-            // NUEVO: Reactivamos la animación quitando la clase de bloqueo
             if (settingsPanel) settingsPanel.classList.remove('no-anim');
 
             const targetId = this.getAttribute('href');

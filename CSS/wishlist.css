@@ -1,207 +1,422 @@
-/* Generado por IA [TEMPORAL] Cambiar cuando se quiera*/
-
-.wishlist-panel {
-    border-radius: 12px;
-    padding: 24px;
-    background: linear-gradient(180deg, rgba(6, 10, 14, 0.96), rgba(15, 20, 30, 0.96));
-    border: 1px solid var(--color-greyneutral-7);
+/* =========================================================
+   CONTENEDOR PRINCIPAL
+   ========================================================= */
+.wishlist-container {
+    width: min(1280px, calc(100% - 32px));
+    margin: 24px auto 40px;
+    color: var(--color-slate-12);
 }
 
-.wishlist-actions {
+/* =========================================================
+   CABECERA (HERO)
+   ========================================================= */
+.wishlist-hero {
+    background: linear-gradient(180deg, var(--color-greyneutral-5), var(--color-greyneutral-2));
+    border: 1px solid var(--color-greyneutral-7);
+    border-radius: 4px;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
+    margin-bottom: 24px;
+}
+
+.wishlist-hero-content {
     display: flex;
-    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
-    gap: 18px;
-    margin-bottom: 28px;
+    padding: 24px;
+    gap: 16px;
+    flex-wrap: wrap;
 }
 
-.wishlist-brand {
+.wishlist-profile {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 16px;
 }
 
-.wishlist-brand strong {
-    display: block;
-    font-size: 1.1rem;
-}
-
-.wishlist-brand span {
-    display: block;
-    font-size: .95rem;
-    color: var(--color-greyneutral-11);
-}
-
-.btn-filter {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 16px;
-    border-radius: 8px;
+.profile-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 4px;
     border: 1px solid var(--color-greyneutral-7);
-    background: rgba(255,255,255,0.04);
-    color: var(--color-slate-12);
-    cursor: pointer;
-    transition: .18s ease;
-    font-size: .95rem;
-}
-
-.btn-filter:hover,
-.btn-filter:focus {
-    background: rgba(255,255,255,0.08);
-}
-
-.filter-dropdown {
-    position: relative;
-}
-
-.filter-popover {
-    position: absolute;
-    right: 0;
-    top: calc(100% + 10px);
-    min-width: 220px;
-    max-width: 260px;
-    padding: 16px;
-    border-radius: 14px;
-    background: rgba(10, 14, 21, 0.98);
-    border: 1px solid var(--color-greyneutral-7);
-    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.18);
-    opacity: 0;
-    transform: translateY(-6px);
-    pointer-events: none;
-    transition: opacity .18s ease, transform .18s ease;
-    z-index: 30;
-}
-
-.filter-popover.open {
-    opacity: 1;
-    transform: translateY(0);
-    pointer-events: auto;
-}
-
-.filter-popover .popover-head {
-    margin-bottom: 12px;
-    font-weight: 600;
-    color: var(--color-slate-12);
-}
-
-.filter-option {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 12px;
-    padding: 10px 12px;
-    border-radius: 8px;
-    background: rgba(255,255,255,0.02);
-    border: 1px solid transparent;
-    cursor: pointer;
-    transition: .18s ease;
-    color: var(--color-greyneutral-11);
-}
-
-.filter-option:hover {
-    border-color: var(--color-greyneutral-6);
-}
-
-.filter-option input {
-    accent-color: var(--color-blue-10);
-    cursor: pointer;
-}
-
-.wishlist-grid {
-    display: grid;
-    gap: 18px;
-}
-
-.wishlist-card {
-    display: grid;
-    grid-template-columns: 70px 1fr;
-    gap: 18px;
-    padding: 18px;
-    border-radius: 14px;
-    background: linear-gradient(180deg, rgba(19, 24, 34, 0.98), rgba(15, 20, 30, 0.98));
-    border: 1px solid var(--color-greyneutral-7);
-}
-
-.wishlist-card .game-thumb {
-    width: 70px;
-    height: 70px;
-    border-radius: 12px;
     display: grid;
     place-items: center;
-    font-weight: 700;
+    color: var(--color-slate-12);
+    border: 2px solid var(--color-greyneutral-4);
+    flex: none;
+    background-size: cover;
+    background-position: center;
     font-size: 1.5rem;
-    background: linear-gradient(180deg, rgba(59, 158, 255, 0.18), rgba(59, 158, 255, 0.08));
+   font-weight: 800;
+}
+.profile-info h1 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-transform: uppercase;
     color: var(--color-slate-12);
-    border: 1px solid rgba(59, 158, 255, 0.12);
+    margin: 0 0 8px 0;
 }
 
-.game-title {
-    margin: 0;
-    font-size: 1.1rem;
-    line-height: 1.2;
-}
-
-.game-link {
-    display: inline-block;
-    color: var(--color-slate-12);
-    text-decoration: none;
-    transition: transform .18s ease, color .18s ease;
-}
-
-.game-link:hover {
-    transform: scale(1.03);
-    color: var(--color-blue-10);
-}
-
-.game-developer {
-    margin: 10px 0 16px;
-    color: var(--color-greyneutral-11);
-    font-size: .95rem;
-}
-
-.game-meta {
+.profile-badges {
     display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    color: var(--color-greyneutral-11);
-    font-size: .92rem;
-}
-
-.meta-item {
-    display: inline-flex;
-    align-items: center;
     gap: 8px;
-    padding: 10px 12px;
-    border-radius: 999px;
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.05);
 }
 
-.meta-item span.material-symbols-outlined {
-    font-size: 1rem;
+.badge {
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: bold;
 }
 
-.field-hidden {
-    display: none !important;
-}
-
-.empty-state {
-    padding: 48px 18px;
-    border-radius: 14px;
-    text-align: center;
-    background: rgba(255,255,255,0.02);
+.badge-dark {
+    background-color: rgba(0, 0, 0, 0.3);
     border: 1px solid var(--color-greyneutral-7);
+}
+
+.badge-primary {
+    background-color: var(--color-greyneutral-5);
+    color: var(--color-slate-12);
+}
+
+/* Formulario de ordenación */
+.wishlist-sort-form {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background-color: rgba(0, 0, 0, 0.25);
+    padding: 12px 16px;
+    border-radius: 4px;
+}
+
+.wishlist-sort-form label {
+    font-size: 1rem;
+    color: var(--color-greyneutral-11);
+    font-weight: bold;
+    min-width: 99px;
+}
+
+.wishlist-select {
+    background-color: var(--color-greyneutral-4);
+    color: var(--color-slate-12);
+    border: 1px solid var(--color-greyneutral-7);
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    outline: none;
+}
+
+.wishlist-select:focus {
+    border-color: var(--color-blue-8);
+}
+
+/* =========================================================
+   LISTA DE JUEGOS
+   ========================================================= */
+.wishlist-list {
+    display: grid;
+    gap: 12px;
+}
+
+.wishlist-item {
+    display: flex;
+    background: linear-gradient(180deg, var(--color-greyneutral-2), var(--color-greyneutral-4));
+    border: 1px solid var(--color-greyneutral-7);
+    border-radius: 4px;
+    overflow: hidden;
+    transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.wishlist-item a {
+    display: flex;
+    flex-grow: 1; /* Obliga al enlace a estirarse y ocupar todo el ancho disponible */
+    text-decoration: none; /* Evita que el texto de dentro salga subrayado */
+    overflow: hidden;
+}
+.wishlist-item:hover {
+    background: linear-gradient(180deg, var(--color-greyneutral-5), var(--color-greyneutral-2));
+    border-color: var(--color-greyneutral-8);
+    
+}
+
+/* Estilo que aplica SortableJS al arrastrar */
+.wishlist-item.sortable-ghost {
+    opacity: 0.5;
+    background: var(--color-greyneutral-4);
+    border: 1px dashed var(--color-blue-8);
+}
+
+/* =========================================================
+   ZONA DE ARRASTRE (DRAG & DROP)
+   ========================================================= */
+.wishlist-handle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 50px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-right: 1px solid var(--color-greyneutral-7);
+    padding: 8px;
+}
+
+.drag-icon {
+    color: var(--color-greyneutral-11);
+    cursor: grab;
+    margin: auto 0 30px 0;
+    opacity: 0.6;
+}
+
+.drag-icon:active {
+    cursor: grabbing;
+}
+
+input.wishlist-rank-input {
+    width: 32px;
+    padding: 11px;
+    height: 24px;
+    text-align: center;
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--color-slate-12);
+    font-size: 0.8rem;
+    border-radius: 3px;}
+
+input.wishlist-rank-input::-webkit-outer-spin-button,
+input.wishlist-rank-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input.wishlist-rank-input:focus {
+    background: rgba(0, 0, 0, 0.3);
+    border-color: var(--color-greyneutral-8);
+    outline: none;
+}
+
+/* =========================================================
+   CONTENIDO DEL JUEGO (IMAGEN E INFO)
+   ========================================================= */
+.wishlist-capsule {
+    width: 200px;
+    height: 100px;
+    min-width: 200px;
+    border-right: 1px solid var(--color-greyneutral-7);
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    margin: 20px;
+    transition: 0.2s ease;
+}
+.wishlist-capsule:hover {
+    filter: brightness(1.09);
+    transition: filter 0.2s ease, transform 0.2s ease;
+}
+
+.wishlist-info {
+    flex-grow: 1;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.wishlist-info h2 {
+    font-size: 1.15rem;
+    font-weight: bold;
+    color: var(--color-slate-12);
+    margin: 0 0 6px 0;
+}
+
+.wishlist-meta {
+    font-size: 0.85rem;
+    color: var(--color-greyneutral-11);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.developer {
+    color: var(--color-blue-7);
+}
+
+.wishlist-reviews {
+    font-size: 0.85rem;
+    font-weight: bold;
+}
+
+.review-positive { color: var(--color-blue-8); }
+.review-mixed { color: var(--color-greyneutral-11); }
+.review-count { color: var(--color-greyneutral-11); font-weight: normal; margin-left: 4px; }
+.review-negative { color: var(--color-red-9); }
+
+/* =========================================================
+   PRECIOS Y BOTONES (DERECHA)
+   ========================================================= */
+.wishlist-actions {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    gap: 16px;
+    background-color: none;
+}
+
+.price-widget {
+    display: flex;
+    height: 40px;
+}
+
+.price-discount-badge {
+    background-color: var(--color-blue-9);
+    color: var(--color-slate-12);
+    font-weight: bold;
+    font-size: 0.9rem;
+    padding: 0 10px;
+    display: flex;
+    align-items: center;
+    border-radius: 3px 0 0 3px;
+}
+
+.price-values {
+    background-color: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--color-greyneutral-7);
+    border-left: none;
+    border-radius: 0 3px 3px 0;
+    padding: 0 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-end;
+}
+
+.price-values.no-discount {
+    border-left: 1px solid var(--color-greyneutral-7);
+    border-radius: 3px;
+    align-items: center;
+}
+
+.price-original {
+    font-size: 0.75rem;
+    color: var(--color-greyneutral-11);
+    text-decoration: line-through;
+    line-height: 1;
+    margin-bottom: 2px;
+}
+
+.price-final {
+    font-size: 0.95rem;
+    color: var(--color-slate-12);
+    font-weight: bold;
+    line-height: 1;
+}
+
+.delete-form {
+    margin: 0;
+    display: flex;
+}
+
+.btn-delete {
+    background: transparent;
+    border: none;
+    color: var(--color-greyneutral-11);
+    cursor: pointer;
+    padding: 8px;
+    transition: color 0.2s ease, transform 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-delete:hover {
+    color: var(--color-red-9);
+    transform: scale(1.1);
+}
+
+/* =========================================================
+   ALERTAS
+   ========================================================= */
+.wishlist-alert {
+    padding: 16px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    font-weight: 500;
+}
+
+.alert-info {
+    background: linear-gradient(180deg, rgba(26, 159, 255, 0.12), rgba(26, 159, 255, 0.08));
+    border: 1px solid rgba(26, 159, 255, 0.2);
+    color: var(--color-blue-8);
+}
+
+.hidden {
+    display: none;
+}
+
+/* =========================================================
+   RESPONSIVE (MÓVILES)
+   ========================================================= */
+@media (max-width: 768px) {
+    .wishlist-item {
+        flex-direction: column;
+    }
+    
+    .wishlist-handle {
+        width: 100%;
+        flex-direction: row;
+        height: 44px;
+        border-right: none;
+        border-bottom: 1px solid var(--color-greyneutral-7);
+        gap: 16px;
+    }
+
+    .drag-icon { margin-bottom: 0; }
+
+    .wishlist-capsule {
+        width: 100%;
+        height: 140px;
+        border-right: none;
+        border-bottom: 1px solid var(--color-greyneutral-7);
+    }
+
+    .wishlist-capsule img {
+        height: 100%;
+    }
+    
+    .wishlist-actions {
+        justify-content: space-between;
+    }
+}
+/* Buscador */
+.wishlist-search-form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 20px;
+    padding: 16px;
+    background: linear-gradient(180deg, var(--color-greyneutral-3), var(--color-greyneutral-2));
+    border: 1px solid var(--color-greyneutral-7);
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.wishlist-search-form label {
+    font-size: 1rem;
+    font-weight: bold;
     color: var(--color-greyneutral-11);
 }
 
-.empty-state span.material-symbols-outlined {
-    font-size: 3rem;
-    margin-bottom: 14px;
+.wishlist-search {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 4px;
+    border: 1px solid var(--color-greyneutral-7);
+    background: var(--color-greyneutral-4);
+    color: var(--color-slate-12);
+    outline: none;
 }
 
-.empty-state p {
-    margin: 0;
-    font-size: 1rem;
+.wishlist-search:focus {
+    border-color: var(--color-blue-8);
+    box-shadow: 0 0 0 2px rgba(26, 159, 255, 0.15);
 }

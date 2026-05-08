@@ -12,7 +12,7 @@
         <meta name="description" content="Trabajo Final de Grado de Óscar, Ahmad y David">
 
         <!-- Enlace al favicon de la página -->
-        <link rel="icon" href="../IMG/app_icons/loto-color.svg" type="image/svg+xml">
+        <link rel="icon" href="../MEDIA/IMG/app_icons/loto-color.svg" type="image/svg+xml">
 
         <!-- Enlace a las hojas de estilo y fuentes -->
         <link rel="stylesheet" href="../CSS/v_style.css">
@@ -30,6 +30,9 @@
         <!-- Enlace a Cropper CSS [libreria para recortar imagenes] -->
         <link rel="stylesheet" href="https://unpkg.com/cropperjs@1.6.2/dist/cropper.min.css">
         <script src="https://unpkg.com/cropperjs@1.6.2/dist/cropper.min.js"></script>
+
+        <!-- Enlace a SortableJS [libreria para ordenar elementos mediante arrastrar y soltar] -->
+        <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.7/Sortable.min.js"></script>
 
 
         <!-- Fuentes de iconos -->

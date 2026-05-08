@@ -40,11 +40,11 @@ INSERT INTO Idiomas (id_idioma, idioma) VALUES
 -- ----------------------------
 -- Inserciones de Usuarios (ID manual)
 -- ----------------------------
-INSERT INTO Usuarios (id_usuario, nombre_usuario, nickname, correo, clave_acceso, fecha_registro, descripcion, visibilidad, id_idioma_principal, id_idioma_secundario) VALUES
-(1, 'Test', 'Test', 't@t.t', '$2y$10$Wg/N0u/BNPaNIyGrIDB0jubnf6nAMP45Ujs5EPSeOSCpgyKUoWPKW', '2026-04-12 10:00:00', 'Usuario de prueba', 'publico', 'ES', 'EN'),
-(2, 'Panolo', 'PanoloPlay', 'ahmad@gmail.com', '$2y$10$Wg/N0u/BNPaNIyGrIDB0jubnf6nAMP45Ujs5EPSeOSCpgyKUoWPKW', '2026-04-12 10:00:00', 'Fanático de los videojuegos...', 'publico', 'ES', 'AR'),
-(3, 'Praxis', 'Praxis99', 'david@gmail.com', '$2y$10$Wg/N0u/BNPaNIyGrIDB0jubnf6nAMP45Ujs5EPSeOSCpgyKUoWPKW', '2026-04-12 10:30:00', '', 'solo_amigos', 'ES', NULL),
-(4, 'Kans', 'Kans2950', 'oacar@gmail.com', '$2y$10$Wg/N0u/BNPaNIyGrIDB0jubnf6nAMP45Ujs5EPSeOSCpgyKUoWPKW', '2026-04-12 11:00:00', 'Amante de los juegos retro', 'privado', 'ES', 'EN');
+INSERT INTO Usuarios (id_usuario, nombre_usuario, nickname, correo, clave_acceso, fecha_registro, descripcion, visibilidad, id_idioma_principal, id_idioma_secundario, clave_amigos) VALUES
+(1, 'Test', 'Test', 't@t.t', '$2y$10$Wg/N0u/BNPaNIyGrIDB0jubnf6nAMP45Ujs5EPSeOSCpgyKUoWPKW', '2026-04-12 10:00:00', 'Usuario de prueba', 'publico', 'ES', 'EN', 123456789),
+(2, 'Panolo', 'PanoloPlay', 'ahmad@gmail.com', '$2y$10$Wg/N0u/BNPaNIyGrIDB0jubnf6nAMP45Ujs5EPSeOSCpgyKUoWPKW', '2026-04-12 10:00:00', 'Fanático de los videojuegos...', 'publico', 'ES', 'AR', 783249012),
+(3, 'Praxis', 'Praxis99', 'david@gmail.com', '$2y$10$Wg/N0u/BNPaNIyGrIDB0jubnf6nAMP45Ujs5EPSeOSCpgyKUoWPKW', '2026-04-12 10:30:00', '', 'solo_amigos', 'ES', NULL, 345628578),
+(4, 'Kans', 'Kans2950', 'oacar@gmail.com', '$2y$10$Wg/N0u/BNPaNIyGrIDB0jubnf6nAMP45Ujs5EPSeOSCpgyKUoWPKW', '2026-04-12 11:00:00', 'Amante de los juegos retro', 'privado', 'ES', 'EN', 901746234);
 
 -- ----------------------------
 -- Inserciones de Juegos (ID manual)
@@ -157,9 +157,9 @@ INSERT INTO Administadores (id_administador, id_usuario, nickname) VALUES
 -- ----------------------------
 -- Inserciones de ListaDeseos (ID manual)
 -- ----------------------------
-INSERT INTO ListaDeseos (id_Wishlist, id_usuario, nickname, id_juego, nombre_juego) VALUES
-(1, 1, 'Test', 1, 'Undertale'),
-(2, 1, 'Test', 2, 'Hollow Knight: Silksong'),
-(3, 2, 'PanoloPlay', 2, 'Hollow Knight: Silksong'),
-(4, 4, 'Kans2950', 1, 'Undertale'),
-(5, 4, 'Kans2950', 2, 'Hollow Knight: Silksong');
+INSERT INTO ListaDeseos (id_Wishlist, id_usuario, nickname, id_juego, nombre_juego, numero_orden) VALUES
+(1, 1, 'Test', 1, 'Undertale', 1),
+(2, 1, 'Test', 2, 'Hollow Knight: Silksong', 2),
+(3, 2, 'PanoloPlay', 2, 'Hollow Knight: Silksong', 1),
+(4, 4, 'Kans2950', 1, 'Undertale', 1),
+(5, 4, 'Kans2950', 2, 'Hollow Knight: Silksong', 2);

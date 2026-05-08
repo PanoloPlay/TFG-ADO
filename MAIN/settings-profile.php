@@ -2,10 +2,7 @@
 require_once '../GENERAL/[General_REQUIRES].php';
 require_once '../BBDD/settings_profile_queries.php';
 
-if (!isset($_SESSION['id_usuario']) || !isset($_SESSION['nickname'])) {
-    header('Location: ../AUTH/login.php');
-    exit;
-}
+require_once '../GENERAL/auth_guard.php';
 
 $idUsuario = (int) $_SESSION['id_usuario'];
 $nicknameSesion = (string) $_SESSION['nickname'];
@@ -44,7 +41,7 @@ try {
         $password_actual = $_POST['password_actual'] ?? '';
         $password_nueva = $_POST['password_nueva'] ?? '';
         $password_repetida = $_POST['password_repetida'] ?? '';
-        $borrarAvatar = (($_POST['borrar_avatar'] ?? '0') === '1');
+        $deleteAvatar = (($_POST['delete_avatar'] ?? '0') === '1');
 
         if ($nombre_usuario === '') {
             throw new Exception('El nombre de usuario no puede estar vacío.');
@@ -110,13 +107,13 @@ try {
             throw new Exception('El nickname no es válido para guardar el avatar.');
         }
 
-        $directorioBase = __DIR__ . '/../IMG/usuarios';
+        $directorioBase = __DIR__ . '/../MEDIA/IMG/usuarios';
 
         if (!is_dir($directorioBase) && !mkdir($directorioBase, 0775, true) && !is_dir($directorioBase)) {
             throw new Exception('No se ha podido crear la carpeta de avatares.');
         }
 
-        if ($borrarAvatar) {
+        if ($deleteAvatar) {
             foreach (glob($directorioBase . '/' . $nicknameAvatarSeguro . '.*') as $archivoAntiguo) {
                 if (is_file($archivoAntiguo)) {
                     unlink($archivoAntiguo);
@@ -235,7 +232,7 @@ require_once '../GENERAL/[head_END - body_START - header - main_START].php';
         <aside class="settings-sidebar">
             <div class="profile-badge">
                 <div
-                    class="profile-avatar <?= e($avatarClass) ?>"
+                    class="profile-avatar avatar-64px <?= e($avatarClass) ?>"
                     <?php if ($avatarPath): ?>
                         style="background-image: url('<?= e($avatarPath) ?>'); background-size: cover; background-position: center;"
                     <?php endif; ?>
@@ -305,7 +302,7 @@ require_once '../GENERAL/[head_END - body_START - header - main_START].php';
                             <div style="margin-top: 8px;">
                                 <div
                                     id="avatarPreviewBox-184px"
-                                    class="profile-avatar <?= e($avatarClass) ?>"
+                                    class="profile-avatar avatar-184px <?= e($avatarClass) ?>"
                                     data-initial="<?= e($initial) ?>"
                                     <?php if ($avatarPath): ?>
                                         style="background-image: url('<?= e($avatarPath) ?>'); background-size: cover; background-position: center;"
@@ -321,7 +318,7 @@ require_once '../GENERAL/[head_END - body_START - header - main_START].php';
                             <div style="margin-top: 8px;">
                                 <div
                                     id="avatarPreviewBox-64px"
-                                    class="profile-avatar <?= e($avatarClass) ?>"
+                                    class="profile-avatar avatar-64px <?= e($avatarClass) ?>"
                                     data-initial="<?= e($initial) ?>"
                                     <?php if ($avatarPath): ?>
                                         style="background-image: url('<?= e($avatarPath) ?>'); background-size: cover; background-position: center;"
@@ -337,7 +334,7 @@ require_once '../GENERAL/[head_END - body_START - header - main_START].php';
                             <div style="margin-top: 8px;">
                                 <div
                                     id="avatarPreviewBox-32px"
-                                    class="profile-avatar <?= e($avatarClass) ?>"
+                                    class="profile-avatar avatar-32px <?= e($avatarClass) ?>"
                                     data-initial="<?= e($initial) ?>"
                                     <?php if ($avatarPath): ?>
                                         style="background-image: url('<?= e($avatarPath) ?>'); background-size: cover; background-position: center;"
@@ -363,7 +360,7 @@ require_once '../GENERAL/[head_END - body_START - header - main_START].php';
                                 La imagen debe ser cuadrada y tener al menos 184 píxeles por lado. Formatos permitidos: PNG, JPG y JPEG.
                             </div>
 
-                            <input type="hidden" name="borrar_avatar" id="borrarAvatarInput" value="0">
+                            <input type="hidden" name="delete_avatar" id="deleteAvatarInput" value="0">
 
                             <?php if ($avatarPath): ?>
                                 <button
@@ -514,11 +511,11 @@ require_once '../GENERAL/[head_END - body_START - header - main_START].php';
                 </div>
             </form>
 
-            <?php if ($mensaje !== ''): ?>
-                <div class="alert-custom alert-<?php echo e($tipoMensaje); ?>">
-                    <?php echo e($mensaje); ?>
-                </div>
-            <?php endif; ?>
+            <div id="settingsAlertContainer"
+                 data-alert-visible="<?php echo ($mensaje !== '') ? '1' : '0'; ?>"
+                 data-alert-type="<?php echo e($tipoMensaje); ?>"
+                 data-alert-message="<?php echo e($mensaje); ?>">
+            </div>
         </div>
     </div>
 </div>

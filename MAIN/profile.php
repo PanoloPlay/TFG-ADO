@@ -104,26 +104,40 @@ if (!$perfilNoEncontrado && $usuario) {
                     <div class="profile-headline">
                         <h1><?= e($usuario['nombre_usuario']) ?></h1>
                     </div>
+
                     <p class="profile-subtitle"><?= e($usuario['nickname']) ?></p>
 
-                <?php if ($perfilPrivado): ?>
-                    <p class="profile-bio private">
-                        Perfil privado.
-                    </p>
-                </div>
-                <?php else: ?>
-                    <p class="profile-bio">
-                        <?php if($usuario['descripcion'] <= 198): ?>
-                            <?= e($usuario['descripcion'] ?: '') ?>
-                            </p>
-                        <?php else: ?>
-                            <?= e(mb_substr($usuario['descripcion'], 0, 198, 'UTF-8')) . '...' ?>
-                            </p>
-                            <span class="material-symbols-outlined">expand_more</span>
-                            Ver más Información.
+                    <?php if ($perfilPrivado): ?>
+                        <p class="profile-bio private">
+                            Perfil privado.
+                        </p>
+                    <?php else: ?>
+                        <?php
+                            $descripcionCompleta = $usuario['descripcion'] ?? '';
+                            $tieneDescripcionLarga = mb_strlen($descripcionCompleta, 'UTF-8') > 198;
+                            $descripcionCorta = $tieneDescripcionLarga
+                                ? mb_substr($descripcionCompleta, 0, 198, 'UTF-8') . '...'
+                                : $descripcionCompleta;
+                        ?>
+
+                        <p class="profile-bio">
+                            <?= e($descripcionCorta) ?>
+                        </p>
+
+                        <?php if ($tieneDescripcionLarga): ?>
+                            <div
+                                class="bio-more-btn"
+                                id="bioMoreBtn"
+                                data-full-description='<?= json_encode($descripcionCompleta, JSON_UNESCAPED_UNICODE | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_HEX_TAG) ?>'
+                            >
+                                <span>Ver más Información</span>
+                                <span class="material-symbols-outlined">expand_more</span>
+                            </div>
                         <?php endif; ?>
-    
+                    <?php endif; ?>
                 </div>
+
+                <?php if (!$perfilPrivado): ?>
                     <div class="profile-badges">
                         <span>
                             <span class="material-symbols-outlined">mail</span>
@@ -166,42 +180,18 @@ if (!$perfilNoEncontrado && $usuario) {
     <?php else: ?>
 
         <section class="profile-feature">
-            <article class="feature-card accent">
-                <span class="material-symbols-outlined">bolt</span>
-                <div>
-                    <strong>Estado de la cuenta</strong>
-                    <p>Perfil activo y listo para explorar la tienda.</p>
-                </div>
-            </article>
-
-            <article class="feature-card">
-                <span class="material-symbols-outlined">sports_esports</span>
+            <?php //feature-card?>
+        </section>
+        <section class="stats-grid">
+            <article class="stat-card">
+                <div class="stat-icon">
+                    <span class="material-symbols-outlined">sports_esports</span>
+                </div>                
                 <div>
                     <strong>Biblioteca</strong>
                     <p><?= (int)$data['totalBiblioteca'] ?> juegos disponibles.</p>
                 </div>
             </article>
-
-            <article class="feature-card">
-                <span class="material-symbols-outlined">workspace_premium</span>
-                <div>
-                    <strong>Progreso</strong>
-                    <p><?= (int)$data['totalLogros'] ?> logros desbloqueados.</p>
-                </div>
-            </article>
-        </section>
-
-        <section class="stats-grid">
-            <article class="stat-card">
-                <div class="stat-icon">
-                    <span class="material-symbols-outlined">sports_esports</span>
-                </div>
-                <div>
-                    <span class="stat-value"><?= (int)$data['totalBiblioteca'] ?></span>
-                    <span class="stat-label">Juegos en biblioteca</span>
-                </div>
-            </article>
-
             <article class="stat-card">
                 <div class="stat-icon">
                     <span class="material-symbols-outlined">group</span>
@@ -282,8 +272,25 @@ if (!$perfilNoEncontrado && $usuario) {
                 <?php if (!empty($data['amigos'])): ?>
                     <ul class="simple-list">
                         <?php foreach ($data['amigos'] as $amigo): ?>
+                            <?php
+                                $avatarAmigo = getProfileAvatarData($amigo['amigo']);
+
+                                $initialAmigo = $avatarAmigo['initial'];
+                                $avatarPathAmigo = $avatarAmigo['avatarPath'];
+                                $avatarClassAmigo = $avatarAmigo['avatarClass'];
+                            ?>
                             <li>
-                                <span class="dot"></span>
+                                <div
+                                    class="avatar-32px <?= e($avatarClassAmigo) ?>"
+                                    <?php if ($avatarPathAmigo): ?>
+                                        style="background-image: url('<?= e($avatarPathAmigo) ?>'); background-size: cover; background-position: center;"
+                                    <?php endif; ?>
+                                >
+                                    <?php if (!$avatarPathAmigo): ?>
+                                        <?= e($initialAmigo) ?>
+                                    <?php endif; ?>
+                                </div>
+
                                 <a href="./profile.php?usuario=<?= e($amigo['amigo']) ?>" class="friend-link">
                                     <?= e($amigo['amigo']) ?>
                                 </a>
@@ -334,6 +341,25 @@ if (!$perfilNoEncontrado && $usuario) {
         </section>
     <?php endif; ?>
 <?php endif; ?>
+
+<?php //Ver mas info ?>
+<?php if (!$perfilNoEncontrado && !$perfilPrivado): ?>
+    <div class="bio-modal" id="bioModal" aria-hidden="true">
+        <div class="bio-modal-content">
+            <button type="button" class="bio-modal-close" id="bioModalClose">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+
+            <h3>Información completa</h3>
+
+            <div class="bio-modal-body scrollbar-theme" >
+                <p id="bioModalText"></p>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
+
+<script src="../JS/profile.js"></script>
 <?php
 require_once '../GENERAL/[main_END - footer].php';
 require_once '../GENERAL/[Page_END].php';

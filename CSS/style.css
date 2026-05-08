@@ -59,7 +59,7 @@
     gap: 18px;
 }
 
-.site-nav a {
+.site-nav > a {
     color: var(--color-slate-12);
     opacity: .85;
     text-decoration: none;
@@ -81,25 +81,51 @@
 .dropdown .dropdown:hover {
     background: rgba(255, 255, 255, 0.04);
 }
-
-.dropdown a {
-    color: var(--color-slate-12);
-    text-decoration: none;
-    padding: 10px 12px;
-    border-radius: 4px;
-}
-.dropdown ul {
-    background: rgba(6, 10, 14, 0.92);
+/* Estilo menus navegables */
+.dropdown-menu {
+    background-color: rgba(6, 10, 14, 0.92) !important;
+    color: var(--color-greyneutral-12) !important;
     backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid var(--color-greyneutral-7)!important;
+    border-radius: 8px;
+    padding: 8px;
+}
+.dropdown-item{
+    color: var(--color-greyneutral-12) !important;
+    padding: 10px 12px !important;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s ease-in-out;
+    background: transparent;
 }
 .dropdown .material-symbols-outlined {
     color: var(--color-blue-10);
-    font-size: 24px;
+    transition: color 0.3s;
 }
-.dropdown .dropdown-item {
-    color: var(--color-greyneutral-12);
+.dropdown-item:hover, 
+.dropdown-item:focus, 
+.dropdown-item:active, 
+.dropdown-item.active {
+    background-color: var(--color-greyneutral-7) !important;
+    color: var(--color-slate-12) !important;
+    outline: none;
+    border-radius: 4px;
+}
+.dropdown-item:hover .material-symbols-outlined,
+.dropdown-item:focus .material-symbols-outlined,
+.dropdown-item:active .material-symbols-outlined,
+.dropdown-item.active .material-symbols-outlined {
+    color: var(--color-blue-11) !important; 
 }
 
+.dropdown-divider {
+    background: var(--color-greyneutral-7);
+    height: 1px;
+}
+
+/* ------[Estilo avatar]------- */
 .chip {
     display: inline-flex;
     align-items: center;
@@ -177,9 +203,6 @@ select {
     -webkit-appearance: none;
     -moz-appearance: none;
     padding-right: 42px;
-    background-image:
-        linear-gradient(45deg, transparent 50%, var(--color-greyneutral-11) 50%),
-        linear-gradient(135deg, var(--color-greyneutral-11) 50%, transparent 50%);
     background-position:
         calc(100% - 18px) calc(50% - 3px),
         calc(100% - 12px) calc(50% - 3px);
@@ -272,7 +295,7 @@ select:disabled {
 }
 
 /* texto */
-.checkbox-filter span {
+span {
     color: var(--color-slate-12);
 }
 
@@ -310,7 +333,10 @@ main, .site-main, .site-main__shell {
     flex: 1 0 auto;
     min-height: auto;
 }
-
+.scrollbar-theme {
+    scrollbar-color: var(--color-greyneutral-8) var(--color-greyneutral-2);
+    scrollbar-width: thin;
+}
 /* Scrollbar */
 html::-webkit-scrollbar,
 body::-webkit-scrollbar {
