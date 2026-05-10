@@ -1,12 +1,12 @@
 -- ----------------------------
--- TFG - ADO - Tienda de Videojuegos
+-- TFG - ADO - Tienda de Hestias_Lotus
 -- ----------------------------
 -- Mantener este Script en el Github y por favor no borrar el script del Github
 -- Lo digo porque asi puedo seguir un control de versiones de la BBDD
 SET FOREIGN_KEY_CHECKS=0;
-DROP DATABASE IF EXISTS TFG_ADO_Tienda_Videojuegos;
-CREATE DATABASE TFG_ADO_Tienda_Videojuegos CHARACTER SET utf8mb4;
-USE TFG_ADO_Tienda_Videojuegos;
+DROP DATABASE IF EXISTS TFG_ADO_Tienda_Hestias_Lotus;
+CREATE DATABASE TFG_ADO_Tienda_Hestias_Lotus CHARACTER SET utf8mb4;
+USE TFG_ADO_Tienda_Hestias_Lotus;
 
 -- ----------------------------
 -- Idiomas

@@ -2,7 +2,7 @@
 -- Limpieza de datos previa
 -- ----------------------------
 SET FOREIGN_KEY_CHECKS = 0;
-USE TFG_ADO_Tienda_Videojuegos;
+USE TFG_ADO_Tienda_Hestias_Lotus;
 
 DELETE FROM ListaDeseos;
 DELETE FROM Administadores;

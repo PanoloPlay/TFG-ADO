@@ -4,7 +4,7 @@
     // ES POSIBLE QUE EN LA CARPETA "MAIL", EN EL FICHERO "mail.php", EN LA FUNCIÓN "mail_Data()", FALTEN LOS CREDENCIALES DE MAILTRAP, SI ES ASÍ, PONLOS SI DESEAS USAR LA MENSAJERÍA
     // $activateMail = false;
 
-    $BBDD_Name = "tfg_ado_tienda_videojuegos";
+    $BBDD_Name = "TFG_ADO_Tienda_Hestias_Lotus";
     $BBDD_Host = "127.0.0.1";
     // cambiar al suvir a AWS, el usuatrio y contraseña de la base de datos
     $BBDD_User = "root";

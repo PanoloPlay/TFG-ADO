@@ -4,7 +4,7 @@ require_once "../BBDD/profile_queries.php";
 
 $idSesion = (int)($_SESSION['id_usuario'] ?? 0);
 $nicknameSesion = $_SESSION['nickname'] ?? '';
-$nicknameUrl = trim($_GET['usuario'] ?? '');
+$nicknameUrl = trim($_GET['user'] ?? '');
 
 $perfilNoEncontrado = false;
 $perfilPrivado = false;
@@ -291,7 +291,7 @@ if (!$perfilNoEncontrado && $usuario) {
                                     <?php endif; ?>
                                 </div>
 
-                                <a href="./profile.php?usuario=<?= e($amigo['amigo']) ?>" class="friend-link">
+                                <a href="./profile.php?user=<?= e($amigo['amigo']) ?>" class="friend-link">
                                     <?= e($amigo['amigo']) ?>
                                 </a>
                             </li>

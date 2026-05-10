@@ -68,18 +68,32 @@ function sonAmigosDeAmigos(PDO $BBDD, int $id1, int $id2): bool
 {
     $query = $BBDD->prepare("
         SELECT 1
-        FROM Amigos a1
-        INNER JOIN Amigos a2
-            ON a1.id_usuario2 = a2.id_usuario1
-        WHERE a1.id_usuario1 = ?
-          AND a2.id_usuario2 = ?
-          AND a1.estado = 'aceptada'
-          AND a2.estado = 'aceptada'
+        FROM (
+            SELECT id_usuario1 AS origen, id_usuario2 AS destino
+            FROM Amigos
+            WHERE estado = 'aceptada'
+            UNION
+            SELECT id_usuario2 AS origen, id_usuario1 AS destino
+            FROM Amigos
+            WHERE estado = 'aceptada'
+        ) f1
+        INNER JOIN (
+            SELECT id_usuario1 AS origen, id_usuario2 AS destino
+            FROM Amigos
+            WHERE estado = 'aceptada'
+            UNION
+            SELECT id_usuario2 AS origen, id_usuario1 AS destino
+            FROM Amigos
+            WHERE estado = 'aceptada'
+        ) f2
+            ON f1.destino = f2.origen
+        WHERE f1.origen = ?
+          AND f2.destino = ?
         LIMIT 1
     ");
-    $query->execute([$id1, $id2]);
 
-    return (bool)$query->fetchColumn();
+    $query->execute([$id1, $id2]);
+    return (bool) $query->fetchColumn();
 }
 
 function getTotalBiblioteca(PDO $BBDD, int $idUsuario, string $nickname): int
