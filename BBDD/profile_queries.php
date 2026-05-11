@@ -72,7 +72,7 @@ function sonAmigosDeAmigos(PDO $BBDD, int $id1, int $id2): bool
             SELECT id_usuario1 AS origen, id_usuario2 AS destino
             FROM Amigos
             WHERE estado = 'aceptada'
-            UNION
+            UNION ALL
             SELECT id_usuario2 AS origen, id_usuario1 AS destino
             FROM Amigos
             WHERE estado = 'aceptada'
@@ -81,7 +81,7 @@ function sonAmigosDeAmigos(PDO $BBDD, int $id1, int $id2): bool
             SELECT id_usuario1 AS origen, id_usuario2 AS destino
             FROM Amigos
             WHERE estado = 'aceptada'
-            UNION
+            UNION ALL
             SELECT id_usuario2 AS origen, id_usuario1 AS destino
             FROM Amigos
             WHERE estado = 'aceptada'
@@ -93,6 +93,7 @@ function sonAmigosDeAmigos(PDO $BBDD, int $id1, int $id2): bool
     ");
 
     $query->execute([$id1, $id2]);
+
     return (bool) $query->fetchColumn();
 }
 

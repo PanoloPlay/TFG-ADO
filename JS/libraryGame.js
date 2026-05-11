@@ -95,14 +95,6 @@ async function orderByPriceDesc() {
     await (librarySorted = await librarySorted.sort((a, b) => b.precio.localeCompare(a.precio)));
 }
 
-async function orderByPriceAscOld() {
-    await (librarySorted = await librarySorted.sort((a, b) => {let precioA = (a.precio - (a.precio * (a.descuento / 100))); let precioB = (b.precio - (b.precio * (b.descuento / 100))); return precioA.localeCompare(precioB)}));
-}
-
-async function orderByPriceDescOld() {
-    await (librarySorted = await librarySorted.sort((a, b) => {let precioA = (a.precio - (a.precio * (a.descuento / 100))); let precioB = (b.precio - (b.precio * (b.descuento / 100))); return precioB.localeCompare(precioA)}));
-}
-
 async function orderByDiscountAsc() {
     await (librarySorted = await librarySorted.sort((a, b) => a.descuento.localeCompare(b.descuento)));
 }
@@ -185,7 +177,7 @@ async function setUpSideLibrary() {
         }
 
         let gameSideImg = document.createElement("img");
-        gameSideImg.src = "../IMG/juegos/" + gameSideIco + "/icons/icon.svg";
+        gameSideImg.src = "../MEDIA/IMG/juegos/" + gameSideIco + "/icons/icon.svg";
         gameSideImg.alt = gameSideName;
         gameSideImg.width = 25;
         gameSideImg.height = 25;
@@ -229,7 +221,7 @@ async function setUpGame(game) {
     gameMainIco = await gameMainIco.replaceAll(";", "");
 
     let mainGameIMG = document.createElement("img");
-    mainGameIMG.src = "../IMG/juegos/" + gameMainIco + "/icons/banner.svg";
+    mainGameIMG.src = "../MEDIA/IMG/juegos/" + gameMainIco + "/icons/banner.svg";
     mainGameIMG.alt = library[game.id]["nombre_juego"];
     mainGameIMG.className = "d-block w-100";
     mainGameIMG.height = 200;
@@ -279,7 +271,7 @@ async function setUpAchivements(game) {
             achivementIcoName = await achivementIcoName.replaceAll(";", "");
 
             let achievementObtainedImg = document.createElement("img");
-            achievementObtainedImg.src = "../IMG/juegos/" + gameIcoPath + "/achivements/" + achivementIcoName + ".svg";
+            achievementObtainedImg.src = "../MEDIA/IMG/juegos/" + gameIcoPath + "/achivements/" + achivementIcoName + ".svg";
             achievementObtainedImg.alt = achievements_obtained[i]["nombre_logro"];
             achievementObtainedImg.width = 50;
             achievementObtainedImg.height = 50;
@@ -299,7 +291,7 @@ async function setUpAchivements(game) {
             achivementIcoName = await achivementIcoName.replaceAll(";", "");
 
             let achievementObtainedImg = document.createElement("img");
-            achievementObtainedImg.src = "../IMG/juegos/" + gameIcoPath + "/achivements/" + achivementIcoName + ".svg";
+            achievementObtainedImg.src = "../MEDIA/IMG/juegos/" + gameIcoPath + "/achivements/" + achivementIcoName + ".svg";
             achievementObtainedImg.style.filter = "grayscale(100%)";
             achievementObtainedImg.alt = achievements_unknown[i]["nombre_logro"];
             achievementObtainedImg.width = 50;
@@ -324,7 +316,7 @@ async function setUpAchivements(game) {
         achievementObtained.className = "achievement-obtained d-flex justify-content-start w-100";
 
         let achievementObtainedImg = document.createElement("img");
-        achievementObtainedImg.src = "../IMG/juegos/" + gameIcoPath + "/achivements/" + achivementIcoName + ".svg";
+        achievementObtainedImg.src = "../MEDIA/IMG/juegos/" + gameIcoPath + "/achivements/" + achivementIcoName + ".svg";
         achievementObtainedImg.alt = achievements_obtainedRecent[i]["nombre_logro"];
         achievementObtainedImg.width = 100;
         achievementObtainedImg.height = 100;
@@ -426,7 +418,7 @@ async function setUpMainLibraryList() {
         gameList.className = "game-list card";
         gameList.style.margin = "2px";
         gameList.style.width = "250px";
-        gameList.style.height = "280px";
+        gameList.style.height = "300px";
 
         gameList.addEventListener("click", async function() {
             gameName = librarySorted[i]["nombre_juego"];
@@ -435,7 +427,7 @@ async function setUpMainLibraryList() {
         });
 
         let gameListImg = document.createElement("img");
-        gameListImg.src = "../IMG/juegos/" + gameListName + "/icons/icon.svg";
+        gameListImg.src = "../MEDIA/IMG/juegos/" + gameListName + "/icons/icon.svg";
         gameListImg.className = "game-list-img card-img-top";
         gameListImg.alt = librarySorted[i]["nombre_juego"];
         gameListImg.width = 150;
@@ -473,7 +465,7 @@ async function setUpMainLibraryList() {
             gameListDescripcion.textContent = "Valoraciones positivas: " + librarySorted[i]["valoraciones_positivas"];
         }
         else if (orderType == "Valoración positiva ratio (asc)" || orderType == "Valoración positiva ratio (desc)") {
-            gameListDescripcion.textContent = "Ratio positivas: " + (librarySorted[i]["valoracion_media"] * 100).toFixed(2) + "%";
+            gameListDescripcion.textContent = "Ratio valoración positivas: " + (librarySorted[i]["valoracion_media"] * 100).toFixed(2) + "%";
         }
 
         gameListData.appendChild(gameListDescripcion);

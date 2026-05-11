@@ -1,135 +1,508 @@
 <?php require_once '../GENERAL/[General_REQUIRES].php'; ?>
-
+<?php require_once '../BBDD/game_queries.php'; ?>
 <?php require_once '../GENERAL/[html_START - head_START].php'; ?>
-
-<link rel="stylesheet" href="../CSS/game.css">
 
 <script src="../JS/checkIfXExists.js" defer></script>
 <script src="../JS/game.js" defer></script>
+<script src="../JS/game-alerts.js" defer></script>
+
+<link rel="stylesheet" href="../CSS/game.css">
 
 <?php require_once '../GENERAL/[head_END - body_START - header - main_START].php'; ?>
 
-<?php if (isset($_SESSION['nickname'])) { ?>
-<input type="hidden" id="hdnSession" data-value="<?php echo $_SESSION['nickname']; ?>" />
-<?php 
-    }
-    else {
-        ?>
-        <input type="hidden" id="hdnSession" data-value="" />
-        <?php
-    }
-?>
+<?php
+$gameId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+$mensaje = trim((string)($_GET['game_message'] ?? ''));
+$tipoMensaje = in_array($_GET['game_message_type'] ?? '', ['success', 'danger', 'info', 'warning'], true)
+    ? $_GET['game_message_type']
+    : 'info';
 
-<div id="error-section">
-</div>
+$gameDataPhp = null;
+$gameNamePhp = '';
+$categories = [];
+$comments = [];
+$positiveCount = 0;
+$negativeCount = 0;
+$userBought = false;
+$userReview = null;
+$userNickname = $_SESSION['nickname'] ?? null;
 
-<h1 id="big-game-title" class="game-title"></h1>
-<aside class="game-hero">
-    <p id="game-description"></p>
-    <p id="game-developer"></p>
-    <p id="game-release-date"></p>
-    <p id="game-rating" class="game-rating_X"></p>
-    <div id="game-categories">
-    </div>
-</aside>
+$userLanguages = [
+    'id_idioma_principal' => '',
+    'id_idioma_secundario' => ''
+];
 
-<div id="carouselExampleIndicators" class="carousel slide w-50">
-    <div id="carousel-container" class="carousel-inner">
-        <?php
-        if (isset($_GET["name"])) {
+if (!empty($userNickname)) {
+    $userLanguages = getUserLanguages($BBDD, $userNickname);
+}
 
-            $active = true;
-            $exists = false;
+if ($gameId > 0) {
+    $gameDataPhp = getGameData($BBDD, $gameId);
 
-            $gameName = $_GET["name"];
-            $gameName = str_replace(".", "", $gameName);
-            $gameName = str_replace(",", "", $gameName);
-            $gameName = str_replace(":", "", $gameName);
-            $gameName = str_replace(";", "", $gameName);
+    if ($gameDataPhp) {
+        $gameNamePhp = $gameDataPhp['nombre_juego'];
 
-            $gameName = trim($gameName);
+        $categories = getGameCategories($BBDD, $gameId);
+        $comments = getGameComments($BBDD, $gameNamePhp);
+        $positiveCount = getPositiveRatingsCount($BBDD, $gameNamePhp);
+        $negativeCount = getNegativeRatingsCount($BBDD, $gameNamePhp);
 
-            $path = "../VIDEO/" . $gameName . "/*.*";
-            $array = glob($path);
+        if (!empty($userNickname)) {
+            $userBought = hasUserBoughtGame($BBDD, $userNickname, $gameNamePhp);
 
-            foreach ($array as $value) {
-                $finalValue = trim($value);
-                if ($active) {
-                    ?>
-                    <div class="carousel-item active">
-                    <?php
-                    $active = false;
-                    $exists = true;
-                }
-                else {
-                    ?>
-                    <div class="carousel-item">
-                    <?php
-                }
-                ?>
-                        <video class="video-carousel d-block w-100" controls>
-                            <source src="<?php echo $finalValue ?>" type="video/mp4">
-                            <source src="<?php echo $finalValue ?>" type="video/ogg">
-                            Your browser does not support the video tag.
-                        </video>
-                    </div>
-                <?php
-            }
-
-            $path = "../IMG/juegos/" . $gameName . "/*.*";
-            $array = glob($path);
-
-            foreach ($array as $value) {
-                $finalValue = trim($value);
-                if ($active) {
-                    ?>
-                    <div class="carousel-item active">
-                    <?php
-                    $active = false;
-                    $exists = true;
-                }
-                else {
-                    ?>
-                    <div class="carousel-item">
-                    <?php
-                }
-                ?>
-                        <img src="<?php echo $finalValue ?>" class="d-block w-100" alt="...">
-                    </div>
-                <?php
-            }
-            ?> </div> <?php
-            
-            if ($exists) {
-                ?>
-                <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev" onclick="pauseVideoIfPlaying()">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Previous</span>
-                </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next" onclick="pauseVideoIfPlaying()">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Next</span>
-                </button>
-                <?php
-            }
-            else {
-                ?>
-                <div class="carousel-item active">
-                    <img src="../IMG/juegos/gamePlaceholderIMG_Large.png" class="d-block w-100" alt="...">
-                </div>
-                <?php
+            if ($userBought) {
+                $userReview = getUserReview($BBDD, $userNickname, $gameNamePhp);
             }
         }
-        ?>
+    }
+}
+?>
+
+<input type="hidden" id="hdnSession" data-value="<?php echo e($userNickname ?? ''); ?>" />
+<input type="hidden" id="hdnGameId" data-value="<?php echo e((string)$gameId); ?>" />
+<input type="hidden" id="hdnGameName" data-value="<?php echo e($gameNamePhp); ?>" />
+<input type="hidden" id="hdnUserLangPrimary" data-value="<?php echo e($userLanguages['id_idioma_principal'] ?? ''); ?>" />
+<input type="hidden" id="hdnUserLangSecondary" data-value="<?php echo e($userLanguages['id_idioma_secundario'] ?? ''); ?>" />
+
+<div id="error-section"></div>
+
+<div id="gameAlertContainer"
+     data-alert-visible="<?php echo ($mensaje !== '') ? '1' : '0'; ?>"
+     data-alert-type="<?php echo e($tipoMensaje); ?>"
+     data-alert-message="<?php echo e($mensaje); ?>">
+</div>
+
+<?php if (!$gameDataPhp): ?>
+
+    <section class="game-page">
+        <div class="error-message">
+            <span class="material-symbols-outlined">videogame_asset_off</span>
+            <h2>Juego no encontrado</h2>
+            <p>Lo sentimos, el juego que buscas no existe.</p>
+            <a class="btn" href="./">Volver al inicio</a>
+        </div>
+    </section>
+
+<?php else: ?>
+
+<section class="game-page">
+    <div class="game-main-content">
+
+        <h1 id="big-game-title" class="game-title">
+            <?php echo e($gameDataPhp['nombre_juego']); ?>
+        </h1>
+
+        <section class="game-media-panel">
+            <div id="carouselExampleIndicators" class="carousel slide game-carousel">
+                <div id="carousel-container" class="carousel-inner">
+                    <?php
+                    $active = true;
+                    $exists = false;
+
+                    $gameFolder = $gameNamePhp;
+                    $gameFolder = str_replace([".", ",", ":", ";"], "", $gameFolder);
+                    $gameFolder = trim($gameFolder);
+
+                    $path = "../MEDIA/VIDEO/" . $gameFolder . "/*.*";
+                    $array = glob($path) ?: [];
+
+                    foreach ($array as $value) {
+                        $finalValue = trim($value);
+                        ?>
+                        <div class="carousel-item <?php echo $active ? 'active' : ''; ?>">
+                            <video class="video-carousel d-block w-100" controls>
+                                <source src="<?php echo e($finalValue); ?>" type="video/mp4">
+                                <source src="<?php echo e($finalValue); ?>" type="video/ogg">
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+                        <?php
+                        $active = false;
+                        $exists = true;
+                    }
+
+                    $path = "../MEDIA/IMG/juegos/" . $gameFolder . "/*.*";
+                    $array = glob($path) ?: [];
+
+                    foreach ($array as $value) {
+                        $finalValue = trim($value);
+                        ?>
+                        <div class="carousel-item <?php echo $active ? 'active' : ''; ?>">
+                            <img src="<?php echo e($finalValue); ?>" class="d-block w-100 game-image" alt="Game image">
+                        </div>
+                        <?php
+                        $active = false;
+                        $exists = true;
+                    }
+
+                    if (!$exists) {
+                        ?>
+                        <div class="carousel-item active">
+                            <img src="../MEDIA/IMG/juegos/gamePlaceholderIMG_Large.png" class="d-block w-100 game-image" alt="Placeholder">
+                        </div>
+                        <?php
+                    }
+                    ?>
+                </div>
+
+                <?php if ($exists): ?>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev" onclick="pauseVideoIfPlaying()">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next" onclick="pauseVideoIfPlaying()">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                <?php endif; ?>
+            </div>
+        </section>
+
+        <section class="game-description-panel">
+            <h2>Acerca del juego</h2>
+            <p id="game-description"><?php echo e($gameDataPhp['descripcion'] ?? 'Descripción no disponible.'); ?></p>
+        </section>
+
+
+
     </div>
-</div>
 
-<div id="purchase-section">
-</div>
+    <aside class="game-sidebar">
 
-<div id="comment-section">
-</div>
+        <div class="game-purchase-card">
+            <div class="purchase-header">
+                <h3>Comprar juego</h3>
+            </div>
+            <div id="purchase-section">
+                <?php
+                $price = (float)($gameDataPhp['precio'] ?? 0);
+                $discount = (float)($gameDataPhp['descuento'] ?? 0);
+                $finalPrice = $discount > 0 ? $price * (1 - $discount / 100) : $price;
+                ?>
+                <?php if ($userBought): ?>
+                    <div class="owned-message">¡Ya tienes este juego en tu biblioteca!</div>
+                    <div class="game-title">Descargar: <?php echo e($gameDataPhp['nombre_juego']); ?></div>
+                    <button class="download-button" type="button" onclick="window.location.href='./libraryGame.php?name=<?php echo urlencode($gameDataPhp['nombre_juego']); ?>'">Descargar</button>
+                <?php else: ?>
+                    <div class="game-title">Comprar: <?php echo e($gameDataPhp['nombre_juego']); ?></div>
+                    <p class="game-price">Precio: <?php echo number_format($finalPrice, 2); ?>€</p>
+                    <?php if ($discount > 0): ?>
+                        <p class="game-discount">Descuento: <?php echo $discount; ?>%</p>
+                    <?php endif; ?>
+                    <button class="btn btn-primary" id="buy-button" type="button">Comprar</button>
+                    <?php
+                    $inWishlist = false;
+
+                    if (!empty($userNickname)) {
+                        try {
+                            $stmtWishlist = $BBDD->prepare("
+                                SELECT COUNT(*) AS in_wishlist
+                                FROM ListaDeseos
+                                WHERE nickname = ? AND nombre_juego = ?
+                            ");
+                            $stmtWishlist->execute([$userNickname, $gameNamePhp]);
+                            $wishlistResult = $stmtWishlist->fetch(PDO::FETCH_ASSOC);
+                            $inWishlist = !empty($wishlistResult) && ((int)($wishlistResult['in_wishlist'] ?? 0) > 0);
+                        } catch (PDOException $e) {
+                            $inWishlist = false;
+                        }
+                    }
+                    ?>
+                    <?php if (!$inWishlist): ?>
+                        <button class="wishlist-button" id="add-wishlist-button" type="button">Añadir a la lista de deseos</button>
+                    <?php else: ?>
+                        <button class="wishlist-button" id="remove-wishlist-button" type="button">Quitar de la lista de deseos</button>
+                    <?php endif; ?>
+                <?php endif; ?>
+            </div>
+        </div>
+
+        <div class="game-info-card">
+            <h3>Información</h3>
+
+            <div class="game-info-list">
+                <div class="game-info-item">
+                    <span class="label">Desarrollador</span>
+                    <p id="game-developer"><?php echo e($gameDataPhp['desarrollador'] ?? 'Desarrollador desconocido.'); ?></p>
+                </div>
+
+                <div class="game-info-item">
+                    <span class="label">Fecha lanzamiento</span>
+                    <p id="game-release-date"><?php echo e($gameDataPhp['fecha_publicacion'] ?? 'Fecha no disponible.'); ?></p>
+                </div>
+
+                <div class="game-info-item">
+                    <span class="label">Valoraciones</span>
+                    <p id="game-rating"><?php echo (int)$positiveCount; ?> positivas</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-category-card">
+            <h3>Categorías</h3>
+            <div id="game-categories" class="game-category-list">
+                <?php if (!empty($categories)): ?>
+                    <?php foreach ($categories as $cat): ?>
+                        <button class="category-button" type="button" onclick="goToShopFilterByCategory('<?php echo e($cat['nombre_categoria']); ?>')"><?php echo e($cat['nombre_categoria']); ?></button>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <span class="game-category">Sin categorías</span>
+                <?php endif; ?>
+            </div>
+        </div>
+
+    </aside>
+            <section class="game-comments-panel">
+            <div class="section-title">
+                <h2>Reseñas y comentarios</h2>
+                <p class="reviews-stats">
+                    <?php echo (int)$positiveCount; ?> positivas · <?php echo (int)$negativeCount; ?> negativas
+                </p>
+            </div>
+                    
+            <div id="comment-section">
+                <?php if ($userBought): ?>
+                    <div class="user-comment-section">
+                        <?php if (!$userReview): ?>
+                            <div class="owned-make-comment review-form" id="comment-form-new">
+                                <p>Escribe tu opinión sobre <?php echo e($gameDataPhp['nombre_juego']); ?> aquí:</p>
+
+                                <textarea id="comment-input-new" placeholder="Escribe tu comentario aquí..."></textarea>
+
+                                <div class="review-vote-group" id="review-vote-group-new">
+                                    <input type="radio" name="review-rating-new" id="review-positive-new" value="positiva" checked>
+                                    <label for="review-positive-new" class="review-vote-button review-vote-positive">
+                                        <span class="material-symbols-outlined">thumb_up</span>
+                                        Lo recomiendo
+                                    </label>
+
+                                    <input type="radio" name="review-rating-new" id="review-negative-new" value="negativa">
+                                    <label for="review-negative-new" class="review-vote-button review-vote-negative">
+                                        <span class="material-symbols-outlined">thumb_down</span>
+                                        No lo recomiendo
+                                    </label>
+                                </div>
+
+                                <button id="submit-comment-button" type="button">Enviar comentario</button>
+                            </div>
+                        <?php else: ?>
+                            <div class="owned-edit-comment review-form" id="comment-form-edit">
+                                <p>Tu opinión sobre <?php echo e($gameDataPhp['nombre_juego']); ?> está aquí:</p>
+
+                                <textarea id="comment-input" placeholder="Escribe tu comentario aquí..." disabled><?php echo e($userReview['comentario']); ?></textarea>
+
+                                <div class="review-vote-group is-disabled" id="review-vote-group-edit">
+                                    <input
+                                        type="radio"
+                                        name="review-rating-edit"
+                                        id="review-positive-edit"
+                                        value="positiva"
+                                        <?php echo (($userReview['valoracion'] ?? '') === 'positiva') ? 'checked' : ''; ?>
+                                        disabled
+                                    >
+                                    <label for="review-positive-edit" class="review-vote-button review-vote-positive">
+                                        <span class="material-symbols-outlined">thumb_up</span>
+                                        Lo recomiendo
+                                    </label>
+
+                                    <input
+                                        type="radio"
+                                        name="review-rating-edit"
+                                        id="review-negative-edit"
+                                        value="negativa"
+                                        <?php echo (($userReview['valoracion'] ?? '') === 'negativa') ? 'checked' : ''; ?>
+                                        disabled
+                                    >
+                                    <label for="review-negative-edit" class="review-vote-button review-vote-negative">
+                                        <span class="material-symbols-outlined">thumb_down</span>
+                                        No lo recomiendo
+                                    </label>
+                                </div>
+
+                                <button id="edit-comment-button" type="button">Editar</button>
+                                <button id="save-comment-button" type="button" class="is-hidden" disabled>Guardar cambios</button>
+                                <button id="delete-comment-button" type="button" class="is-hidden" disabled>Borrar comentario</button>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                <?php endif; ?>
+
+                <?php if (!empty($userNickname)): ?>
+                    <div class="reviews-toolbar">
+                        <div class="reviews-toolbar-row d-flex flex-wrap gap-2 align-items-end">
+
+                            <!-- Buscador -->
+                            <div class="filter-item flex-grow-1" style="min-width: 250px;">
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <span class="material-symbols-outlined">search</span>
+                                    </span>
+                                    <input id="review-search" class="form-control" type="search" placeholder="Buscar en reseñas">
+                                </div>
+                            </div>
+
+                            <!-- Filtro Valoración -->
+                            <div class="filter-item">
+                                <div class="dropdown">
+                                    <button class="btn btn-outline-light dropdown-toggle d-flex align-items-center gap-2"
+                                            type="button"
+                                            id="ratingDropdown"
+                                            data-bs-toggle="dropdown">
+                                        <span id="selected-rating-icon" class="material-symbols-outlined">star</span>
+                                        <span id="selected-rating-text">Todas las valoraciones</span>
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="ratingDropdown">
+                                        <li>
+                                            <a class="dropdown-item d-flex align-items-center gap-2" href="#" data-value="all" data-icon="star">
+                                                <span class="material-symbols-outlined">star</span>
+                                                Todas las valoraciones
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item d-flex align-items-center gap-2" href="#" data-value="positiva" data-icon="thumb_up">
+                                                <span class="material-symbols-outlined text-success">thumb_up</span>
+                                                Positivas
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item d-flex align-items-center gap-2" href="#" data-value="negativa" data-icon="thumb_down">
+                                                <span class="material-symbols-outlined text-danger">thumb_down</span>
+                                                Negativas
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- Filtro Idioma -->
+                            <div class="filter-item">
+                                <div class="dropdown">
+                                    <button class="btn btn-outline-light dropdown-toggle d-flex align-items-center gap-2"
+                                            type="button"
+                                            id="languageDropdown"
+                                            data-bs-toggle="dropdown">
+                                        <span id="selected-language-icon" class="material-symbols-outlined">language</span>
+                                        <span id="selected-language-text">Todos los idiomas</span>
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="languageDropdown">
+                                        <li>
+                                            <a class="dropdown-item d-flex align-items-center gap-2" href="#" data-value="all" data-icon="language">
+                                                <span class="material-symbols-outlined">language</span>
+                                                Todos los idiomas
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item d-flex align-items-center gap-2" href="#" data-value="my" data-icon="translate">
+                                                <span class="material-symbols-outlined">translate</span>
+                                                Tu idioma
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- Ordenar -->
+                            <div class="filter-item">
+                                <div class="dropdown">
+                                    <button class="btn btn-outline-light dropdown-toggle d-flex align-items-center gap-2"
+                                            type="button"
+                                            id="sortDropdown"
+                                            data-bs-toggle="dropdown">
+                                        <span id="selected-sort-icon" class="material-symbols-outlined">sort</span>
+                                        <span id="selected-sort-text">Más recientes</span>
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="sortDropdown">
+                                        <li>
+                                            <a class="dropdown-item d-flex align-items-center gap-2" href="#" data-value="new" data-icon="schedule">
+                                                <span class="material-symbols-outlined">schedule</span>
+                                                Más recientes
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item d-flex align-items-center gap-2" href="#" data-value="old" data-icon="history">
+                                                <span class="material-symbols-outlined">history</span>
+                                                Más antiguas
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item d-flex align-items-center gap-2" href="#" data-value="positive" data-icon="thumb_up">
+                                                <span class="material-symbols-outlined text-success">thumb_up</span>
+                                                Positivas primero
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item d-flex align-items-center gap-2" href="#" data-value="negative" data-icon="thumb_down">
+                                                <span class="material-symbols-outlined text-danger">thumb_down</span>
+                                                Negativas primero
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- Rango de Fecha -->
+                            <div class="filter-item date-range-wrapper">
+                                <button id="review-date-toggle" class="btn btn-outline-light d-flex align-items-center gap-2" type="button">
+                                    <span class="material-symbols-outlined">calendar_today</span>
+                                    Rango de fecha
+                                </button>
+                                <div id="date-dropdown" class="date-dropdown mt-2">
+                                    <div class="d-flex gap-3">
+                                        <div>
+                                            <small class="text-muted">Desde:</small>
+                                            <input id="review-date-from" type="date" class="form-control">
+                                        </div>
+                                        <div>
+                                            <small class="text-muted">Hasta:</small>
+                                            <input id="review-date-to" type="date" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Limpiar Filtros -->
+                            <div class="filter-item filter-reset">
+                                <button id="review-reset" class="btn btn-outline-danger d-flex align-items-center gap-2" type="button">
+                                    <span class="material-symbols-outlined">refresh</span>
+                                    Limpiar
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+                <?php endif; ?>
+
+                <div id="comment-list" class="comment-list">
+                    <?php if (!empty($comments)): ?>
+                        <?php foreach ($comments as $comment): ?>
+                            <?php
+                                $commentTimestamp = !empty($comment['fechaPublicacion']) ? strtotime($comment['fechaPublicacion']) : 0;
+                                $commentLanguage = $comment['id_idioma_comentario'] ?? '';
+                                $searchText = strtolower(trim(($comment['nickname'] ?? '') . ' ' . ($comment['comentario'] ?? '')));
+                            ?>
+                            <div
+                                class="comment comment-card"
+                                data-valoracion="<?php echo e($comment['valoracion']); ?>"
+                                data-idioma="<?php echo e($commentLanguage); ?>"
+                                data-timestamp="<?php echo e((string)$commentTimestamp); ?>"
+                                data-search-text="<?php echo e($searchText); ?>"
+                            >
+                                <p><strong><?php echo e($comment['nickname']); ?></strong></p>
+                                <p>Valoración: <span class="rating-<?php echo e($comment['valoracion']); ?>"><?php echo e(ucfirst($comment['valoracion'])); ?></span></p>
+                                <p><?php echo e($comment['comentario']); ?></p>
+                                <p>Fecha: <?php echo e($comment['fechaPublicacion']); ?></p>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                    <?php endif; ?>
+                </div>
+
+                <p id="no-comment-results" class="no-comment-results" style="display:none;">No se han encontrado reseñas con esos filtros.</p>
+            </div>
+        </section>
+</section>
+
+<?php endif; ?>
 
 <?php require_once '../GENERAL/[main_END - footer].php'; ?>
-
 <?php require_once '../GENERAL/[Page_END].php'; ?>

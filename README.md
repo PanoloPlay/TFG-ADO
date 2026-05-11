@@ -5,10 +5,10 @@
 
 > Una plataforma web que ofrece la calidez que da la diosa del hogar Hestia.
 
-## 🚀 Acceso a la web
-Prueba la aplicación aquí 🏗️ (enlace)
+## 🚀 Acceso a la web en AWS
 
-*(Nota: Agregar el enlace de acceso a la web).*
+[Web TFG-ADO Hestia's Lotus](http://tfg-ado-hestias-lotus.us-east-1.elasticbeanstalk.com/)
+
 
 ---
 
@@ -43,17 +43,17 @@ Si quieres correr este proyecto en tu máquina, sigue estos pasos:
 2. **Importa la BBDD en xampp**
 
    Ruta del schema.sql
-   - /BBDD/schema.sql
+   - /BBDD/SQL/schema.sql
 
 
    ```bash
-   https://github.com/PanoloPlay/TFG-ADO/blob/main/BBDD/schema.sql
+   https://github.com/PanoloPlay/TFG-ADO/blob/main/BBDD/SQL/schema.sql
 4. **Importa las datos de prueba de la BBDD**
    
    Ruta del test-data.sql
-   - /BBDD/test-data.sql
+   - /BBDD/SQL/test-data.sql
    ```bash
-   https://github.com/PanoloPlay/TFG-ADO/blob/main/BBDD/test-data.sql
+   https://github.com/PanoloPlay/TFG-ADO/blob/main/BBDD/SQL/test-data.sql
 F. **Final**
 
 De momento con lo anterior funcionara la web.

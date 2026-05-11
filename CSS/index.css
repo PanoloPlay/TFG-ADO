@@ -175,6 +175,25 @@
     font-weight: 700;
 }
 
+/* Game links */
+.feature-link,
+.game-link,
+.recommend-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.feature-link:hover,
+.game-link:hover,
+.recommend-link:hover {
+    transform: translateY(-2px);
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: var(--color-greyneutral-8);
+    text-decoration: none;
+}
+
 .section {
     margin-top: 18px;
     padding: 22px;

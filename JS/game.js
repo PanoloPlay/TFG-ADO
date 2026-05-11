@@ -1,656 +1,455 @@
-let params = new URLSearchParams(document.location.search);
-var userNickname;
+let userNickname = "";
+let gameName = "";
+let gameId = 0;
+let userLangPrimary = "";
+let userLangSecondary = "";
 
-var gameName;
+$(window).on("load", function () {
+    userNickname = String($("#hdnSession").data("value") || "");
+    gameId = Number($("#hdnGameId").data("value") || 0);
+    gameName = String($("#hdnGameName").data("value") || "");
+    userLangPrimary = String($("#hdnUserLangPrimary").data("value") || "");
+    userLangSecondary = String($("#hdnUserLangSecondary").data("value") || "");
 
-var like = true;
-
-var userLanguages;
-
-var game;
-var bought;
-var userReview;
-var comments;
-var positive;
-var wishlist;
-var categories;
-
-var commentsSorted;
-var isFiltered = 0;
-
-var commentFilterMode = 0;
-
-$(window).on("load", async function() {
-    if (await getAllData()) {
-        await setUp();
-    }
+    initInteractions();
+    initReviewFilters();
+    initCommentActions();
+    initDateDropdown();
 });
 
-async function orderByDateAsc() {
-    await (commentsSorted = await commentsSorted.sort((a, b) => a.fechaPublicacion.localeCompare(b.fechaPublicacion)));
-    await setUpComments();
+function initInteractions() {
+    $("#buy-button").on("click", function () {
+        buyGame();
+    });
+
+    $("#add-wishlist-button").on("click", function () {
+        addWishlist();
+    });
+
+    $("#remove-wishlist-button").on("click", function () {
+        removeWishlist();
+    });
 }
 
-async function orderByDateDesc() {
-    await (commentsSorted = await commentsSorted.sort((a, b) => b.fechaPublicacion.localeCompare(a.fechaPublicacion)));
-    await setUpComments();
+function parseDateInput(value, endOfDay = false) {
+    if (!value) return null;
+
+    const parts = String(value).split("-");
+    if (parts.length !== 3) return null;
+
+    const year = Number(parts[0]);
+    const month = Number(parts[1]);
+    const day = Number(parts[2]);
+
+    if (!year || !month || !day) return null;
+
+    return endOfDay
+        ? new Date(year, month - 1, day, 23, 59, 59, 999)
+        : new Date(year, month - 1, day, 0, 0, 0, 0);
 }
 
+function getFilterValues() {
+    return {
+        search: String($("#review-search").val() || "").trim().toLowerCase(),
+        rating: String($("#ratingDropdown").data("current-value") || "all"),
+        languageFilter: String($("#languageDropdown").data("current-value") || "all"),
+        sortMode: String($("#sortDropdown").data("current-value") || "new"),
+        dateFrom: parseDateInput($("#review-date-from").val(), false),
+        dateTo: parseDateInput($("#review-date-to").val(), true)
+    };
+}
 
-async function getAllData() {
-    userNickname = $("#hdnSession").data('value');
-    gameName = params.get("name");
+function initReviewFilters() {
+    $("#review-search, #review-date-from, #review-date-to").on("input change", function () {
+        filterAndSortReviews();
+    });
 
-    if (gameName != null) {
+    $(document).on("click", ".dropdown-item[data-value]", function (e) {
+        e.preventDefault();
 
-        gameName = gameName.replaceAll("_", " ");
+        const $this = $(this);
+        const value = String($this.data("value") || "all");
+        const icon = String($this.data("icon") || "");
+        const text = $this.clone().find(".material-symbols-outlined").remove().end().text().trim();
+        const buttonId = $this.closest(".dropdown-menu").attr("aria-labelledby");
+
+        if (buttonId === "ratingDropdown") {
+            $("#ratingDropdown").data("current-value", value);
+            $("#selected-rating-icon").text(icon || "star");
+            $("#selected-rating-text").text(text);
+        } else if (buttonId === "languageDropdown") {
+            $("#languageDropdown").data("current-value", value);
+            $("#selected-language-icon").text(icon || "language");
+            $("#selected-language-text").text(text);
+        } else if (buttonId === "sortDropdown") {
+            $("#sortDropdown").data("current-value", value);
+            $("#selected-sort-icon").text(icon || "sort");
+            $("#selected-sort-text").text(text);
+        }
+
+        filterAndSortReviews();
+    });
+
+    $("#review-reset").on("click", function () {
+        $("#review-search").val("");
+        $("#review-date-from").val("");
+        $("#review-date-to").val("");
+
+        $("#ratingDropdown").data("current-value", "all");
+        $("#selected-rating-icon").text("star");
+        $("#selected-rating-text").text("Todas las valoraciones");
+
+        $("#languageDropdown").data("current-value", "all");
+        $("#selected-language-icon").text("language");
+        $("#selected-language-text").text("Todos los idiomas");
+
+        $("#sortDropdown").data("current-value", "new");
+        $("#selected-sort-icon").text("sort");
+        $("#selected-sort-text").text("Más recientes");
+
+        filterAndSortReviews();
+    });
+
+    $("#ratingDropdown").data("current-value", "all");
+    $("#languageDropdown").data("current-value", "all");
+    $("#sortDropdown").data("current-value", "new");
+
+    filterAndSortReviews();
+}
+
+function filterAndSortReviews() {
+    const { search, rating, languageFilter, sortMode, dateFrom, dateTo } = getFilterValues();
+
+    const comments = Array.from(document.querySelectorAll("#comment-list .comment-card"));
+    const noResults = document.getElementById("no-comment-results");
+
+    if (comments.length === 0) {
+        if (noResults) noResults.style.display = "block";
+        return;
     }
-    else {
 
-        let errorParam =  document.createElement("div");
-        errorParam.className = "error-message";
+    let filtered = comments.filter((card) => {
+        const searchText = String(card.dataset.searchText || "").toLowerCase();
+        const commentRating = String(card.dataset.valoracion || "");
+        const commentLanguage = String(card.dataset.idioma || "");
+        const commentTimestamp = Number(card.dataset.timestamp || 0);
 
-        let errorTitle = document.createElement("h2");
-        errorTitle.textContent = "Juego no encontrado";
+        const matchesSearch = !search || searchText.includes(search);
+        const matchesRating = rating === "all" || commentRating === rating;
+        const matchesLanguage =
+            languageFilter === "all" ||
+            (languageFilter === "my" && isMyLanguage(commentLanguage));
 
-        let errorText = document.createElement("p");
-        errorText.textContent = "Lo sentimos, el juego que buscas no existe.";
+        let matchesDate = true;
+        if (dateFrom || dateTo) {
+            const commentDate = new Date(commentTimestamp * 1000);
 
-        let errorButton = document.createElement("a");
-        errorButton.className = "btn";
-        errorButton.textContent = "Volver al inicio";
-        errorButton.href = "./";
+            if (dateFrom && commentDate < dateFrom) {
+                matchesDate = false;
+            }
 
-        errorParam.appendChild(errorTitle);
-        errorParam.appendChild(errorText);
-        errorParam.appendChild(errorButton);
+            if (dateTo && commentDate > dateTo) {
+                matchesDate = false;
+            }
+        }
 
-        document.getElementById("error-section").appendChild(errorParam);
+        return matchesSearch && matchesRating && matchesLanguage && matchesDate;
+    });
 
+    filtered.sort((a, b) => {
+        const dateA = Number(a.dataset.timestamp || 0);
+        const dateB = Number(b.dataset.timestamp || 0);
+
+        if (sortMode === "old") {
+            return dateA - dateB;
+        }
+
+        if (sortMode === "positive") {
+            const aPositive = a.dataset.valoracion === "positiva" ? 1 : 0;
+            const bPositive = b.dataset.valoracion === "positiva" ? 1 : 0;
+
+            if (bPositive !== aPositive) {
+                return bPositive - aPositive;
+            }
+
+            return dateB - dateA;
+        }
+
+        if (sortMode === "negative") {
+            const aNegative = a.dataset.valoracion === "negativa" ? 1 : 0;
+            const bNegative = b.dataset.valoracion === "negativa" ? 1 : 0;
+
+            if (bNegative !== aNegative) {
+                return bNegative - aNegative;
+            }
+
+            return dateB - dateA;
+        }
+
+        return dateB - dateA;
+    });
+
+    comments.forEach((card) => {
+        card.style.display = "none";
+    });
+
+    filtered.forEach((card) => {
+        card.style.display = "";
+        document.getElementById("comment-list").appendChild(card);
+    });
+
+    if (noResults) {
+        noResults.style.display = filtered.length === 0 ? "block" : "none";
+    }
+}
+
+function isMyLanguage(languageCode) {
+    if (!languageCode) {
         return false;
     }
 
-    game = await checkField_1(gameName, "get_game", "../AJAX/gameData.php");
-    if (!game) {
-        
-        window.location.href = './game.php?error=GameNotFound';
-        return false;
-    }
-
-    if (userNickname != null) {
-
-        bought = await checkField_2(gameName, userNickname, "check_bought", "../AJAX/gameData.php");
-
-        if (bought != null) {
-            userReview = await checkField_2(gameName, userNickname, "user_comment", "../AJAX/gameData.php");
-        }
-    }
-
-    comments = await checkField_1(gameName, "get_comments", "../AJAX/gameData.php");
-
-    commentsSorted = await checkField_1(gameName, "get_comments", "../AJAX/gameData.php");
-
-    positive = await checkField_1(gameName, "positive", "../AJAX/gameData.php");
-
-    wishlist = await checkField_2(gameName, userNickname, "get_wishlist", "../AJAX/gameData.php");
-
-    userLanguages = await checkField_2(gameName, userNickname, "get_languages", "../AJAX/gameData.php");
-
-    categories = await checkField_1(gameName, "get_game_categories", "../AJAX/gameData.php");
-
-    return true;
+    return (
+        languageCode === userLangPrimary ||
+        languageCode === userLangSecondary
+    );
 }
 
-async function setUp() {
-
-    document.getElementById("big-game-title").textContent = game[0]['nombre_juego'];
-    document.getElementById("game-description").textContent = game[0]['descripcion'];
-    document.getElementById("game-developer").textContent = "Desarrollador: " + game[0]['desarrollador'];
-    let date = new Date(game[0]['fecha_publicacion']);
-    document.getElementById("game-release-date").textContent = "Fecha de publicación: " + date.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
-
-    setUpGameCategories();
-
-    setUpGameInfo();
-    setUpPurchaseSection();
-    setUpComments();
+function initCommentActions() {
+    $("#submit-comment-button").on("click", createComment);
+    $("#edit-comment-button").on("click", enableCommentEdit);
+    $("#save-comment-button").on("click", saveComment);
+    $("#delete-comment-button").on("click", deleteComment);
 }
 
-async function setUpGameCategories() {
+function getSelectedRating(formSelector) {
+    const selected = document.querySelector(`${formSelector} input[type="radio"]:checked`);
+    return selected ? selected.value : "";
+}
 
-    let categorySection = document.getElementById("game-categories");
-    categorySection.innerHTML = "";
+function enableCommentEdit() {
+    $("#comment-input").prop("disabled", false);
+    $("#review-vote-group-edit input[type='radio']").prop("disabled", false);
+    $("#review-vote-group-edit").removeClass("is-disabled");
 
-    for (let pos = 0; pos < categories.length; pos++) {
+    $("#save-comment-button")
+        .removeClass("is-hidden")
+        .prop("disabled", false);
 
-        let categoryButton = document.createElement("button");
-        categoryButton.className = "category-button"
-        categoryButton.textContent = categories[pos]["categoria"];
+    $("#delete-comment-button")
+        .removeClass("is-hidden")
+        .prop("disabled", false);
 
-        categoryButton.addEventListener("click", goToShopFilterByCategory);
-        
-        categorySection.appendChild(categoryButton);
+    $("#edit-comment-button").prop("disabled", true);
+}
+
+function initDateDropdown() {
+    const toggleButton = $("#review-date-toggle");
+    const dropdown = $("#date-dropdown");
+
+    toggleButton.on("click", function () {
+        dropdown.toggleClass("active");
+        toggleButton.toggleClass("active");
+    });
+
+    $(document).on("click", function (e) {
+        if (!$(e.target).closest(".date-range-wrapper").length) {
+            dropdown.removeClass("active");
+            toggleButton.removeClass("active");
+        }
+    });
+}
+
+function redirectWithGameMessage(message, type = "success") {
+    const url = new URL(window.location.href);
+    url.searchParams.set("game_message", message);
+    url.searchParams.set("game_message_type", type);
+    window.location.href = url.toString();
+}
+
+async function createComment() {
+    if (!userNickname) {
+        showGameAlert("Debes iniciar sesión.", "warning");
+        return;
     }
-}
 
-async function setUpGameInfo() {
-    
-    if (comments == null) {
+    const comment = String($("#comment-input-new").val() || "").trim();
+    const rating = getSelectedRating("#comment-form-new");
 
-        document.getElementById("game-rating").textContent = "Aún no hay valoraciones para este juego.";
-        document.getElementById("game-rating").className = "game-rating-none";
-    } 
-    else {
+    if (!comment) {
+        showGameAlert("Escribe un comentario antes de enviarlo.", "warning");
+        return;
+    }
 
-        if (positive == null) {
+    if (!rating) {
+        showGameAlert("Selecciona una valoración.", "warning");
+        return;
+    }
 
-            document.getElementById("game-rating").textContent = "Valoraciones muy negativas (" + comments.length + ")";
-            document.getElementById("game-rating").className = "game-rating-terrible";
+    try {
+        const result = await checkField_4(
+            gameName,
+            userNickname,
+            rating,
+            comment,
+            "create_comment"
+        );
+
+        if (result && result.success) {
+            redirectWithGameMessage(result.message || "Comentario creado correctamente.", "success");
+        } else {
+            showGameAlert(result?.message || "No se pudo crear el comentario.", "danger");
         }
-        else {
-
-            let porcentage = (positive.length / comments.length) * 100;
-            
-
-            if (porcentage > 80) {
-
-                document.getElementById("game-rating").textContent = "Valoraciones muy positivas (" + comments.length + ")";
-                document.getElementById("game-rating").className = "game-rating-excellent";
-            }
-            else if (porcentage > 60) {
-
-                document.getElementById("game-rating").textContent = "Valoraciones positivas (" + comments.length + ")";
-                document.getElementById("game-rating").className = "game-rating-good";
-            }
-            else if (porcentage > 40) {
-
-                document.getElementById("game-rating").textContent = "Valoraciones variadas (" + comments.length + ")";
-                document.getElementById("game-rating").className = "game-rating-neutral";
-            }
-            else if (porcentage > 20) {
-
-                document.getElementById("game-rating").textContent = "Valoraciones negativas (" + comments.length + ")";
-                document.getElementById("game-rating").className = "game-rating-bad";
-            }
-            else {
-
-                document.getElementById("game-rating").textContent = "Valoraciones muy negativas (" + comments.length + ")";
-                document.getElementById("game-rating").className = "game-rating-terrible";
-            }
-        }
+    } catch (error) {
+        console.error(error);
+        showGameAlert("Ha ocurrido un error al crear el comentario.", "danger");
     }
 }
 
-async function setUpPurchaseSection() {
-
-    let purchaseSection = document.getElementById("purchase-section");
-    purchaseSection.innerHTML = "";
-
-    if (bought != null) {
-
-        let owned = document.createElement("div");
-        owned.className = "owned-message";
-        owned.textContent = "¡Ya has comprado este juego!";
-
-        purchaseSection.appendChild(owned);
-
-        let title = document.createElement("div");
-        title.className = "game-title";
-        title.textContent = "Descargar: " + game[0]['nombre_juego'];
-
-        purchaseSection.appendChild(title);
-
-        let downloadButton = document.createElement("button");
-        downloadButton.className = "download-button";
-        downloadButton.textContent = "Descargar";
-
-        downloadButton.addEventListener("click", function() {
-            window.location.href = './libraryGame.php?name=' + gameName.replaceAll(" ", "_");
-        });
-
-        purchaseSection.appendChild(downloadButton);
-    }
-    else {
-
-        let title = document.createElement("div");
-        title.className = "game-title";
-        title.textContent = "Comprar: " + game[0]['nombre_juego'];
-
-        purchaseSection.appendChild(title);
-
-        let price = document.createElement("div");
-        price.className = "game-price";
-
-        if (game[0]['descuento'] == 0 || game[0]['descuento'] == null) {
-            
-            price.textContent = game[0]['precio'] + "€";
-        }
-        else {
-
-            let discount = document.createElement("div");
-            discount.className = "game-discount";
-            discount.textContent = game[0]['descuento'] + "%";
-
-            let discountedPrice = (game[0]['precio'] - (game[0]['precio'] * (game[0]['descuento'] / 100)));
-
-            price.className = "game-price";
-            price.textContent = discountedPrice.toFixed(2) + "€";
-
-            purchaseSection.appendChild(discount);
-        }
-        
-        purchaseSection.appendChild(price);
-
-        let buyButton = document.createElement("button");
-        buyButton.className = "buy-button";
-        buyButton.textContent = "Comprar";
-
-        buyButton.addEventListener("click", buyGame);
-
-        purchaseSection.appendChild(buyButton);
-
-        if (!wishlist) {
-
-            let addWishlistButton = document.createElement("button");
-            addWishlistButton.className = "wishlist-button";
-            addWishlistButton.textContent = "Añadir a la lista de deseos";
-
-            addWishlistButton.addEventListener("click", addToWishlist);
-
-            purchaseSection.appendChild(addWishlistButton);
-        }
-        else {
-
-            let removeWishlistButton = document.createElement("button");
-            removeWishlistButton.className = "wishlist-button";
-            removeWishlistButton.textContent = "Quitar de la lista de deseos";
-
-            removeWishlistButton.addEventListener("click", removeToWishlist);
-
-            purchaseSection.appendChild(removeWishlistButton);
-        }
+async function saveComment() {
+    if (!userNickname) {
+        showGameAlert("Debes iniciar sesión.", "warning");
+        return;
     }
 
+    const comment = String($("#comment-input").val() || "").trim();
+    const rating = getSelectedRating("#comment-form-edit");
+
+    if (!comment) {
+        showGameAlert("Escribe un comentario antes de guardar.", "warning");
+        return;
+    }
+
+    if (!rating) {
+        showGameAlert("Selecciona una valoración.", "warning");
+        return;
+    }
+
+    try {
+        const result = await checkField_4(
+            gameName,
+            userNickname,
+            rating,
+            comment,
+            "update_comment"
+        );
+
+        if (result && result.success) {
+            redirectWithGameMessage(result.message || "Comentario actualizado correctamente.", "success");
+        } else {
+            showGameAlert(result?.message || "No se pudo actualizar el comentario.", "danger");
+        }
+    } catch (error) {
+        console.error(error);
+        showGameAlert("Ha ocurrido un error al actualizar el comentario.", "danger");
+    }
 }
 
-async function setUpComments() {
-
-    let commentsSection = document.getElementById("comment-section");
-    commentsSection.innerHTML = "";
-
-    if (bought != null) {
-
-        let userComments = document.createElement("div");
-        
-        if (userReview == null) {
-
-            userComments.className = "owned-make-comment";
-
-            let newP = document.createElement("p");
-            newP.textContent = "Escribe tu opinión sobre " + game[0]['nombre_juego'] + " aquí:";
-
-            userComments.appendChild(newP);
-
-            let commentInput = document.createElement("textarea");
-            commentInput.id = "comment-input-new";
-            commentInput.placeholder = "Escribe tu comentario aquí...";
-
-            userComments.appendChild(commentInput);
-
-            let likeButton = document.createElement("button");
-            likeButton.id = "like-button";
-
-            let likeSpan = document.createElement("span");
-            likeSpan.id = "likeDislike";
-            likeSpan.className = "material-symbols-outlined";
-
-            if (like) {
-                likeButton.className = "like";
-                likeSpan.textContent = "thumb_up";
-            }
-            else {
-                likeButton.className = "dislike";
-                likeSpan.textContent = "thumb_down";
-            }
-
-            likeButton.appendChild(likeSpan);
-
-            userComments.appendChild(likeButton);
-
-            likeButton.addEventListener("click", likeDislike);
-
-            let submitButton = document.createElement("button");
-            submitButton.id = "submit-comment-button";
-            submitButton.textContent = "Enviar comentario";
-
-            submitButton.addEventListener("click", submitComment);
-
-            userComments.appendChild(submitButton);
-        }
-        else {
-
-            userComments.className = "owned-edit-comment";
-
-            let newP = document.createElement("p");
-            newP.textContent = "Tu opinión sobre " + game[0]['nombre_juego'] + " esta aquí:";
-
-            userComments.appendChild(newP);
-
-            let commentInput = document.createElement("textarea");
-            commentInput.id = "comment-input";
-            commentInput.placeholder = "Escribe tu comentario aquí...";
-            commentInput.value = userReview[0]['comentario'];
-            commentInput.disabled = true;
-
-            userComments.appendChild(commentInput);
-
-            let likeButton = document.createElement("button");
-            likeButton.id = "like-button-new";
-
-            let likeSpan = document.createElement("span");
-            likeSpan.id = "likeDislike";
-            likeSpan.className = "material-symbols-outlined";
-
-            if (like) {
-                likeButton.className = "like";
-                likeSpan.textContent = "thumb_up";
-            }
-            else {
-                likeButton.className = "dislike";
-                likeSpan.textContent = "thumb_down";
-            }
-
-            likeButton.disabled = true;
-
-            likeButton.appendChild(likeSpan);
-
-            userComments.appendChild(likeButton);
-
-            likeButton.addEventListener("click", likeDislike);
-
-            let editButton = document.createElement("button");
-            editButton.id = "edit-comment-button";
-            editButton.textContent = "Editar";
-
-            editButton.addEventListener("click", editComment);
-
-            userComments.appendChild(editButton);
-
-            let saveButton = document.createElement("button");
-            saveButton.id = "save-comment-button";
-            saveButton.textContent = "Guardar cambios";
-            saveButton.disabled = true;
-
-            saveButton.addEventListener("click", saveComment);
-
-            userComments.appendChild(saveButton);
-
-            let deleteButton = document.createElement("button");
-            deleteButton.id = "delete-comment-button";
-            deleteButton.textContent = "Borrar comentario";
-            deleteButton.disabled = true;
-
-            deleteButton.addEventListener("click", deleteComment);
-
-            userComments.appendChild(deleteButton);
-        }
-
-        commentsSection.appendChild(userComments);
-
+async function deleteComment() {
+    if (!userNickname) {
+        showGameAlert("Debes iniciar sesión.", "warning");
+        return;
     }
 
-    if (commentsSorted == null) {
-
-        let noComments = document.createElement("div");
-        noComments.className = "no-comments";
-        noComments.textContent = "Aún no hay comentarios para este juego.";
-
-        commentsSection.appendChild(noComments);
+    if (!confirm("¿Seguro que quieres borrar tu reseña?")) {
+        return;
     }
-    else {
-        if (userNickname != null && userNickname != "") {
 
-            let filterButtonAll = document.createElement("button");
-            filterButtonAll.id = 0;
-            filterButtonAll.className = "filter-button";
-            filterButtonAll.textContent = "Filtro: Todos los comentarios";
-            filterButtonAll.addEventListener("click", filterComments);
+    try {
+        const result = await checkField_2(
+            gameName,
+            userNickname,
+            "delete_comment"
+        );
 
-            commentsSection.appendChild(filterButtonAll);
-
-            let filterButtonLanguage = document.createElement("button");
-            filterButtonLanguage.id = 1;
-            filterButtonLanguage.className = "filter-button";
-            filterButtonLanguage.textContent = "Filtro: Comentarios de tu idioma";
-            filterButtonLanguage.addEventListener("click", filterComments);
-
-            commentsSection.appendChild(filterButtonLanguage);
-
-            let filterButtonPositive = document.createElement("button");
-            filterButtonPositive.id = 2;
-            filterButtonPositive.className = "filter-button";
-            filterButtonPositive.textContent = "Filtro: Comentarios positivos de tu idioma";
-            filterButtonPositive.addEventListener("click", filterComments);
-
-            commentsSection.appendChild(filterButtonPositive);
-
-            let filterButtonNegative = document.createElement("button");
-            filterButtonNegative.id = 3;
-            filterButtonNegative.className = "filter-button";
-            filterButtonNegative.textContent = "Filtro: Comentarios negativos de tu idioma";
-            filterButtonNegative.addEventListener("click", filterComments);
-
-            commentsSection.appendChild(filterButtonNegative);
-
-            let filterButtonPositiveLanguage = document.createElement("button");
-            filterButtonPositiveLanguage.id = 4;
-            filterButtonPositiveLanguage.className = "filter-button";
-            filterButtonPositiveLanguage.textContent = "Filtro: Comentarios positivos";
-            filterButtonPositiveLanguage.addEventListener("click", filterComments);
-
-            commentsSection.appendChild(filterButtonPositiveLanguage);
-
-            let filterButtonNegativeLanguage = document.createElement("button");
-            filterButtonNegativeLanguage.id = 5;
-            filterButtonNegativeLanguage.className = "filter-button";
-            filterButtonNegativeLanguage.textContent = "Filtro: Comentarios negativos";
-            filterButtonNegativeLanguage.addEventListener("click", filterComments);
-
-            commentsSection.appendChild(filterButtonNegativeLanguage);
-
-            let buttonOrderByDateAsc = document.createElement("button");
-            buttonOrderByDateAsc.id = 1;
-            buttonOrderByDateAsc.className = "filter-button";
-            buttonOrderByDateAsc.textContent = "Ordenar: Más antiguos";
-            buttonOrderByDateAsc.addEventListener("click", orderByDateAsc);
-
-            commentsSection.appendChild(buttonOrderByDateAsc);
-
-            let buttonOrderByDateDesc = document.createElement("button");
-            buttonOrderByDateDesc.id = 2;
-            buttonOrderByDateDesc.className = "filter-button";
-            buttonOrderByDateDesc.textContent = "Ordenar: Más recientes";
-            buttonOrderByDateDesc.addEventListener("click", orderByDateDesc);
-
-            commentsSection.appendChild(buttonOrderByDateDesc);
+        if (result && result.success) {
+            redirectWithGameMessage(result.message || "Comentario eliminado correctamente.", "success");
+        } else {
+            showGameAlert(result?.message || "No se pudo eliminar el comentario.", "danger");
         }
-
-        for (let i = 0; i < commentsSorted.length; i++) {
-
-            if (userLanguages != null) {
-                if (commentFilterMode == 1 && (userLanguages[0]['id_idioma_principal'] != commentsSorted[i]['id_idioma_comentario'] && userLanguages[0]['id_idioma_secundario'] != commentsSorted[i]['id_idioma_comentario'])) {
-                    continue;
-                }
-                else if (commentFilterMode == 2 && ((userLanguages[0]['id_idioma_principal'] != commentsSorted[i]['id_idioma_comentario'] && userLanguages[0]['id_idioma_secundario'] != commentsSorted[i]['id_idioma_comentario']) || commentsSorted[i]['valoracion'] == "negativa")) {
-                    continue;
-                }
-                else if (commentFilterMode == 3 && ((userLanguages[0]['id_idioma_principal'] != commentsSorted[i]['id_idioma_comentario'] && userLanguages[0]['id_idioma_secundario'] != commentsSorted[i]['id_idioma_comentario']) || commentsSorted[i]['valoracion'] == "positiva")) {
-                    continue;
-                }
-                else if (commentFilterMode == 4 && (commentsSorted[i]['valoracion'] == "negativa")) {
-                    continue;
-                }
-                else if (commentFilterMode == 5 && (commentsSorted[i]['valoracion'] == "positiva")) {
-                    continue;
-                }
-            }
-
-            let comment = document.createElement("div");
-            comment.className = "comment";
-
-            let commentUser = document.createElement("p");
-            commentUser.className = "comment-user";
-            commentUser.textContent = commentsSorted[i]['nickname'];
-
-            comment.appendChild(commentUser);
-
-            let commentFecha = document.createElement("p");
-            commentFecha.className = "comment-user";
-            commentFecha.textContent = "Fecha publicación: " + commentsSorted[i]['fechaPublicacion'];
-
-            comment.appendChild(commentFecha);
-
-            let commentRating = document.createElement("p");
-            commentRating.className = "comment-rating";
-            commentRating.textContent = "Valoración: " + commentsSorted[i]['valoracion'];
-
-            comment.appendChild(commentRating);
-
-            let commentText = document.createElement("p");
-            commentText.className = "comment-text";
-            commentText.textContent = commentsSorted[i]['comentario'];
-
-            comment.appendChild(commentText);
-
-            commentsSection.appendChild(comment);
-        }
+    } catch (error) {
+        console.error(error);
+        showGameAlert("Ha ocurrido un error al eliminar el comentario.", "danger");
     }
 }
 
 async function buyGame() {
-    let buy_bought = await checkField_2(gameName, userNickname, "buy_game", "../AJAX/gameData.php");
-    bought = await checkField_2(gameName, userNickname, "check_bought", "../AJAX/gameData.php");
-    if (bought) {
-        if (wishlist) {
-            let comment = await checkField_2(gameName, userNickname, "remove_wishlist", "../AJAX/gameData.php");
-            wishlist = await checkField_2(gameName, userNickname, "get_wishlist", "../AJAX/gameData.php");
+    if (!userNickname) {
+        redirectWithGameMessage("Debes iniciar sesión para comprar juegos.", "danger");
+        return;
+    }
+
+    try {
+        const result = await checkField_2(
+            gameName,
+            userNickname,
+            "buy_game"
+        );
+
+        if (result && result.success) {
+            redirectWithGameMessage("Juego añadido a la biblioteca.", "success");
+        } else {
+            redirectWithGameMessage("Ha ocurrido un error al comprar.", "danger");
         }
-    }
-    await setUpPurchaseSection();
-    await setUpComments();
-}
-
-async function submitComment() {
-    let rating
-    if (like) {
-        rating = "positiva";
-    }
-    else {
-        rating = "negativa";
-    }
-    let commentValue = document.querySelector("#comment-input-new").value;
-    let comment = await checkField_4(gameName, userNickname, rating, commentValue, "create_comment", "../AJAX/gameData.php");
-    userReview = await checkField_2(gameName, userNickname, "user_comment", "../AJAX/gameData.php");
-    comments = await checkField_1(gameName, "get_comments", "../AJAX/gameData.php");
-    commentsSorted = await checkField_1(gameName, "get_comments", "../AJAX/gameData.php");
-    if (isFiltered == 1) {
-        await orderByDateAsc();
-    }
-    else if (isFiltered == 2) {
-        await orderByDateDesc();
-    }
-    positive = await checkField_1(gameName, "positive", "../AJAX/gameData.php");
-    await setUpGameInfo();
-    await setUpComments();
-}
-
-async function saveComment() {
-    let rating
-    if (like) {
-        rating = "positiva";
-    }
-    else {
-        rating = "negativa";
-    }
-    let commentValue = document.querySelector("#comment-input").value;
-    let comment = await checkField_4(gameName, userNickname, rating, commentValue, "update_comment", "../AJAX/gameData.php");
-    userReview = await checkField_2(gameName, userNickname, "user_comment", "../AJAX/gameData.php");
-    comments = await checkField_1(gameName, "get_comments", "../AJAX/gameData.php");
-    commentsSorted = await checkField_1(gameName, "get_comments", "../AJAX/gameData.php");
-    if (isFiltered == 1) {
-        await orderByDateAsc();
-    }
-    else if (isFiltered == 2) {
-        await orderByDateDesc();
-    }
-    positive = await checkField_1(gameName, "positive", "../AJAX/gameData.php");
-    await setUpGameInfo();
-    await setUpComments();
-}
-
-async function deleteComment() {
-    let comment = await checkField_2(gameName, userNickname, "update_comment", "../AJAX/gameData.php");
-    userReview = await checkField_2(gameName, userNickname, "delete_comment", "../AJAX/gameData.php");
-    comments = await checkField_1(gameName, "get_comments", "../AJAX/gameData.php");
-    commentsSorted = await checkField_1(gameName, "get_comments", "../AJAX/gameData.php");
-    if (isFiltered == 1) {
-        await orderByDateAsc();
-    }
-    else if (isFiltered == 2) {
-        await orderByDateDesc();
-    }
-    positive = await checkField_1(gameName, "positive", "../AJAX/gameData.php");
-    await setUpGameInfo();
-    await setUpComments();
-}
-
-async function editComment() {
-    document.getElementById("comment-input").disabled = !document.getElementById("comment-input").disabled;
-    document.getElementById("save-comment-button").disabled = !document.getElementById("save-comment-button").disabled;
-    document.getElementById("delete-comment-button").disabled = !document.getElementById("delete-comment-button").disabled;
-    document.getElementById("like-button-new").disabled = !document.getElementById("like-button-new").disabled;
-}
-
-async function likeDislike() {
-    like = !like;
-    if (like) {
-        document.getElementById("likeDislike").textContent = "thumb_up";
-    }
-    else {
-        document.getElementById("likeDislike").textContent = "thumb_down";
-    }
-    
-}
-
-async function addToWishlist() {
-    let comment = await checkField_2(gameName, userNickname, "add_wishlist", "../AJAX/gameData.php");
-    wishlist = await checkField_2(gameName, userNickname, "get_wishlist", "../AJAX/gameData.php");
-    await setUpPurchaseSection();
-}
-
-async function removeToWishlist() {
-    let comment = await checkField_2(gameName, userNickname, "remove_wishlist", "../AJAX/gameData.php");
-    wishlist = await checkField_2(gameName, userNickname, "get_wishlist", "../AJAX/gameData.php");
-    await setUpPurchaseSection();
-}
-
-async function filterComments() {
-    commentsSorted = await checkField_1(gameName, "get_comments", "../AJAX/gameData.php");
-    await (isFiltered = 0);
-    await (commentFilterMode = parseInt(this.id));
-    await setUpComments();
-}
-
-async function pauseVideoIfPlaying() {
-    
-    let videos = await document.getElementsByClassName("video-carousel");
-    for (let pos = 0; pos < videos.length; pos++) {
-
-        videos[pos].pause();
+    } catch (error) {
+        console.error(error);
+        redirectWithGameMessage("Ha ocurrido un error al comprar.", "danger");
     }
 }
 
-async function goToShopFilterByCategory() {
+async function addWishlist() {
+    if (!userNickname) {
+        redirectWithGameMessage("Debes iniciar sesión.", "danger");
+        return;
+    }
 
-    window.location.href = './game.php?error=changeURLInLine585';
+    try {
+        const result = await checkField_2(
+            gameName,
+            userNickname,
+            "add_wishlist"
+        );
+
+        if (result && result.success) {
+            redirectWithGameMessage("Juego añadido a la wishlist.", "success");
+        } else {
+            redirectWithGameMessage("No se pudo añadir a wishlist.", "danger");
+        }
+    } catch (error) {
+        console.error(error);
+        redirectWithGameMessage("Ha ocurrido un error al añadir a wishlist.", "danger");
+    }
+}
+
+async function removeWishlist() {
+    if (!userNickname) {
+        redirectWithGameMessage("Debes iniciar sesión.", "danger");
+        return;
+    }
+
+    try {
+        const result = await checkField_2(
+            gameName,
+            userNickname,
+            "remove_wishlist"
+        );
+
+        if (result && result.success) {
+            redirectWithGameMessage("Juego eliminado de wishlist.", "success");
+        } else {
+            redirectWithGameMessage("No se pudo eliminar de wishlist.", "danger");
+        }
+    } catch (error) {
+        console.error(error);
+        redirectWithGameMessage("Ha ocurrido un error al eliminar de wishlist.", "danger");
+    }
+}
+
+function pauseVideoIfPlaying() {
+    const videos = document.querySelectorAll(".video-carousel");
+
+    videos.forEach((video) => {
+        if (!video.paused) {
+            video.pause();
+        }
+    });
 }

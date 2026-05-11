@@ -47,6 +47,7 @@
 
                             $imgUrl = getGameImageUrl((int)$juego['id_juego'], 'icon');
                         ?>
+                        <a href="game.php?id=<?= (int)$juego['id_juego'] ?>" class="feature-link">
                         <article class="feature-card">
                             <div class="feature-card__thumb"
                                  style="background-image: url('<?= e($imgUrl) ?>'); background-size: cover; background-position: center; background-repeat: no-repeat;">
@@ -57,6 +58,7 @@
                                 <span><?= number_format((float)$precioFinal, 2, ',', '.') ?> €</span>
                             </div>
                         </article>
+                        </a>
                     <?php endforeach; ?>
                 </div>
             <?php else: ?>
@@ -86,6 +88,7 @@
 
                         $imgUrl = getGameImageUrl((int)$juego['id_juego'], 'wide-cover');
                     ?>
+                    <a href="game.php?id=<?= (int)$juego['id_juego'] ?>" class="game-link">
                     <article class="game-card">
                         <div class="game-card__art"
                              style="background-image: url('<?= e($imgUrl) ?>'); background-size: cover; background-position: center; background-repeat: no-repeat;">
@@ -101,6 +104,7 @@
                             </div>
                         </div>
                     </article>
+                    </a>
                 <?php endforeach; ?>
             </div>
         <?php else: ?>
@@ -123,6 +127,7 @@
                         <?php
                             $imgUrl = getGameImageUrl((int)$juego['id_juego'], 'banner');
                         ?>
+                        <a href="game.php?id=<?= (int)$juego['id_juego'] ?>" class="recommend-link">
                         <div class="recommend-item">
                             <div class="recommend-item__thumb"
                                  style="background-image: url('<?= e($imgUrl) ?>'); background-size: cover; background-position: center; background-repeat: no-repeat;">
@@ -132,6 +137,7 @@
                                 <span><?= e($juego['desarrollador']) ?></span>
                             </div>
                         </div>
+                        </a>
                     <?php endforeach; ?>
                 </div>
             <?php else: ?>

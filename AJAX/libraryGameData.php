@@ -22,7 +22,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'get_user') {
 
     $nickname = $_POST['value_1'];
 
-    $stmt = $BBDD->prepare("SELECT `nickname` FROM `usuarios` WHERE `nickname` = :nick ");
+    $stmt = $BBDD->prepare("SELECT `nickname` FROM `Usuarios` WHERE `nickname` = :nick ");
     $stmt->bindParam(":nick", $nickname);
     $stmt->execute();
 
@@ -55,7 +55,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'get_library') {
     $nickname = $_POST['value_1'];
 
     $stmt = $BBDD->prepare("SELECT j.`nombre_juego`, j.`descripcion`, j.`fecha_publicacion`, j.`desarrollador`, j.`precio`, j.`descuento`, COUNT(v.`id_valoracion`) AS valoraciones, COUNT(CASE WHEN v.`valoracion` = 'positiva' THEN 1 END) AS valoraciones_positivas, AVG(CASE WHEN v.`valoracion` = 'positiva' THEN 1 ELSE 0 END) AS valoracion_media
-                            FROM `biblioteca` AS b 
+                            FROM `Biblioteca` AS b 
                             JOIN `juegos` AS j ON b.`id_juego` = j.`id_juego` 
                             JOIN `valoraciones` AS v ON b.`nombre_juego` = v.`nombre_juego`
                             WHERE b.`nickname` = :nick 
@@ -82,8 +82,8 @@ if (isset($_POST['action']) && $_POST['action'] === 'get_logros') {
     $nameJuego = $_POST['value_1'];
 
     $stmt = $BBDD->prepare("SELECT `nombre_logro`, `descripcion_logro`, `nombre_juego` 
-                            FROM `logros` AS l
-                            WHERE `nombre_juego` = :nmJuego AND `nombre_logro` NOT IN (SELECT `nombre_logro` FROM `logrosusuario` WHERE `nickname` = :nick AND `Logros_nombre_juego` = :nmJuego)");
+                            FROM `Logros` AS l
+                            WHERE `nombre_juego` = :nmJuego AND `nombre_logro` NOT IN (SELECT `nombre_logro` FROM `LogrosUsuario` WHERE `nickname` = :nick AND `Logros_nombre_juego` = :nmJuego)");
     $stmt->bindParam(":nmJuego", $nameJuego);
     $stmt->bindParam(":nick", $_SESSION["nickname"]);
     $stmt->execute();
