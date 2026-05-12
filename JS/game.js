@@ -216,7 +216,7 @@ function isMyLanguage(languageCode) {
 
 function initCommentActions() {
     $("#submit-comment-button").on("click", createComment);
-    $("#edit-comment-button").on("click", enableCommentEdit);
+    $("#edit-comment-button").on("click", toggleCommentEdit);
     $("#save-comment-button").on("click", saveComment);
     $("#delete-comment-button").on("click", deleteComment);
 }
@@ -226,20 +226,53 @@ function getSelectedRating(formSelector) {
     return selected ? selected.value : "";
 }
 
-function enableCommentEdit() {
-    $("#comment-input").prop("disabled", false);
-    $("#review-vote-group-edit input[type='radio']").prop("disabled", false);
-    $("#review-vote-group-edit").removeClass("is-disabled");
+function toggleCommentEdit() {
+    const $editButton = $("#edit-comment-button");
+    const isEditing = $editButton.data("editing") === true;
 
-    $("#save-comment-button")
-        .removeClass("is-hidden")
-        .prop("disabled", false);
+    if (!isEditing) {
+        const currentComment = $("#comment-input").val();
+        const currentRating = getSelectedRating("#comment-form-edit");
 
-    $("#delete-comment-button")
-        .removeClass("is-hidden")
-        .prop("disabled", false);
+        $editButton.data("editing", true);
+        $editButton.data("original-comment", currentComment);
+        $editButton.data("original-rating", currentRating);
+        $editButton.text("Cancelar");
 
-    $("#edit-comment-button").prop("disabled", true);
+        $("#comment-input").prop("disabled", false);
+        $("#review-vote-group-edit input[type='radio']").prop("disabled", false);
+        $("#review-vote-group-edit").removeClass("is-disabled");
+
+        $("#save-comment-button")
+            .removeClass("is-hidden")
+            .prop("disabled", false);
+
+        $("#delete-comment-button")
+            .removeClass("is-hidden")
+            .prop("disabled", false);
+    } else {
+        const originalComment = $editButton.data("original-comment") || "";
+        const originalRating = $editButton.data("original-rating") || "";
+
+        $("#comment-input").val(originalComment).prop("disabled", true);
+        $("#review-vote-group-edit input[type='radio']").prop("disabled", true);
+        $("#review-vote-group-edit").addClass("is-disabled");
+
+        if (originalRating) {
+            $(`#review-vote-group-edit input[type='radio'][value='${originalRating}']`).prop("checked", true);
+        }
+
+        $("#save-comment-button")
+            .addClass("is-hidden")
+            .prop("disabled", true);
+
+        $("#delete-comment-button")
+            .addClass("is-hidden")
+            .prop("disabled", true);
+
+        $editButton.data("editing", false);
+        $editButton.text("Editar");
+    }
 }
 
 function initDateDropdown() {
