@@ -35,7 +35,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'get_game') {
             precio,
             descuento,
             fecha_publicacion
-        FROM juegos
+        FROM Juegos
         WHERE nombre_juego = :nmJuego
     ";
 
@@ -71,7 +71,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'check_bought') {
         SELECT
             nickname,
             nombre_juego
-        FROM biblioteca
+        FROM Biblioteca
         WHERE
             nombre_juego = :nmJuego
             AND nickname = :nick
@@ -248,7 +248,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'get_languages') {
         respondFail();
     }
 
-    $stmt = $BBDD->prepare("SELECT nickname, id_idioma_principal, id_idioma_secundario FROM usuarios WHERE nickname = :nick");
+    $stmt = $BBDD->prepare("SELECT nickname, id_idioma_principal, id_idioma_secundario FROM Usuarios WHERE nickname = :nick");
     $stmt->bindValue(":nick", $_POST['value_2']);
     $stmt->execute();
 
@@ -278,7 +278,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'buy_game') {
 
     $sql = "
         SELECT id_usuario, nickname
-        FROM usuarios
+        FROM Usuarios
         WHERE nickname = :nick
     ";
 
@@ -294,7 +294,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'buy_game') {
 
     $sql = "
         SELECT id_juego, nombre_juego
-        FROM juegos
+        FROM Juegos
         WHERE nombre_juego = :nmJuego
     ";
 
@@ -308,7 +308,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'buy_game') {
         respondFail('Juego no encontrado');
     }
 
-    $stmt = $BBDD->prepare("SELECT COUNT(*) FROM biblioteca WHERE nickname = :nick AND nombre_juego = :nmJuego");
+    $stmt = $BBDD->prepare("SELECT COUNT(*) FROM Biblioteca WHERE nickname = :nick AND nombre_juego = :nmJuego");
     $stmt->bindParam(":nick", $_POST['value_2']);
     $stmt->bindParam(":nmJuego", $_POST['value_1']);
     $stmt->execute();
@@ -319,7 +319,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'buy_game') {
     }
 
     $stmt = $BBDD->prepare("
-        INSERT INTO biblioteca (id_usuario, nickname, id_juego, nombre_juego)
+        INSERT INTO Biblioteca (id_usuario, nickname, id_juego, nombre_juego)
         VALUES (:idUsuario, :nick, :idJuego, :nmJuego)
     ");
     $stmt->bindParam(":idUsuario", $user["id_usuario"]);
@@ -330,7 +330,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'buy_game') {
     $ok = $stmt->execute();
 
     if ($ok) {
-        $stmt = $BBDD->prepare("DELETE FROM listadeseos WHERE nickname = :nick AND nombre_juego = :nmJuego");
+        $stmt = $BBDD->prepare("DELETE FROM ListaDeseos WHERE nickname = :nick AND nombre_juego = :nmJuego");
         $stmt->bindParam(":nick", $_POST['value_2']);
         $stmt->bindParam(":nmJuego", $_POST['value_1']);
         $stmt->execute();
@@ -359,7 +359,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'create_comment') {
 
         $sql = "
             SELECT id_usuario, nickname, id_idioma_principal
-            FROM usuarios
+            FROM Usuarios
             WHERE nickname = :nick
         ";
 
@@ -375,7 +375,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'create_comment') {
 
         $sql = "
             SELECT id_juego, nombre_juego
-            FROM juegos
+            FROM Juegos
             WHERE nombre_juego = :nmJuego
         ";
 
@@ -438,7 +438,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'update_comment') {
 
         $sql = "
             SELECT id_usuario, nickname, id_idioma_principal
-            FROM usuarios
+            FROM Usuarios
             WHERE nickname = :nick
         ";
 
@@ -454,7 +454,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'update_comment') {
 
         $sql = "
             SELECT id_juego, nombre_juego
-            FROM juegos
+            FROM Juegos
             WHERE nombre_juego = :nmJuego
         ";
 
@@ -546,7 +546,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'add_wishlist') {
 
     $sql = "
         SELECT id_usuario, nickname
-        FROM usuarios
+        FROM Usuarios
         WHERE nickname = :nick
     ";
 
@@ -562,7 +562,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'add_wishlist') {
 
     $sql = "
         SELECT id_juego, nombre_juego
-        FROM juegos
+        FROM Juegos
         WHERE nombre_juego = :nmJuego
     ";
 
@@ -576,7 +576,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'add_wishlist') {
         respondFail('Juego no encontrado');
     }
 
-    $stmt = $BBDD->prepare("SELECT COUNT(*) FROM listadeseos WHERE nickname = :nick AND nombre_juego = :nmJuego");
+    $stmt = $BBDD->prepare("SELECT COUNT(*) FROM ListaDeseos WHERE nickname = :nick AND nombre_juego = :nmJuego");
     $stmt->bindParam(":nick", $_POST['value_2']);
     $stmt->bindParam(":nmJuego", $_POST['value_1']);
     $stmt->execute();
@@ -592,7 +592,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'add_wishlist') {
     $nameJuego = $_POST['value_1'];
 
     $stmt = $BBDD->prepare("
-        INSERT INTO listadeseos (id_usuario, nickname, id_juego, nombre_juego)
+        INSERT INTO ListaDeseos (id_usuario, nickname, id_juego, nombre_juego)
         VALUES (:idUser, :nick, :idJuego, :nmJuego)
     ");
 
@@ -627,7 +627,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'remove_wishlist') {
     $nickname = $_POST['value_2'];
     $nameJuego = $_POST['value_1'];
 
-    $stmt = $BBDD->prepare("DELETE FROM listadeseos WHERE nombre_juego = :nmJuego AND nickname = :nick");
+    $stmt = $BBDD->prepare("DELETE FROM ListaDeseos WHERE nombre_juego = :nmJuego AND nickname = :nick");
     $stmt->bindParam(":nmJuego", $nameJuego);
     $stmt->bindParam(":nick", $nickname);
 
@@ -657,7 +657,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'get_wishlist') {
     $nickname = $_POST['value_2'];
     $nameJuego = $_POST['value_1'];
 
-    $stmt = $BBDD->prepare("SELECT * FROM listadeseos WHERE nombre_juego = :nmJuego AND nickname = :nick");
+    $stmt = $BBDD->prepare("SELECT * FROM ListaDeseos WHERE nombre_juego = :nmJuego AND nickname = :nick");
     $stmt->bindParam(":nmJuego", $nameJuego);
     $stmt->bindParam(":nick", $nickname);
     $stmt->execute();
@@ -680,7 +680,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'get_game_categories') {
 
     $nameJuego = $_POST['value_1'];
 
-    $stmt = $BBDD->prepare("SELECT categoria FROM categorias_juego WHERE nombre_juego = :nmJuego");
+    $stmt = $BBDD->prepare("SELECT categoria FROM Categorias_Juego WHERE nombre_juego = :nmJuego");
     $stmt->bindParam(":nmJuego", $nameJuego);
     $stmt->execute();
 
