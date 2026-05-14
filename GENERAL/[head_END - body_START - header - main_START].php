@@ -61,7 +61,24 @@
 
                         <a class="chip d-inline-flex align-items-center gap-2" id="cart-button" href="../MAIN/cart.php" type="button">
                             <span class="material-symbols-outlined">shopping_cart</span>
-                            <span id="cart-count">0</span>
+                            <span id="cart-count">
+                                <?php 
+                                    $sqlCurrentCart = "
+                                        SELECT COUNT(*) AS total_cart_items
+                                        FROM Carrito
+                                        WHERE id_usuario = :id_usuario
+                                        AND nickname = :nickname
+                                    ";
+                                    $stmtCurrentCart = $BBDD->prepare($sqlCurrentCart);
+                                    $stmtCurrentCart->execute([
+                                        ':id_usuario' => $_SESSION['id_usuario'] ?? 0,
+                                        ':nickname' => $_SESSION['nickname'] ?? '',
+                                    ]); 
+
+                                    $cartCount = $stmtCurrentCart->fetch(PDO::FETCH_ASSOC)['total_cart_items'] ?? 0;
+                                    echo $cartCount > 0 ? $cartCount : 0;
+                                ?>
+                            </span>
                         </a>
 
                         <div class="dropdown">

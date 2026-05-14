@@ -77,6 +77,23 @@ function renderPrecioFinal($precio, $descuento) {
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.7/Sortable.min.js"></script>
 <link rel="stylesheet" href="../CSS/wishlist.css">
 
+<style>
+    #buyAllButton {
+        border: none;
+        padding: 5px 10px;
+        border: 1px solid var(--color-greyneutral-7);
+        background: linear-gradient(180deg, rgba(59, 158, 255, 0.20), rgba(59, 158, 255, 0.10));
+        border-color: rgba(59, 158, 255, 0.28);
+        color: var(--color-slate-12);
+        cursor: pointer;
+        border-radius: 5px;
+    }
+    #buyAllButton:hover {
+        background: linear-gradient(180deg, rgba(59, 158, 255, 0.30), rgba(59, 158, 255, 0.15));
+        border-color: rgba(59, 158, 255, 0.40);
+    }
+</style>
+
 <?php include '../GENERAL/[head_END - body_START - header - main_START].php'; ?>
 <div class="wishlist-container">
     <div class="wishlist-hero">
@@ -113,12 +130,36 @@ function renderPrecioFinal($precio, $descuento) {
                 </select>
             </form>
         </div>
-        <form style="justify-content: space-between;" name="buyAllForm" method="post" onsubmit="return confirm('¿Estás seguro de que quieres comprar todos los artículos?');" class="wishlist-sort-form">
-            <div style="color: #fff; border: none; padding: 5px 10px;" class="btn btn-danger">(0)</div>    
-            <div>
-                <div style="color: #fff; border: none; padding: 5px 10px;" class="btn btn-primary">100.00€</div>
-                <button type="submit" style="color: #fff; border: none; padding: 5px 10px; cursor: pointer;" name="buyAll" value="usuario" class="btn btn-primary">Comprar todo</button>
+        <form style="justify-content: flex-end;" name="buyAllForm" method="post" onsubmit="return confirm('¿Estás seguro de que quieres comprar todos los artículos?');" class="wishlist-sort-form">
+            <div style="color: #fff; border: none; padding: 5px 10px; background-color: #23262e; border-radius: 5px; margin-right: 10px;">
+                <?php 
+                    $sqlPriceGamesInCart = "
+                        SELECT 
+                            SUM(CASE 
+                                    WHEN J.descuento > 0 THEN 
+                                        GREATEST(0, J.precio - (J.precio * (J.descuento / 100))) 
+                                    ELSE 
+                                        J.precio 
+                                END) AS total_price
+                        FROM Carrito C
+                        INNER JOIN Juegos J ON J.nombre_juego = C.nombre_juego
+                        WHERE C.id_usuario = :id_usuario
+                          AND C.nickname = :nickname
+                    ";
+                    $stmtPriceGamesInCart = $BBDD->prepare($sqlPriceGamesInCart);
+                    $stmtPriceGamesInCart->execute([
+                        ':id_usuario' => $idUsuario ?? 0,
+                        ':nickname' => $nickname ?? '',
+                    ]); 
+
+                    $cartCount = $stmtPriceGamesInCart->fetch(PDO::FETCH_ASSOC)['total_price'] ?? 0;
+                    echo $cartCount > 0 ? number_format($cartCount, 2) . "€" : "Gratis";
+                ?>
             </div>
+            <button type="submit" id="buyAllButton"
+                    name="buyAll" value="usuario">
+                Comprar todo
+            </button>
         </form>
     </div>
     <form class="wishlist-search-form" onsubmit="return false;">
