@@ -192,6 +192,7 @@ if ($gameId > 0) {
                     <button class="btn btn-primary" id="buy-button" type="button">Comprar</button>
                     <?php
                     $inWishlist = false;
+                    $inCart = false;
 
                     if (!empty($userNickname)) {
                         try {
@@ -203,8 +204,18 @@ if ($gameId > 0) {
                             $stmtWishlist->execute([$userNickname, $gameNamePhp]);
                             $wishlistResult = $stmtWishlist->fetch(PDO::FETCH_ASSOC);
                             $inWishlist = !empty($wishlistResult) && ((int)($wishlistResult['in_wishlist'] ?? 0) > 0);
+
+                            $stmtCart = $BBDD->prepare("
+                                SELECT COUNT(*) AS in_cart
+                                FROM Carrito
+                                WHERE nickname = ? AND nombre_juego = ?
+                            ");
+                            $stmtCart->execute([$userNickname, $gameNamePhp]);
+                            $cartResult = $stmtCart->fetch(PDO::FETCH_ASSOC);
+                            $inCart = !empty($cartResult) && ((int)($cartResult['in_cart'] ?? 0) > 0);
                         } catch (PDOException $e) {
                             $inWishlist = false;
+                            $inCart = false;
                         }
                     }
                     ?>
@@ -212,6 +223,11 @@ if ($gameId > 0) {
                         <button class="wishlist-button" id="add-wishlist-button" type="button">Añadir a la lista de deseos</button>
                     <?php else: ?>
                         <button class="wishlist-button" id="remove-wishlist-button" type="button">Quitar de la lista de deseos</button>
+                    <?php endif; ?>
+                    <?php if (!$inCart): ?>
+                        <button class="wishlist-button" id="add-cart-button" type="button">Añadir al carrito</button>
+                    <?php else: ?>
+                        <button class="wishlist-button" id="remove-cart-button" type="button">Quitar del carrito</button>
                     <?php endif; ?>
                 <?php endif; ?>
             </div>
@@ -497,7 +513,7 @@ if ($gameId > 0) {
                     <?php endif; ?>
                 </div>
 
-                <p id="no-comment-results" class="no-comment-results" style="display:none;">No se han encontrado reseñas con esos filtros.</p>
+                <p id="no-comment-results" class="no-comment-results" style="display:none;">No se han encontrado reseñas.</p>
             </div>
         </section>
 </section>

@@ -335,6 +335,11 @@ if (isset($_POST['action']) && $_POST['action'] === 'buy_game') {
         $stmt->bindParam(":nmJuego", $_POST['value_1']);
         $stmt->execute();
 
+        $stmt = $BBDD->prepare("DELETE FROM Carrito WHERE nickname = :nick AND nombre_juego = :nmJuego");
+        $stmt->bindParam(":nick", $_POST['value_2']);
+        $stmt->bindParam(":nmJuego", $_POST['value_1']);
+        $stmt->execute();
+
         respondOk('Compra realizada correctamente');
     }
 
@@ -671,6 +676,154 @@ if (isset($_POST['action']) && $_POST['action'] === 'get_wishlist') {
 
     respondFail();
 }
+
+
+
+if (isset($_POST['action']) && $_POST['action'] === 'add_cart') {
+
+    if (empty($_SESSION["nickname"])) {
+        respondFail('Sesión no válida');
+    }
+
+    if (empty($_POST['value_1']) || empty($_POST['value_2'])) {
+        respondFail('Faltan datos');
+    }
+
+    if ($_SESSION["nickname"] != $_POST['value_2']) {
+        respondFail('Usuario no autorizado');
+    }
+
+    $sql = "
+        SELECT id_usuario, nickname
+        FROM Usuarios
+        WHERE nickname = :nick
+    ";
+
+    $stmt = $BBDD->prepare($sql);
+    $stmt->bindParam(":nick", $_POST['value_2']);
+    $stmt->execute();
+
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$user) {
+        respondFail('Usuario no encontrado');
+    }
+
+    $sql = "
+        SELECT id_juego, nombre_juego
+        FROM Juegos
+        WHERE nombre_juego = :nmJuego
+    ";
+
+    $stmt = $BBDD->prepare($sql);
+    $stmt->bindParam(":nmJuego", $_POST['value_1']);
+    $stmt->execute();
+
+    $game = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$game) {
+        respondFail('Juego no encontrado');
+    }
+
+    $stmt = $BBDD->prepare("SELECT COUNT(*) FROM Carrito WHERE nickname = :nick AND nombre_juego = :nmJuego");
+    $stmt->bindParam(":nick", $_POST['value_2']);
+    $stmt->bindParam(":nmJuego", $_POST['value_1']);
+    $stmt->execute();
+    $count = $stmt->fetchColumn();
+
+    if ($count > 0) {
+        respondFail('Este juego ya está en tu carrito');
+    }
+
+    $idUser = $user["id_usuario"];
+    $nickname = $_POST['value_2'];
+    $idGame = $game["id_juego"];
+    $nameJuego = $_POST['value_1'];
+
+    $stmt = $BBDD->prepare("
+        INSERT INTO Carrito (id_usuario, nickname, id_juego, nombre_juego)
+        VALUES (:idUser, :nick, :idJuego, :nmJuego)
+    ");
+
+    $stmt->bindParam(":idUser", $idUser);
+    $stmt->bindParam(":nick", $nickname);
+    $stmt->bindParam(":idJuego", $idGame);
+    $stmt->bindParam(":nmJuego", $nameJuego);
+
+    $ok = $stmt->execute();
+
+    if ($ok) {
+        respondOk('Añadido al carrito');
+    }
+
+    respondFail('No se pudo añadir al carrito');
+}
+
+if (isset($_POST['action']) && $_POST['action'] === 'remove_cart') {
+
+    if (empty($_SESSION["nickname"])) {
+        respondFail();
+    }
+
+    if (empty($_POST['value_1']) || empty($_POST['value_2'])) {
+        respondFail();
+    }
+
+    if ($_SESSION["nickname"] != $_POST['value_2']) {
+        respondFail();
+    }
+
+    $nickname = $_POST['value_2'];
+    $nameJuego = $_POST['value_1'];
+
+    $stmt = $BBDD->prepare("DELETE FROM Carrito WHERE nombre_juego = :nmJuego AND nickname = :nick");
+    $stmt->bindParam(":nmJuego", $nameJuego);
+    $stmt->bindParam(":nick", $nickname);
+
+    $ok = $stmt->execute();
+
+    if ($ok) {
+        respondOk('Eliminado del carrito');
+    }
+
+    respondFail('No se pudo eliminar del carrito');
+}
+
+if (isset($_POST['action']) && $_POST['action'] === 'get_cart') {
+
+    if (empty($_SESSION["nickname"])) {
+        respondFail();
+    }
+
+    if (empty($_POST['value_1']) || empty($_POST['value_2'])) {
+        respondFail();
+    }
+
+    if ($_SESSION["nickname"] != $_POST['value_2']) {
+        respondFail();
+    }
+
+    $nickname = $_POST['value_2'];
+    $nameJuego = $_POST['value_1'];
+
+    $stmt = $BBDD->prepare("SELECT * FROM Carrito WHERE nombre_juego = :nmJuego AND nickname = :nick");
+    $stmt->bindParam(":nmJuego", $nameJuego);
+    $stmt->bindParam(":nick", $nickname);
+    $stmt->execute();
+
+    $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    if (!empty($data)) {
+        echo json_encode($data);
+        exit();
+    }
+
+    respondFail();
+}
+
+
+
+
 
 if (isset($_POST['action']) && $_POST['action'] === 'get_game_categories') {
 

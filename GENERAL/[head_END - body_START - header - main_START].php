@@ -59,6 +59,11 @@
                             $headerAvatarData = getProfileAvatarData($headerNickname);
                         ?>
 
+                        <a class="chip d-inline-flex align-items-center gap-2" id="cart-button" href="../MAIN/cart.php" type="button">
+                            <span class="material-symbols-outlined">shopping_cart</span>
+                            <span id="cart-count">0</span>
+                        </a>
+
                         <div class="dropdown">
                             <a class="chip dropdown-toggle d-flex align-items-center gap-2" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <div

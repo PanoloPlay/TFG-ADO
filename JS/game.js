@@ -29,6 +29,14 @@ function initInteractions() {
     $("#remove-wishlist-button").on("click", function () {
         removeWishlist();
     });
+
+    $("#add-cart-button").on("click", function () {
+        addCart();
+    });
+
+    $("#remove-cart-button").on("click", function () {
+        removeCart();
+    });
 }
 
 function parseDateInput(value, endOfDay = false) {
@@ -474,6 +482,54 @@ async function removeWishlist() {
     } catch (error) {
         console.error(error);
         redirectWithGameMessage("Ha ocurrido un error al eliminar de wishlist.", "danger");
+    }
+}
+
+async function addCart() {
+    if (!userNickname) {
+        redirectWithGameMessage("Debes iniciar sesión.", "danger");
+        return;
+    }
+
+    try {
+        const result = await checkField_2(
+            gameName,
+            userNickname,
+            "add_cart"
+        );
+
+        if (result && result.success) {
+            redirectWithGameMessage("Juego añadido al carrito.", "success");
+        } else {
+            redirectWithGameMessage("No se pudo añadir al carrito.", "danger");
+        }
+    } catch (error) {
+        console.error(error);
+        redirectWithGameMessage("Ha ocurrido un error al añadir al carrito.", "danger");
+    }
+}
+
+async function removeCart() {
+    if (!userNickname) {
+        redirectWithGameMessage("Debes iniciar sesión.", "danger");
+        return;
+    }
+
+    try {
+        const result = await checkField_2(
+            gameName,
+            userNickname,
+            "remove_cart"
+        );
+
+        if (result && result.success) {
+            redirectWithGameMessage("Juego eliminado del carrito.", "success");
+        } else {
+            redirectWithGameMessage("No se pudo eliminar del carrito.", "danger");
+        }
+    } catch (error) {
+        console.error(error);
+        redirectWithGameMessage("Ha ocurrido un error al eliminar del carrito.", "danger");
     }
 }
 
