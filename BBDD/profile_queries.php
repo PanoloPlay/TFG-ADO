@@ -326,7 +326,7 @@ function getLibraryGamesByCategories(PDO $BBDD, int $idUsuario, string $nickname
         INNER JOIN Juegos J
             ON B.id_juego = J.id_juego
            AND B.nombre_juego = J.nombre_juego
-        INNER JOIN Categorias_Juego CJ
+        INNER JOIN CategoriasJuego CJ
             ON J.id_juego = CJ.id_juego
            AND J.nombre_juego = CJ.nombre_juego
         WHERE B.id_usuario = ? 
