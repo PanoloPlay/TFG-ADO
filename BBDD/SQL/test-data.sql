@@ -6,7 +6,7 @@ USE TFG_ADO_Tienda_Hestias_Lotus;
 
 DELETE FROM ListaDeseos;
 DELETE FROM Administadores;
-DELETE FROM Categorias_Juego;
+DELETE FROM CategoriasJuego;
 DELETE FROM Categorias;
 DELETE FROM LogrosUsuario;
 DELETE FROM Biblioteca;
@@ -16,6 +16,7 @@ DELETE FROM Logros;
 DELETE FROM Valoraciones;
 DELETE FROM IdiomasJuego;
 DELETE FROM Juegos;
+DELETE FROM Desarrollador;
 DELETE FROM Usuarios;
 DELETE FROM Idiomas;
 
@@ -27,7 +28,7 @@ ALTER TABLE Categorias AUTO_INCREMENT = 1;
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- ----------------------------
--- Inserciones de Idiomas
+-- 1. Idiomas
 -- ----------------------------
 INSERT INTO Idiomas (id_idioma, idioma) VALUES
 ('ES', 'Español'),
@@ -35,131 +36,150 @@ INSERT INTO Idiomas (id_idioma, idioma) VALUES
 ('FR', 'Français'),
 ('DE', 'Deutsch'),
 ('IT', 'Italiano'),
-('AR', 'العربية');
+('PT', 'Português'),
+('ZH', '中文 (Chinese)'),
+('JA', '日本語 (Japanese)'),
+('KO', '한국어 (Korean)'),
+('RU', 'Русский (Russian)'),
+('AR', 'العربية (Arabic)'),
+('HI', 'हिन्दी (Hindi)'),
+('BN', 'বাংলা (Bengali)'),
+('PA', 'ਪੰਜਾਬੀ (Punjabi)'),
+('JV', 'Jawa (Javanese)'),
+('MS', 'Bahasa Melayu'),
+('VI', 'Tiếng Việt'),
+('TR', 'Türkçe'),
+('PL', 'Polski'),
+('NL', 'Nederlands'),
+('EL', 'Ελληνικά (Greek)'),
+('TH', 'ไทย (Thai)'),
+('ID', 'Bahasa Indonesia'),
+('FA', 'فارسی (Persian)'),
+('UK', 'Українська (Ukrainian)'),
+('RO', 'Română'),
+('HU', 'Magyar'),
+('CS', 'Čeština'),
+('SV', 'Svenska'),
+('FI', 'Suomi'),
+('DA', 'Dansk'),
+('NO', 'Norsk'),
+('HE', 'עברית (Hebrew)'),
+('TL', 'Tagalog'),
+('SW', 'Kiswahili'),
+('AM', 'አማርኛ (Amharic)'),
+('YO', 'Yorùbá'),
+('IG', 'Igbo'),
+('UR', 'اردو (Urdu)'),
+('CA', 'Català'),
+('EU', 'Euskara'),
+('GL', 'Galego');
 
 -- ----------------------------
--- Inserciones de Usuarios (ID manual)
+-- 2. Usuarios
 -- ----------------------------
 INSERT INTO Usuarios (id_usuario, nombre_usuario, nickname, correo, clave_acceso, fecha_registro, descripcion, visibilidad, id_idioma_principal, id_idioma_secundario, clave_amigos) VALUES
-(1, 'Test', 'Test', 't@t.t', '$2y$10$Wg/N0u/BNPaNIyGrIDB0jubnf6nAMP45Ujs5EPSeOSCpgyKUoWPKW', '2026-04-12 10:00:00', 'Usuario de prueba', 'publico', 'ES', 'EN', 123456789),
-(2, 'Panolo', 'PanoloPlay', 'ahmad@gmail.com', '$2y$10$Wg/N0u/BNPaNIyGrIDB0jubnf6nAMP45Ujs5EPSeOSCpgyKUoWPKW', '2026-04-12 10:00:00', 'Fanático de los videojuegos...', 'publico', 'ES', 'AR', 783249012),
-(3, 'Praxis', 'Praxis99', 'david@gmail.com', '$2y$10$Wg/N0u/BNPaNIyGrIDB0jubnf6nAMP45Ujs5EPSeOSCpgyKUoWPKW', '2026-04-12 10:30:00', '', 'solo_amigos', 'ES', NULL, 345628578),
-(4, 'Kans', 'Kans2950', 'oacar@gmail.com', '$2y$10$Wg/N0u/BNPaNIyGrIDB0jubnf6nAMP45Ujs5EPSeOSCpgyKUoWPKW', '2026-04-12 11:00:00', 'Amante de los juegos retro', 'privado', 'ES', 'EN', 901746234);
+(1, 'Test User', 'Test', 't@t.t', '$2y$10$Wg/N0u/BNPaNIyGrIDB0jubnf6nAMP45Ujs5EPSeOSCpgyKUoWPKW', NOW(), 'Usuario de prueba', 'publico', 'ES', 'EN', 123456789),
+(2, 'Panolo', 'PanoloPlay', 'ahmad@gmail.com', '$2y$10$Wg/N0u/BNPaNIyGrIDB0jubnf6nAMP45Ujs5EPSeOSCpgyKUoWPKW', NOW(), 'Fanático de los videojuegos...', 'publico', 'ES', 'AR', 783249012),
+(3, 'David Praxis', 'Praxis99', 'david@gmail.com', '$2y$10$Wg/N0u/BNPaNIyGrIDB0jubnf6nAMP45Ujs5EPSeOSCpgyKUoWPKW', NOW(), '', 'solo_amigos', 'ES', NULL, 345628578),
+(4, 'Oscar Kans', 'Kans2950', 'oacar@gmail.com', '$2y$10$Wg/N0u/BNPaNIyGrIDB0jubnf6nAMP45Ujs5EPSeOSCpgyKUoWPKW', NOW(), 'Amante de los juegos retro', 'privado', 'ES', 'EN', 901746234);
 
 -- ----------------------------
--- Inserciones de Juegos (ID manual)
+-- 3. Desarrolladores (Obligatorio antes que Juegos)
+-- ----------------------------
+INSERT INTO Desarrollador (id_desarrollador, nombre_desarrollador, nickname) VALUES
+(1, 'Toby Fox', 'Test'),
+(2, 'Team Cherry', 'Praxis99'),
+(3, 'Unknown Worlds Entertainment', 'Kans2950');
+
+-- ----------------------------
+-- 4. Juegos
 -- ----------------------------
 INSERT INTO Juegos (id_juego, nombre_juego, descripcion, fecha_publicacion, desarrollador, precio, descuento) VALUES
-(1, 'Undertale', 'Un RPG innovador...', '2015-09-15 00:00:00', 'Toby Fox', 9.99, NULL),
+(1, 'Undertale', 'Un RPG innovador...', '2015-09-15 00:00:00', 'Toby Fox', 9.99, 0.00),
 (2, 'Hollow Knight: Silksong', 'Secuela de Hollow Knight...', '2023-04-01 00:00:00', 'Team Cherry', 24.99, 10.00),
 (3, 'Subnautica', 'Un juego de supervivencia...', '2018-01-23 00:00:00', 'Unknown Worlds Entertainment', 29.99, 15.00);
 
 -- ----------------------------
--- Inserciones de IdiomasJuego (ID manual)
+-- 5. IdiomasJuego
 -- ----------------------------
-INSERT INTO IdiomasJuego (id_idioma_juego, id_juego, nombre_juego, id_idioma) VALUES
-(1, 1, 'Undertale', 'EN'),
-(2, 2, 'Hollow Knight: Silksong', 'ES'),
-(3, 2, 'Hollow Knight: Silksong', 'EN'),
-(4, 3, 'Subnautica', 'ES'),
-(5, 3, 'Subnautica', 'EN');
+INSERT INTO IdiomasJuego (id_juego, nombre_juego, id_idioma) VALUES
+(1, 'Undertale', 'EN'),
+(2, 'Hollow Knight: Silksong', 'ES'),
+(2, 'Hollow Knight: Silksong', 'EN'),
+(3, 'Subnautica', 'ES'),
+(3, 'Subnautica', 'EN');
 
 -- ----------------------------
--- Inserciones de Valoraciones (ID manual)
+-- 6. Valoraciones (Añadida fechaPublicacion)
 -- ----------------------------
-INSERT INTO Valoraciones (id_valoracion, nombre_juego, nickname, id_idioma_comentario, valoracion, comentario) VALUES
-(1, 'Undertale', 'PanoloPlay',  'ES', 'negativa', 'No esta en español, me cago en ti TOBIFOOOOOX'),
-(2, 'Hollow Knight: Silksong', 'PanoloPlay',  'EN', 'positiva', 'Increíble historia, gráficos impresionantes.'),
-(3, 'Subnautica', 'PanoloPlay', 'ES', 'positiva', 'Diversión pura, un clásico moderno.');
+INSERT INTO Valoraciones (nombre_juego, nickname, id_idioma_comentario, valoracion, comentario, fechaPublicacion) VALUES
+('Undertale', 'PanoloPlay', 'ES', 'negativa', 'No esta en español, me cago en ti TOBIFOOOOOX', NOW()),
+('Hollow Knight: Silksong', 'PanoloPlay', 'EN', 'positiva', 'Increíble historia, gráficos impresionantes.', NOW()),
+('Subnautica', 'PanoloPlay', 'ES', 'positiva', 'Diversión pura, un clásico moderno.', NOW());
 
 -- ----------------------------
--- Inserciones de Logros (ID manual)
+-- 7. Logros
 -- ----------------------------
 INSERT INTO Logros (id_logro, nombre_logro, descripcion_logro, id_juego, nombre_juego) VALUES
 (1, 'Pacifista', 'Completa el juego sin matar a nadie.', 1, 'Undertale'),
 (2, 'Genocida', 'Completa el juego matando a todos los enemigos.', 1, 'Undertale'),
-(3, 'True Pacifist', 'Alcanza el final verdadero sin hacer daño a nadie.', 1, 'Undertale'),
 (4, 'Explorador Audaz', 'Descubre todas las áreas del mundo en Silksong.', 2, 'Hollow Knight: Silksong'),
 (5, 'Silksong Supremo', 'Derrota a todos los jefes del juego.', 2, 'Hollow Knight: Silksong'),
-(6, 'Viajero del Reino', 'Recoge todos los recuerdos en Silksong.', 2, 'Hollow Knight: Silksong'),
-(7, 'Superviviente', 'Sobrevive durante 100 días en el océano de Subnautica.', 3, 'Subnautica'),
-(8, 'Explorador del Abismo', 'Explora el fondo más profundo del océano.', 3, 'Subnautica'),
-(9, 'Titan de Acero', 'Construye un Cyclops y explora el océano en él.', 3, 'Subnautica');
+(7, 'Superviviente', 'Sobrevive durante 100 días en el océano de Subnautica.', 3, 'Subnautica');
 
 -- ----------------------------
--- Inserciones de Amigos (ID manual)
+-- 8. Amigos
 -- ----------------------------
-INSERT INTO Amigos (id_amistad, id_usuario1, nickname1, id_usuario2, nickname2, estado) VALUES
-(1, 4, 'Kans2950', 2, 'PanoloPlay', 'aceptada'),
-(2, 2, 'PanoloPlay', 3, 'Praxis99', 'pendiente');
+INSERT INTO Amigos (id_usuario1, nickname1, id_usuario2, nickname2, estado) VALUES
+(4, 'Kans2950', 2, 'PanoloPlay', 'aceptada'),
+(2, 'PanoloPlay', 3, 'Praxis99', 'pendiente');
 
 -- ----------------------------
--- Inserciones de Mensajes (ID manual)
+-- 9. Mensajes
 -- ----------------------------
-INSERT INTO Mensajes (id_mensaje, id_amistad, mensaje, fecha_envio, leido, id_remitente, nickname_remitente, id_destinatario, nickname_destinatario) VALUES
-(1, 1, 'Hola, ¿quieres jugar al Silksong esta tarde?', '2026-04-12 12:00:00', 'si', 4, 'Kans2950', 2, 'PanoloPlay'),
-(2, 1, '¡Claro! Me encantaría. A las 6pm está bien.', '2026-04-12 12:30:00', 'no', 2, 'PanoloPlay', 4, 'Kans2950');
+INSERT INTO Mensajes (id_amistad, mensaje, fecha_envio, leido, id_remitente, nickname_remitente, id_destinatario, nickname_destinatario) VALUES
+(1, 'Hola, ¿quieres jugar al Silksong esta tarde?', NOW(), 'si', 4, 'Kans2950', 2, 'PanoloPlay'),
+(1, '¡Claro! Me encantaría.', NOW(), 'no', 2, 'PanoloPlay', 4, 'Kans2950');
 
 -- ----------------------------
--- Inserciones de Biblioteca (ID manual)
--- ----------------------------
-INSERT INTO Biblioteca (id_Biblioteca, id_usuario, nickname, id_juego, nombre_juego) VALUES
-(1, 1, 'Test', 3, 'Subnautica'),
-(2, 2, 'PanoloPlay', 1, 'Undertale'),
-(3, 2, 'PanoloPlay', 3, 'Subnautica'),
-(4, 3, 'Praxis99', 2, 'Hollow Knight: Silksong'),
-(5, 4, 'Kans2950', 2, 'Hollow Knight: Silksong');
-
--- ----------------------------
--- Inserciones de LogrosUsuario (ID manual)
--- ----------------------------
-INSERT INTO LogrosUsuario (id_usuario_logro, id_usuario, nickname, Logros_id_logro, id_juego, Logros_nombre_juego, nombre_logro, fecha_obtencion) VALUES
-(1, 2, 'PanoloPlay', 1, 1, 'Undertale', 'Pacifista', '2026-04-12 15:00:00'),
-(2, 4, 'Kans2950', 4, 2, 'Hollow Knight: Silksong', 'Explorador Audaz', '2026-04-12 18:00:00'),
-(3, 4, 'Kans2950', 5, 2, 'Hollow Knight: Silksong', 'Silksong Supremo', '2026-04-12 18:30:00'),
-(4, 4, 'Kans2950', 6, 2, 'Hollow Knight: Silksong', 'Viajero del Reino', '2026-04-12 19:00:00'),
-(5, 2, 'PanoloPlay', 7, 3, 'Subnautica', 'Superviviente', '2026-04-12 19:30:00');
-
--- ----------------------------
--- Inserciones de Categorias (ID manual)
+-- 10. Categorias
 -- ----------------------------
 INSERT INTO Categorias (id_categoria, categoria) VALUES
 (1, 'Acción'),
 (2, 'Aventura'),
 (3, 'RPG'),
-(4, 'Plataformas'),
+(4, 'Metroidvania'),
 (5, 'Indie'),
-(6, 'Metroidvania'),
-(7, 'Supervivencia');
+(6, 'Supervivencia');
 
 -- ----------------------------
--- Inserciones de Categorias_Juego
+-- 11. CategoriasJuego
 -- ----------------------------
-INSERT INTO Categorias_Juego (id_categoria, categoria, id_juego, nombre_juego) VALUES
+INSERT INTO CategoriasJuego (id_categoria, categoria, id_juego, nombre_juego) VALUES
 (5, 'Indie', 1, 'Undertale'),
-(2, 'Aventura', 1, 'Undertale'),
 (3, 'RPG', 1, 'Undertale'),
-(1, 'Acción', 2, 'Hollow Knight: Silksong'),
-(2, 'Aventura', 2, 'Hollow Knight: Silksong'),
-(6, 'Metroidvania', 2, 'Hollow Knight: Silksong'),
-(1, 'Acción', 3, 'Subnautica'),
-(2, 'Aventura', 3, 'Subnautica'),
-(7, 'Supervivencia', 3, 'Subnautica');
+(4, 'Metroidvania', 2, 'Hollow Knight: Silksong'),
+(6, 'Supervivencia', 3, 'Subnautica');
 
 -- ----------------------------
--- Inserciones de Administradores
+-- 12. Biblioteca y Lista de Deseos
+-- ----------------------------
+INSERT INTO Biblioteca (id_usuario, nickname, id_juego, nombre_juego) VALUES
+(1, 'Test', 3, 'Subnautica'),
+(2, 'PanoloPlay', 1, 'Undertale');
+
+INSERT INTO ListaDeseos (id_usuario, nickname, id_juego, nombre_juego, numero_orden) VALUES
+(1, 'Test', 1, 'Undertale', 1),
+(1, 'Test', 2, 'Hollow Knight: Silksong', 2);
+
+-- ----------------------------
+-- 13. LogrosUsuario
+-- ----------------------------
+INSERT INTO LogrosUsuario (id_usuario, nickname, Logros_id_logro, id_juego, Logros_nombre_juego, nombre_logro, fecha_obtencion) VALUES
+(2, 'PanoloPlay', 1, 1, 'Undertale', 'Pacifista', NOW());
+
+-- ----------------------------
+-- 14. Administradores
 -- ----------------------------
 INSERT INTO Administadores (id_administador, id_usuario, nickname) VALUES
-(1, 2, 'PanoloPlay'),
-(2, 3, 'Praxis99'),
-(3, 4, 'Kans2950');
-
--- ----------------------------
--- Inserciones de ListaDeseos (ID manual)
--- ----------------------------
-INSERT INTO ListaDeseos (id_Wishlist, id_usuario, nickname, id_juego, nombre_juego, numero_orden) VALUES
-(1, 1, 'Test', 1, 'Undertale', 1),
-(2, 1, 'Test', 2, 'Hollow Knight: Silksong', 2),
-(3, 2, 'PanoloPlay', 2, 'Hollow Knight: Silksong', 1),
-(4, 4, 'Kans2950', 1, 'Undertale', 1),
-(5, 4, 'Kans2950', 2, 'Hollow Knight: Silksong', 2);
+(1, 2, 'PanoloPlay');

@@ -20,7 +20,7 @@ function getGameCategories($BBDD, $gameId) {
     $stmt = $BBDD->prepare("
         SELECT c.categoria AS nombre_categoria
         FROM Categorias c
-        INNER JOIN Categorias_Juego cj ON c.id_categoria = cj.id_categoria
+        INNER JOIN CategoriasJuego cj ON c.id_categoria = cj.id_categoria
         WHERE cj.id_juego = ?
     ");
 

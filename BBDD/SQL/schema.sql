@@ -50,20 +50,51 @@ CREATE TABLE Usuarios (
 ) ENGINE=InnoDB;
 
 -- ----------------------------
+-- Desarrollador
+-- ----------------------------
+CREATE TABLE Desarrollador(
+  id_desarrollador INT NOT NULL AUTO_INCREMENT,
+  nombre_desarrollador VARCHAR(100) NOT NULL,
+  nickname VARCHAR(50) NOT NULL,
+  PRIMARY KEY (id_desarrollador, nombre_desarrollador),
+  INDEX (nombre_desarrollador, nickname),
+  FOREIGN KEY (nickname) REFERENCES Usuarios(nickname)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
+-- ----------------------------
 -- Juegos
 -- ----------------------------
 CREATE TABLE Juegos (
   id_juego INT NOT NULL AUTO_INCREMENT,
   nombre_juego VARCHAR(100) NOT NULL,
   descripcion TEXT,
-  fecha_publicacion DATETIME NOT NULL,
+  fecha_publicacion DATETIME,
   desarrollador VARCHAR(100) NOT NULL,
   precio DECIMAL(10,2),
   descuento DECIMAL(5,2),
   PRIMARY KEY (id_juego, nombre_juego),
+  INDEX (nombre_juego),
+  FOREIGN KEY (desarrollador) REFERENCES Desarrollador(nombre_desarrollador)
+    ON DELETE CASCADE ON UPDATE CASCADE,
   UNIQUE (nombre_juego)
 ) ENGINE=InnoDB;
 
+-- ----------------------------
+-- MultimediaJuego
+-- ----------------------------
+CREATE TABLE MultimediaJuego (
+  id_multimedia INT NOT NULL AUTO_INCREMENT,
+  id_juego INT NOT NULL,
+  nombre_juego VARCHAR(100) NOT NULL,
+  url_multimedia VARCHAR(255) NOT NULL,
+  tipo ENUM('imagen', 'video') NOT NULL,
+  numero_orden INT NOT NULL,
+  PRIMARY KEY (id_multimedia),
+  INDEX (nombre_juego, url_multimedia, tipo, numero_orden),
+  FOREIGN KEY (id_juego, nombre_juego) REFERENCES Juegos(id_juego, nombre_juego)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB;
 -- ----------------------------
 -- IdiomasJuego
 -- ----------------------------
@@ -75,8 +106,10 @@ CREATE TABLE IdiomasJuego (
   PRIMARY KEY (id_idioma_juego),
   INDEX (id_idioma),
   INDEX (id_juego, nombre_juego),
-  FOREIGN KEY (id_idioma) REFERENCES Idiomas(id_idioma),
+  FOREIGN KEY (id_idioma) REFERENCES Idiomas(id_idioma)
+    ON DELETE RESTRICT ON UPDATE CASCADE,
   FOREIGN KEY (id_juego, nombre_juego) REFERENCES Juegos(id_juego, nombre_juego)
+    ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
 -- ----------------------------
@@ -109,8 +142,9 @@ CREATE TABLE Logros (
   descripcion_logro TEXT,
   id_juego INT NOT NULL,
   nombre_juego VARCHAR(100) NOT NULL,
+  
   PRIMARY KEY (id_logro, id_juego, nombre_juego, nombre_logro),
-  INDEX (id_juego, nombre_juego),
+  INDEX (id_juego, nombre_juego, id_logro, nombre_logro),
   FOREIGN KEY (id_juego, nombre_juego) REFERENCES Juegos(id_juego, nombre_juego)
 ) ENGINE=InnoDB;
 
@@ -128,8 +162,10 @@ CREATE TABLE Amigos (
   UNIQUE (id_usuario1, id_usuario2),
   INDEX (id_usuario1, nickname1),
   INDEX (id_usuario2, nickname2),
-  FOREIGN KEY (id_usuario1, nickname1) REFERENCES Usuarios(id_usuario, nickname),
+  FOREIGN KEY (id_usuario1, nickname1) REFERENCES Usuarios(id_usuario, nickname)
+  ON DELETE CASCADE ON UPDATE CASCADE,
   FOREIGN KEY (id_usuario2, nickname2) REFERENCES Usuarios(id_usuario, nickname)
+  ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
 -- ----------------------------
@@ -149,9 +185,12 @@ CREATE TABLE Mensajes (
   INDEX (id_amistad),
   INDEX (id_remitente, nickname_remitente),
   INDEX (id_destinatario, nickname_destinatario),
-  FOREIGN KEY (id_amistad) REFERENCES Amigos(id_amistad) ON DELETE CASCADE,
-  FOREIGN KEY (id_remitente, nickname_remitente) REFERENCES Usuarios(id_usuario, nickname),
+  FOREIGN KEY (id_amistad) REFERENCES Amigos(id_amistad)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (id_remitente, nickname_remitente) REFERENCES Usuarios(id_usuario, nickname)
+    ON DELETE CASCADE ON UPDATE CASCADE,
   FOREIGN KEY (id_destinatario, nickname_destinatario) REFERENCES Usuarios(id_usuario, nickname)
+    ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
 -- ----------------------------
@@ -169,9 +208,11 @@ CREATE TABLE LogrosUsuario (
   PRIMARY KEY (id_usuario_logro),
   INDEX (id_usuario, nickname),
   INDEX (Logros_id_logro, id_juego, Logros_nombre_juego, nombre_logro),
-  FOREIGN KEY (id_usuario, nickname) REFERENCES Usuarios(id_usuario, nickname),
+  FOREIGN KEY (id_usuario, nickname) REFERENCES Usuarios(id_usuario, nickname)
+     ON DELETE CASCADE ON UPDATE CASCADE,
   FOREIGN KEY (Logros_id_logro, id_juego, Logros_nombre_juego, nombre_logro)
     REFERENCES Logros(id_logro, id_juego, nombre_juego, nombre_logro)
+    ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
 -- ----------------------------
@@ -185,9 +226,9 @@ CREATE TABLE Categorias (
 ) ENGINE=InnoDB;
 
 -- ----------------------------
--- Categorias_Juego
+-- CategoriasJuego
 -- ----------------------------
-CREATE TABLE Categorias_Juego (
+CREATE TABLE CategoriasJuego (
   id_categoria INT NOT NULL,
   categoria VARCHAR(45) NOT NULL,
   id_juego INT NOT NULL,
@@ -209,6 +250,7 @@ CREATE TABLE Administadores (
   PRIMARY KEY (id_administador, id_usuario, nickname),
   INDEX (id_usuario, nickname),
   FOREIGN KEY (id_usuario, nickname) REFERENCES Usuarios(id_usuario, nickname)
+    ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
 -- ----------------------------
@@ -225,9 +267,9 @@ CREATE TABLE ListaDeseos (
   INDEX (id_juego, nombre_juego),
   INDEX (id_usuario, nickname),
   FOREIGN KEY (id_usuario, nickname) REFERENCES Usuarios(id_usuario, nickname)
-    ON DELETE NO ACTION ON UPDATE NO ACTION,
+    ON DELETE CASCADE ON UPDATE CASCADE,
   FOREIGN KEY (id_juego, nombre_juego) REFERENCES Juegos(id_juego, nombre_juego)
-    ON DELETE NO ACTION ON UPDATE NO ACTION
+    ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
 -- ----------------------------
@@ -243,9 +285,9 @@ CREATE TABLE Biblioteca (
   INDEX (id_juego, nombre_juego),
   INDEX (id_usuario, nickname),
   FOREIGN KEY (id_usuario, nickname) REFERENCES Usuarios(id_usuario, nickname)
-    ON DELETE NO ACTION ON UPDATE NO ACTION,
+    ON DELETE CASCADE ON UPDATE CASCADE,
   FOREIGN KEY (id_juego, nombre_juego) REFERENCES Juegos(id_juego, nombre_juego)
-    ON DELETE NO ACTION ON UPDATE NO ACTION
+    ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
 SET FOREIGN_KEY_CHECKS=1;
