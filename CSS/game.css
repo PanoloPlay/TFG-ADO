@@ -60,6 +60,17 @@
     letter-spacing: .2px;
 }
 
+.feature-card__thumb {
+    width: 100px;
+    height: 100px;
+    border-radius: 4px;
+    display: grid;
+    place-items: center;
+    font-weight: 800;
+    background: linear-gradient(180deg, var(--color-greyneutral-8), var(--color-greyneutral-4));
+    color: var(--color-slate-12);
+    border: 1px solid var(--color-greyneutral-7);
+}
 /* Layout principal */
 .game-main-content {
     min-width: 0;
@@ -654,7 +665,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 /* Compra */
 #purchase-section {
-    display: grid;
+    display: flex;
+    flex-direction: column;
+    grid-area: -1 / 1 / -1 / 2;
     gap: 12px;
 }
 
@@ -674,22 +687,71 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     font-weight: 700;
 }
 
-.game-price {
-    margin: 0;
-    font-size: 1.35rem;
-    font-weight: 800;
-    color: var(--color-slate-12);
+.card-image {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 6px;
+    border: 1px solid var(--color-greyneutral-7);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.32);
+    margin-bottom: 12px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    overflow: hidden;
+}
+.purchase-section .price-widget{
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
 }
 
-.game-discount {
-    margin: 0;
-    width: fit-content;
-    padding: 6px 10px;
-    border-radius: 4px;
-    border: 1px solid rgba(59, 158, 255, 0.22);
-    background: rgba(59, 158, 255, 0.12);
-    color: var(--color-blue-12);
-    font-weight: 800;
+.price-widget{
+    display: flex;
+    height: 60px;
+    justify-content: flex-end;
+}
+
+.price-discount-badge {
+    background-color: var(--color-blue-9);
+    color: var(--color-slate-12);
+    font-weight: bold;
+    font-size: 1.75rem;
+    padding: 0 10px;
+    display: flex;
+    align-items: center;
+    border-radius: 3px 0 0 3px;
+}
+
+.price-values {
+    background-color: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--color-greyneutral-7);
+    border-left: none;
+    border-radius: 0 3px 3px 0;
+    padding: 0 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-end;
+}
+
+.price-values.no-discount {
+    background: transparent;
+    border: 0;
+    border-radius: 3px;
+    align-items: center;
+}
+
+.price-original {
+    font-size: 1rem;
+    color: var(--color-greyneutral-11);
+    text-decoration: line-through;
+    line-height: 1;
+    margin-bottom: 2px;
+}
+
+.price-final {
+    font-size: 1.25rem;
+    color: var(--color-slate-12);
+    font-weight: bold;
+    line-height: 1;
 }
 /* =========================
    BUTTONS

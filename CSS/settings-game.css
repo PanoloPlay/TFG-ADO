@@ -1,0 +1,1247 @@
+.developer-panel-page,
+.developer-panel-page * {
+    box-sizing: border-box;
+}
+
+.developer-panel-page {
+    width: min(1380px, calc(100% - 24px));
+    margin: 20px auto 40px;
+    color: var(--color-slate-12);
+}
+
+/* =========================
+   HERO
+========================= */
+.developer-panel-page .developer-panel__hero {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 18px;
+    padding: 24px;
+    border: 1px solid var(--color-greyneutral-7);
+    border-radius: 4px;
+    background: linear-gradient(180deg, var(--color-greyneutral-4), var(--color-greyneutral-6));
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
+}
+
+.developer-panel-page .developer-panel__hero h1 {
+    margin: 0;
+    font-size: 2rem;
+    line-height: 1.1;
+    color: var(--color-slate-12);
+}
+
+.developer-panel-page .developer-panel__hero p {
+    margin: 8px 0 0;
+    color: var(--color-greyneutral-11);
+    max-width: 68ch;
+}
+
+/* =========================
+   LAYOUT
+========================= */
+.developer-panel-page .developer-panel__layout {
+    display: grid;
+    grid-template-columns: 280px minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+}
+
+.developer-panel-page .developer-panel__sidebar {
+    position: sticky;
+    top: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.developer-panel-page .developer-panel__content {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* =========================
+   CARDS / PANELS
+========================= */
+.developer-panel-page .panel-card {
+    padding: 18px;
+    border: 1px solid var(--color-greyneutral-7);
+    border-radius: 4px;
+    background: var(--color-greyneutral-2);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
+    backdrop-filter: blur(12px);
+}
+
+.developer-panel-page .panel-card--sub {
+    padding: 16px;
+    background: var(--color-greyneutral-3);
+    box-shadow: none;
+}
+
+.developer-panel-page .panel-card__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding-bottom: 14px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--color-greyneutral-7);
+}
+
+.developer-panel-page .panel-card__title {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--color-slate-12);
+}
+
+.developer-panel-page .section-divider {
+    margin: 18px 0 16px;
+    padding-top: 4px;
+    border-top: 1px solid var(--color-greyneutral-7);
+}
+
+.developer-panel-page .section-divider h5 {
+    margin: 12px 0 12px 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-slate-12);
+}
+
+.developer-panel-page .section-divider__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.developer-panel-page .helper-text {
+    margin: 0;
+    color: var(--color-greyneutral-11);
+    font-size: 0.9rem;
+}
+
+/* =========================
+   PROFILE / SIDEBAR
+========================= */
+.developer-panel-page .panel-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.developer-panel-page .panel-profile__content strong {
+    display: block;
+    font-size: 1rem;
+    color: var(--color-slate-12);
+}
+
+.developer-panel-page .panel-profile__content small {
+    display: block;
+    margin-top: 2px;
+    color: var(--color-greyneutral-11);
+}
+
+.developer-panel-page .panel-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.developer-panel-page .panel-nav__item {
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 14px;
+    border: 1px solid var(--color-greyneutral-7);
+    border-radius: 4px;
+    background: var(--color-greyneutral-3);
+    color: var(--color-slate-12);
+    text-decoration: none;
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.developer-panel-page .panel-nav__item:hover {
+    background: var(--color-greyneutral-5);
+    border-color: var(--color-greyneutral-8);
+    transform: translateY(-1px);
+}
+
+.developer-panel-page .panel-nav__item.is-active {
+    background: rgba(59, 158, 255, 0.14);
+    border-color: rgba(59, 158, 255, 0.35);
+}
+
+.developer-panel-page .panel-nav__item.is-disabled {
+    opacity: 0.55;
+    cursor: default;
+    pointer-events: none;
+}
+
+.developer-panel-page .panel-nav__item .material-symbols-outlined {
+    font-size: 18px;
+}
+
+/* =========================
+   GRID / FIELDS
+========================= */
+.developer-panel-page .panel-grid {
+    display: grid;
+    gap: 20px;
+}
+
+.developer-panel-page .panel-grid--2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.developer-panel-page .form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+}
+
+.developer-panel-page .form-label {
+    display: block;
+    font-weight: 600;
+    color: var(--color-slate-12);
+    font-size: 0.95rem;
+    margin: 12px 0 0 0;
+}
+
+/* =========================
+   FORM CONTROLS
+========================= */
+.developer-panel-page .form-control,
+.developer-panel-page .form-select {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--color-greyneutral-7);
+    border-radius: 4px;
+    background: var(--color-greyneutral-3);
+    color: var(--color-slate-12);
+    font-size: 0.95rem;
+    box-shadow: none;
+    transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+.developer-panel-page .form-control.js-static-image-input{
+    margin: auto 0 12px 0;
+}
+.developer-panel-page .form-control:hover,
+.developer-panel-page .form-select:hover {
+    border-color: var(--color-greyneutral-8);
+    background: var(--color-greyneutral-4);
+}
+
+.developer-panel-page .form-control:focus,
+.developer-panel-page .form-select:focus,
+.developer-panel-page textarea:focus {
+    outline: none;
+    border-color: var(--color-blue-8);
+    background: rgba(13, 40, 71, 0.35);
+    box-shadow: 0 0 0 3px rgba(26, 159, 255, 0.12);
+}
+
+.developer-panel-page textarea.form-control {
+    resize: vertical;
+    min-height: 140px;
+}
+
+.developer-panel-page input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    filter: brightness(0) invert(1);
+    cursor: pointer;
+}
+.developer-panel-page input.form-control[type="file"],
+.developer-panel-page input[type="file"] {
+    background-color: var(--color-greyneutral-3) ;
+    color: var(--color-slate-12) ;
+    -webkit-text-fill-color: var(--color-slate-12) ;
+    border: 1px solid var(--color-greyneutral-7) ;
+    border-radius: 4px;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    color-scheme: dark;
+}
+
+/* Hover del contenedor */
+.developer-panel-page input.form-control[type="file"]:hover,
+.developer-panel-page input[type="file"]:hover {
+    background-color: var(--color-greyneutral-4) ;
+    border-color: var(--color-greyneutral-8) ;
+    color: var(--color-slate-12) ;
+    -webkit-text-fill-color: var(--color-slate-12) ;
+}
+
+/* Botón interno */
+.developer-panel-page input.form-control[type="file"]::file-selector-button,
+.developer-panel-page input[type="file"]::file-selector-button {
+    background: var(--color-greyneutral-5) ;
+    color: var(--color-slate-12) ;
+    -webkit-text-fill-color: var(--color-slate-12) ;
+    border: 1px solid var(--color-greyneutral-7) ;
+    border-radius: 4px;
+    padding: 0.42rem 0.85rem;
+    margin: 0 14px 0 0;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.developer-panel-page input.form-control[type="file"]:hover::file-selector-button,
+.developer-panel-page input[type="file"]:hover::file-selector-button {
+    background: var(--color-greyneutral-6) ;
+    border-color: var(--color-greyneutral-8) ;
+    color: var(--color-slate-12) ;
+    -webkit-text-fill-color: var(--color-slate-12) ;
+}
+
+/* WebKit antiguo */
+.developer-panel-page input.form-control[type="file"]::-webkit-file-upload-button,
+.developer-panel-page input[type="file"]::-webkit-file-upload-button {
+    background: var(--color-greyneutral-5) ;
+    color: var(--color-slate-12) ;
+    border: 1px solid var(--color-greyneutral-7) ;
+    border-radius: 4px;
+    padding: 0.42rem 0.85rem;
+    cursor: pointer;
+    font-weight: 600;
+}
+/* =========================
+   PREVIEWS / MEDIA
+========================= */
+.developer-panel-page .media-preview-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.developer-panel-page .media-preview,
+.developer-panel-page .empty-state .media-preview {
+    width: 100%;
+    min-height: 120px;
+    border: 1px solid var(--color-greyneutral-7);
+    border-radius: 4px;
+    background-color: var(--color-greyneutral-2);
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: contain;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.developer-panel-page .carousel-item__preview {
+    width: 100%;
+    min-height: 120px;
+    border: 1px solid var(--color-greyneutral-7);
+    border-radius: 4px;
+    background-color: var(--color-greyneutral-2);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.developer-panel-page .media-preview:hover,
+.developer-panel-page .carousel-item__preview:hover {
+    border-color: var(--color-blue-8);
+    box-shadow: 0 12px 30px rgba(26, 159, 255, 0.14);
+}
+
+.developer-panel-page .media-preview--contain {
+    background-size: contain;
+}
+
+.developer-panel-page .preview-caption {
+    font-size: 0.85rem;
+    color: var(--color-greyneutral-11);
+}
+
+.developer-panel-page .media-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.developer-panel-page .media-card {
+    padding: 14px;
+    border: 1px solid var(--color-greyneutral-7);
+    border-radius: 4px;
+    background: var(--color-greyneutral-3);
+}
+
+.developer-panel-page .achievement-preview-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.developer-panel-page .achievement-preview-card {
+    width: 120px;
+    max-width: 100%;
+    text-align: center;
+}
+
+.developer-panel-page .achievement-preview-image {
+    width: 100%;
+    max-width: 120px;
+    height: auto;
+    max-height: 120px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid var(--color-greyneutral-7);
+    display: block;
+    margin: 0 auto;
+}
+
+.developer-panel-page .achievement-preview-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.developer-panel-page .achievement-preview-row-title {
+    font-weight: 700;
+    color: var(--color-slate-12);
+}
+
+.developer-panel-page .achievement-preview-grayscale .achievement-preview-image {
+    filter: grayscale(100%);
+}
+
+
+.developer-panel-page .multimedia-media {
+    width: 100%;
+    border-radius: 4px;
+    display: block;
+    object-fit: cover;
+    background: #000;
+}
+
+.developer-panel-page .empty-state {
+    display: grid;
+    gap: 12px;
+    justify-items: start;
+}
+
+.developer-panel-page .empty-state__text {
+    color: var(--color-greyneutral-11);
+}
+
+#preview_header,
+#preview_logo,
+#preview_capsule,
+#preview_background,
+#preview_wide-cover,
+#preview_banner,
+#preview_cover,
+#preview_icon {
+    min-height: 300px;
+}
+
+/* =========================
+   SEARCH / FILTERS
+========================= */
+.developer-panel-page .search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.developer-panel-page .search-box__icon {
+    position: absolute;
+    left: 0.9rem;
+    color: var(--color-greyneutral-11);
+    pointer-events: none;
+}
+
+.developer-panel-page .search-box .form-control {
+    padding-left: 2.8rem;
+    padding-right: 2.5rem;
+}
+
+/* Ensure custom filter input text and placeholder colors apply */
+.developer-panel-page .search-box .js-filter-input {
+    color: var(--color-slate-12);
+    -webkit-text-fill-color: var(--color-slate-12);
+}
+.developer-panel-page .search-box .js-filter-input::placeholder {
+    color: var(--color-greyneutral-11);
+    opacity: 1;
+}
+
+.developer-panel-page .search-box .btn-icon {
+    position: absolute;
+    right: 0.35rem;
+}
+
+.developer-panel-page .option-list {
+    display: grid;
+    gap: 10px;
+}
+
+.developer-panel-page .option-list--scroll {
+    max-height: 330px;
+    overflow-y: auto;
+    padding-right: 8px;
+}
+
+.developer-panel-page .option-list--scroll::-webkit-scrollbar {
+    width: 6px;
+}
+
+.developer-panel-page .option-list--scroll::-webkit-scrollbar-thumb {
+    background: var(--color-greyneutral-8);
+    border-radius: 4px;
+}
+
+.developer-panel-page .option-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--color-greyneutral-7);
+    border-radius: 4px;
+    background: var(--color-greyneutral-3);
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.developer-panel-page .option-item:hover {
+    background: var(--color-greyneutral-4);
+    border-color: var(--color-greyneutral-8);
+    transform: translateY(-1px);
+}
+
+.developer-panel-page .option-item input[type="checkbox"] {
+    margin: 0;
+    transform: translateY(1px);
+}
+
+/* =========================
+   CARRUSEL
+========================= */
+.developer-panel-page .carousel-list {
+    display: grid;
+    gap: 12px;
+}
+
+.developer-panel-page .carousel-item-row {
+    display: flex;
+    align-items: stretch;
+    background: linear-gradient(180deg, var(--color-greyneutral-2), var(--color-greyneutral-4));
+    border: 1px solid var(--color-greyneutral-7);
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.developer-panel-page .carousel-item-row:hover {
+    background: linear-gradient(180deg, var(--color-greyneutral-5), var(--color-greyneutral-2));
+    border-color: var(--color-greyneutral-8);
+}
+
+.developer-panel-page .sortable-ghost {
+    opacity: 0.45 ;
+    border: 1px dashed var(--color-blue-8) ;
+}
+
+.developer-panel-page .sortable-chosen {
+    box-shadow: 0 0 0 2px rgba(26, 159, 255, 0.25), 0 12px 30px rgba(0, 0, 0, 0.25);
+}
+
+.developer-panel-page .sortable-drag {
+    opacity: 0.88;
+    cursor: grabbing ;
+}
+
+.developer-panel-page .carousel-item__handle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 54px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-right: 1px solid var(--color-greyneutral-7);
+    padding: 8px;
+    flex-shrink: 0;
+}
+
+.developer-panel-page .btn-drag {
+    background: transparent;
+    border: none;
+    color: var(--color-greyneutral-11);
+    cursor: grab;
+    padding: 0.5rem;
+    transition: color 0.2s ease, opacity 0.2s ease;
+}
+.developer-panel-page .section-achievement-preview {
+    margin: 18px 0 16px;
+    padding-top: 0;
+    border-top: none;
+}
+
+.developer-panel-page .section-achievement-preview h5 {
+    margin: 12px 0 12px 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-slate-12);
+}
+
+.developer-panel-page .btn-drag:hover {
+    color: var(--color-slate-12);
+}
+
+.developer-panel-page .btn-drag:active {
+    cursor: grabbing;
+    color: var(--color-blue-8);
+}
+
+.developer-panel-page .carousel-item__preview {
+    width: 200px;
+    min-width: 200px;
+    height: 100px;
+    margin: 20px;
+    flex-shrink: 0;
+}
+
+.developer-panel-page .carousel-item__video {
+    width: 200px;
+    min-width: 200px;
+    height: 100px;
+    margin: 20px;
+    display: none;
+    background: #000;
+    border-radius: 4px;
+}
+
+.developer-panel-page .carousel-item__body {
+    flex: 1;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+}
+
+.developer-panel-page .carousel-item__fields {
+    width: 100%;
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+.developer-panel-page .carousel-item__field--file {
+    flex: 1;
+    min-width: 180px;
+}
+
+.developer-panel-page .carousel-item__field--order {
+    width: 86px;
+}
+
+.developer-panel-page .carousel-item__field--type {
+    width: 130px;
+}
+
+.developer-panel-page .carousel-order-input {
+    width: 100%;
+    height: 49px;
+    padding: 8px;
+    text-align: center;
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--color-slate-12);
+    font-size: 0.9rem;
+    border-radius: 4px;
+}
+
+.developer-panel-page .carousel-order-input::-webkit-outer-spin-button,
+.developer-panel-page .carousel-order-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.developer-panel-page .carousel-order-input:focus {
+    background: rgba(0, 0, 0, 0.28);
+    border-color: var(--color-greyneutral-8);
+    outline: none;
+}
+
+.developer-panel-page .js-remove-carousel-item {
+    align-self: flex-end;
+    white-space: nowrap;
+}
+
+.developer-panel-page .carousel-item-row .form-label {
+    font-size: 0.85rem;
+    margin: 4px ;
+}
+
+/* =========================
+   TABLE
+========================= */
+.developer-panel-page .panel-table {
+    width: 100%;
+    border-collapse: collapse;
+    overflow: hidden;
+    border: 1px solid var(--color-greyneutral-7);
+    border-radius: 4px;
+    background: var(--color-greyneutral-2);
+}
+
+.developer-panel-page .panel-table th,
+.developer-panel-page .panel-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--color-greyneutral-7);
+    text-align: left;
+}
+
+.developer-panel-page .panel-table thead th {
+    background: var(--color-greyneutral-3);
+    color: var(--color-slate-12);
+    font-weight: 700;
+}
+
+.developer-panel-page .panel-table tbody tr:hover td {
+    background: var(--color-greyneutral-4);
+}
+
+.developer-panel-page .table-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+.developer-panel-page .form-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+.developer-panel-page .form-actions .btn-primary,
+.developer-panel-page .form-actions .btn-secondary {
+    flex: 1;
+    max-width: 120px;
+}
+
+.developer-panel-page button,
+.developer-panel-page a.btn-primary,
+.developer-panel-page a.btn-secondary,
+.developer-panel-page a.btn-danger,
+.developer-panel-page a.btn-outline-secondary,
+.developer-panel-page button.btn-icon,
+.developer-panel-page a.btn-icon,
+.developer-panel-page .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    text-decoration: none;
+}
+.developer-panel-page button,
+.developer-panel-page a.btn-primary,
+.developer-panel-page a.btn-secondary,
+.developer-panel-page a.btn-outline-secondary,
+.developer-panel-page button.btn-icon,
+.developer-panel-page a.btn-icon,
+.developer-panel-page .btn {
+    margin: 12px 0 12px 0;
+}
+.developer-panel-page .btn-danger {
+    margin: 37px 0 0 0;
+}
+.developer-panel-page button .material-symbols-outlined,
+.developer-panel-page a .material-symbols-outlined {
+    font-size: 1.2rem;
+}
+
+.developer-panel-page .btn-sm {
+    padding: 0.42rem 0.82rem;
+    font-size: 0.875rem;
+    min-height: 36px;
+}
+.developer-panel-page .btn-secondary.btn-sm,
+.developer-panel-page .del-game  {
+    margin: 25px 0 12px 0;
+}
+.developer-panel-page .btn-md {
+    padding: 0.625rem 1.15rem;
+    font-size: 0.95rem;
+    min-height: 44px;
+}
+
+.developer-panel-page .btn-lg {
+    padding: 0.75rem 1.25rem;
+    font-size: 1rem;
+    min-height: 48px;
+}
+
+.developer-panel-page .btn--icon {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+}
+
+.developer-panel-page .btn-primary {
+    background: var(--color-blue-5);
+    color: #fff;
+    border-color: rgba(37, 99, 235, 0.2);
+}
+
+.developer-panel-page .btn-primary:hover {
+    background: var(--color-blue-6);
+    transform: translateY(-1px);
+}
+
+.developer-panel-page .btn-secondary {
+    background: var(--color-greyneutral-3);
+    color: var(--color-slate-12);
+    border-color: var(--color-greyneutral-7);
+}
+
+.developer-panel-page .btn-secondary:hover {
+    background: var(--color-greyneutral-4);
+    border-color: var(--color-greyneutral-8);
+}
+
+.developer-panel-page .btn-danger {
+    background: rgba(239, 68, 68, 0.18);
+    color: var(--color-red-12);
+    border-color: rgba(239, 68, 68, 0.28);
+}
+
+.developer-panel-page .btn-danger:hover {
+    background: rgba(239, 68, 68, 0.26);
+}
+
+.developer-panel-page .btn-outline-secondary {
+    background: transparent;
+    color: var(--color-slate-12);
+    border-color: var(--color-greyneutral-7);
+}
+
+.developer-panel-page .btn-outline-secondary:hover {
+    background: var(--color-greyneutral-4);
+}
+
+.developer-panel-page .btn-icon {
+    background: transparent;
+    border: none;
+    color: var(--color-greyneutral-11);
+    padding: 0.4rem;
+    border-radius: 4px;
+}
+
+.developer-panel-page .btn-icon:hover {
+    background: var(--color-greyneutral-4);
+    color: var(--color-slate-12);
+}
+
+/* =========================
+   ALERTS / HELPERS
+========================= */
+.developer-panel-page .alert-custom {
+    padding: 12px 14px;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    margin-bottom: 16px;
+}
+
+.developer-panel-page .alert-success {
+    background: rgba(76, 204, 134, 0.14);
+    border-color: rgba(76, 204, 134, 0.25);
+    color: #b9f3d0;
+}
+
+.developer-panel-page .alert-danger {
+    background: rgba(239, 68, 68, 0.14);
+    border-color: rgba(239, 68, 68, 0.25);
+    color: #fecaca;
+}
+
+.developer-panel-page .text-center { text-align: center; }
+.developer-panel-page .text-muted { color: var(--color-slate-11) !important; }
+.developer-panel-page .mb-0 { margin-bottom: 0 ; }
+.developer-panel-page .mb-1 { margin-bottom: 0.25rem ; }
+.developer-panel-page .mb-2 { margin-bottom: 0.5rem ; }
+.developer-panel-page .mb-3 { margin-bottom: 1rem ; }
+.developer-panel-page .mt-2 { margin-top: 0.5rem ; }
+.developer-panel-page .mt-3 { margin-top: 1rem ; }
+.developer-panel-page .py-4 { padding-top: 1.5rem ; padding-bottom: 1.5rem ; }
+.developer-panel-page .table-responsive { overflow-x: auto; }
+
+/* =========================
+   MODAL
+========================= */
+.modal-dialog.modal-xl {
+    max-width: min(590px, calc(100vw - 40px)) !important;
+    margin: 20px auto 0 auto ;
+}
+
+.modal-content {
+    background: var(--color-greyneutral-2);
+    border: 1px solid var(--color-greyneutral-7);
+    border-radius: 4px;
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--color-greyneutral-7);
+    background: var(--color-greyneutral-3);
+    padding: 16px;
+}
+
+.modal-header .modal-title {
+    color: var(--color-slate-12);
+    font-weight: 700;
+}
+
+.modal-header .btn-close {
+    border: none;
+    color: var(--color-slate-12);
+    filter: brightness(0) invert(1);
+}
+
+.modal-header .btn-close:hover {
+    color: var(--color-slate-12);
+}
+
+.modal-body {
+    background: var(--color-greyneutral-2);
+    padding: 16px;
+}
+
+.modal-footer {
+    border-top: 1px solid var(--color-greyneutral-7);
+    background: var(--color-greyneutral-3);
+    padding: 16px;
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+.modal-footer .btn{ 
+    display: flex;
+    padding: 0.625rem 1.15rem;
+}
+.modal-footer .btn span{ 
+    margin: 0 10px 0 0;
+}
+.cropper-modal-content {
+    background: var(--color-greyneutral-2);
+    border: 1px solid var(--color-greyneutral-7);
+    border-radius: 4px;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
+    overflow: hidden;
+}
+
+.cropper-modal__body {
+    background: var(--color-greyneutral-3);
+    padding: 1rem;
+}
+
+.cropper-modal__canvas {
+    width: 100%;
+    min-height: 420px;
+    max-height: 920px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: var(--color-greyneutral-1);
+    border-radius: 4px;
+}
+
+.cropper-modal__canvas img {
+    display: block;
+    max-width: 100%;
+}
+
+.cropper-view-box,
+.cropper-face {
+    border-radius: 2px;
+}
+
+.cropper-line,
+.cropper-point {
+    background-color: var(--color-blue-10);
+}
+/* =========================
+   ACHIEVEMENTS / LOGROS
+========================= */
+.developer-panel-page .achievement-list {
+    display: grid;
+    gap: 12px;
+}
+
+.developer-panel-page .achievement-item-row {
+    display: flex;
+    align-items: stretch;
+    background: linear-gradient(180deg, var(--color-greyneutral-2), var(--color-greyneutral-4));
+    border: 1px solid var(--color-greyneutral-7);
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.developer-panel-page .achievement-item-row:hover {
+    background: linear-gradient(180deg, var(--color-greyneutral-5), var(--color-greyneutral-2));
+    border-color: var(--color-greyneutral-8);
+}
+
+.developer-panel-page .achievement-item-row.sortable-ghost {
+    opacity: 0.45;
+    border: 1px dashed var(--color-blue-8);
+}
+
+.developer-panel-page .achievement-item-row.sortable-chosen {
+    box-shadow: 0 0 0 2px rgba(26, 159, 255, 0.25), 0 12px 30px rgba(0, 0, 0, 0.25);
+}
+
+.developer-panel-page .achievement-item-row.sortable-drag {
+    opacity: 0.88;
+    cursor: grabbing;
+}
+
+.developer-panel-page .achievement-item__body {
+    flex: 1;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+}
+
+.developer-panel-page .achievement-item__fields {
+    width: 100%;
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+.developer-panel-page .achievement-item__field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.developer-panel-page .achievement-item__field--name {
+    flex: 1;
+    min-width: 180px;
+}
+
+.developer-panel-page .achievement-item__field--description {
+    flex: 1.5;
+    min-width: 220px;
+}
+
+.developer-panel-page .achievement-item__field--rarity {
+    width: 130px;
+}
+
+.developer-panel-page .achievement-item__field--order {
+    width: 80px;
+}
+
+.developer-panel-page .achievement-item__field--identifier {
+    flex: 1;
+    min-width: 150px;
+}
+
+.developer-panel-page .achievement-item__field label {
+    font-size: 0.85rem;
+    margin-bottom: 4px !important;
+    color: var(--color-greyneutral-10);
+}
+
+.developer-panel-page .achievement-item__field .form-control {
+    min-height: 40px;
+    font-size: 0.9rem;
+}
+.developer-panel-page .description-input{
+    margin: 12px 0;
+}
+.developer-panel-page .achievement-order-input {
+    width: 100%;
+    height: 40px;
+    padding: 8px;
+    text-align: center;
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--color-slate-12);
+    font-size: 0.9rem;
+    border-radius: 3px;
+}
+
+.developer-panel-page .achievement-order-input::-webkit-outer-spin-button,
+.developer-panel-page .achievement-order-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.developer-panel-page .achievement-order-input:focus {
+    background: rgba(0, 0, 0, 0.3);
+    border-color: var(--color-greyneutral-8);
+    outline: none;
+}
+
+.developer-panel-page .js-remove-achievement-item {
+    align-self: flex-end;
+    white-space: nowrap;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.developer-panel-page .achievement-item-row .form-label {
+    font-size: 0.85rem;
+    margin-bottom: 4px;
+}
+
+/* Responsive para achievements */
+@media (max-width: 980px) {
+    .developer-panel-page .achievement-item-row {
+        flex-wrap: wrap;
+    }
+
+    .developer-panel-page .achievement-item__body {
+        width: 100%;
+    }
+
+    .developer-panel-page .achievement-item__fields {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .developer-panel-page .achievement-item__field {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .developer-panel-page .achievement-item__field--name,
+    .developer-panel-page .achievement-item__field--description,
+    .developer-panel-page .achievement-item__field--rarity,
+    .developer-panel-page .achievement-item__field--order,
+    .developer-panel-page .achievement-item__field--identifier {
+        width: 100%;
+    }
+}
+
+@media (max-width: 720px) {
+    .developer-panel-page .achievement-item__fields {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .developer-panel-page .achievement-item-row .form-label {
+        font-size: 0.85rem;
+        margin-bottom: 4px;
+    }
+    
+    .developer-panel-page .developer-panel__layout {
+        grid-template-columns: 1fr;
+    }
+
+    .developer-panel-page .developer-panel__sidebar {
+        position: static;
+    }
+}
+
+@media (max-width: 980px) {
+    .developer-panel-page .panel-grid--2,
+    .developer-panel-page .media-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .developer-panel-page .carousel-item-row {
+        flex-wrap: wrap;
+    }
+
+    .developer-panel-page .carousel-item__body {
+        width: 100%;
+    }
+
+    .developer-panel-page .carousel-item__preview,
+    .developer-panel-page .carousel-item__video {
+        width: calc(100% - 40px);
+        min-width: 0;
+    }
+}
+
+@media (max-width: 720px) {
+    .developer-panel-page .developer-panel__hero {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .developer-panel-page .carousel-item-row {
+        flex-direction: column;
+    }
+
+    .developer-panel-page .carousel-item__handle {
+        width: 100%;
+        min-height: 44px;
+        flex-direction: row;
+        border-right: none;
+        border-bottom: 1px solid var(--color-greyneutral-7);
+        gap: 12px;
+    }
+
+    .developer-panel-page .carousel-item__preview,
+    .developer-panel-page .carousel-item__video {
+        width: 100%;
+        min-width: 0;
+        margin: 0;
+        height: 160px;
+        border-right: none;
+        border-bottom: 1px solid var(--color-greyneutral-7);
+    }
+
+    .developer-panel-page .carousel-item__fields {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .developer-panel-page .carousel-item__field--file,
+    .developer-panel-page .carousel-item__field--order,
+    .developer-panel-page .carousel-item__field--type {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .developer-panel-page .form-actions {
+        flex-direction: column;
+    }
+
+    .developer-panel-page .btn-primary,
+    .developer-panel-page .btn-secondary,
+    .developer-panel-page .btn-danger,
+    .developer-panel-page .btn-outline-secondary {
+        width: 100%;
+    }
+}
+

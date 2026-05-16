@@ -34,10 +34,18 @@ function getGameCategories($BBDD, $gameId) {
 
 function getGameComments($BBDD, $gameName) {
     $stmt = $BBDD->prepare("
-        SELECT nickname, comentario, valoracion, fechaPublicacion, id_idioma_comentario
-        FROM Valoraciones
-        WHERE nombre_juego = ?
-        ORDER BY fechaPublicacion DESC
+        SELECT 
+            U.nombre_usuario,
+            V.nickname,
+            V.comentario,
+            V.valoracion,
+            V.fechaPublicacion,
+            V.id_idioma_comentario
+        FROM Valoraciones V
+        INNER JOIN Usuarios U 
+            ON V.nickname = U.nickname
+        WHERE V.nombre_juego = ?
+        ORDER BY V.fechaPublicacion DESC
         LIMIT 20
     ");
 

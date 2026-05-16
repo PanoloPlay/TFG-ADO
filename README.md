@@ -1,7 +1,7 @@
 # 
 # 🎮 Hestia's Lotus
 
-![Banner o logo del proyecto](https://github.com/PanoloPlay/TFG-ADO/blob/main/MEDIA/IMG//app_icons/loto-color.svg)
+![Banner o logo del proyecto](https://github.com/PanoloPlay/TFG-ADO/blob/main/MEDIA/IMG/app_icons/loto-color.svg)
 
 > Una plataforma web que ofrece la calidez que da la diosa del hogar Hestia.
 

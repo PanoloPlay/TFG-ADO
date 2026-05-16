@@ -11,6 +11,7 @@ function getGameImageUrl(int $idJuego, string $variant): string
         'wide-cover' => ['wide-cover.jpg', 'wide-cover.jpeg'],
         'banner' => ['banner.jpg', 'banner.jpeg'],
         'cover' => ['cover.jpg', 'cover.jpeg'],
+        'capsule'=> ['capsule.jpg', 'capsule.jpeg'],
         'icon' => ['icon.png', 'icon.jpg', 'icon.jpeg', 'icon.ico']
     ];
     

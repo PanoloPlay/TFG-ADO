@@ -120,12 +120,15 @@ INSERT INTO Valoraciones (nombre_juego, nickname, id_idioma_comentario, valoraci
 -- ----------------------------
 -- 7. Logros
 -- ----------------------------
-INSERT INTO Logros (id_logro, nombre_logro, descripcion_logro, id_juego, nombre_juego) VALUES
-(1, 'Pacifista', 'Completa el juego sin matar a nadie.', 1, 'Undertale'),
-(2, 'Genocida', 'Completa el juego matando a todos los enemigos.', 1, 'Undertale'),
-(4, 'Explorador Audaz', 'Descubre todas las áreas del mundo en Silksong.', 2, 'Hollow Knight: Silksong'),
-(5, 'Silksong Supremo', 'Derrota a todos los jefes del juego.', 2, 'Hollow Knight: Silksong'),
-(7, 'Superviviente', 'Sobrevive durante 100 días en el océano de Subnautica.', 3, 'Subnautica');
+INSERT INTO Logros (id_logro, nombre_logro, descripcion_logro, id_juego, nombre_juego, rareza, identificador_unico) VALUES
+(1, 'Pacifista', 'Completa el juego sin matar a nadie.', 1, 'Undertale', 'cobre', '1_1_cobre'),
+(2, 'Genocida', 'Completa el juego matando a todos los enemigos.', 1, 'Undertale', 'plata', '2_1_plata'),
+(4, 'Explorador Audaz', 'Descubre todas las áreas del mundo en Silksong.', 2, 'Hollow Knight: Silksong', 'oro', '4_2_oro'),
+(7, 'Superviviente', 'Completa todos los logros del juego.', 3, 'Subnautica', 'lotus', '8_3_lotus'),
+(8, 'Superviviente', 'Completa todos los logros del juego.', 3, 'Subnautica', 'lotus', '8_3_lotus'),
+(9, 'Silksong Supremo', 'Derrota a todos los jefes del juego.', 2, 'Hollow Knight: Silksong', 'platino', '9_2_platino'),
+(10, 'Superviviente', 'Sobrevive durante 100 días en el océano de Subnautica.', 3, 'Subnautica', 'platino', '10_3_platino'),
+(11, 'Superviviente', 'Completa todos los logros del juego.', 3, 'Subnautica', 'lotus', '11_3_lotus');
 
 -- ----------------------------
 -- 8. Amigos

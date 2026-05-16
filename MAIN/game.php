@@ -56,6 +56,17 @@ if ($gameId > 0) {
         }
     }
 }
+function renderPrecioOriginal($precio, $descuento) {
+    if ($descuento > 0) {
+        return '<span class="price-original">' . number_format($precio, 2, ',', '.') . '€</span>';
+    }
+    return '';
+}
+
+function renderPrecioFinal($precio, $descuento) {
+    $final = $precio - ($precio * ($descuento / 100));
+    return '<span class="price-final">' . ($final <= 0 ? 'Gratis' : number_format($final, 2, ',', '.') . '€') . '</span>';
+}
 ?>
 
 <input type="hidden" id="hdnSession" data-value="<?php echo e($userNickname ?? ''); ?>" />
@@ -163,112 +174,7 @@ if ($gameId > 0) {
             <p id="game-description"><?php echo e($gameDataPhp['descripcion'] ?? 'Descripción no disponible.'); ?></p>
         </section>
 
-
-
-    </div>
-
-    <aside class="game-sidebar">
-
-        <div class="game-purchase-card">
-            <div class="purchase-header">
-                <h3>Comprar juego</h3>
-            </div>
-            <div id="purchase-section">
-                <?php
-                $price = (float)($gameDataPhp['precio'] ?? 0);
-                $discount = (float)($gameDataPhp['descuento'] ?? 0);
-                $finalPrice = $discount > 0 ? $price * (1 - $discount / 100) : $price;
-                ?>
-                <?php if ($userBought): ?>
-                    <div class="owned-message">¡Ya tienes este juego en tu biblioteca!</div>
-                    <div class="game-title">Descargar: <?php echo e($gameDataPhp['nombre_juego']); ?></div>
-                    <button class="download-button" type="button" onclick="window.location.href='./libraryGame.php?name=<?php echo urlencode($gameDataPhp['nombre_juego']); ?>'">Descargar</button>
-                <?php else: ?>
-                    <div class="game-title">Comprar: <?php echo e($gameDataPhp['nombre_juego']); ?></div>
-                    <p class="game-price">Precio: <?php echo number_format($finalPrice, 2); ?>€</p>
-                    <?php if ($discount > 0): ?>
-                        <p class="game-discount">Descuento: <?php echo $discount; ?>%</p>
-                    <?php endif; ?>
-                    <button class="btn btn-primary" id="buy-button" type="button">Comprar</button>
-                    <?php
-                    $inWishlist = false;
-                    $inCart = false;
-
-                    if (!empty($userNickname)) {
-                        try {
-                            $stmtWishlist = $BBDD->prepare("
-                                SELECT COUNT(*) AS in_wishlist
-                                FROM ListaDeseos
-                                WHERE nickname = ? AND nombre_juego = ?
-                            ");
-                            $stmtWishlist->execute([$userNickname, $gameNamePhp]);
-                            $wishlistResult = $stmtWishlist->fetch(PDO::FETCH_ASSOC);
-                            $inWishlist = !empty($wishlistResult) && ((int)($wishlistResult['in_wishlist'] ?? 0) > 0);
-
-                            $stmtCart = $BBDD->prepare("
-                                SELECT COUNT(*) AS in_cart
-                                FROM Carrito
-                                WHERE nickname = ? AND nombre_juego = ?
-                            ");
-                            $stmtCart->execute([$userNickname, $gameNamePhp]);
-                            $cartResult = $stmtCart->fetch(PDO::FETCH_ASSOC);
-                            $inCart = !empty($cartResult) && ((int)($cartResult['in_cart'] ?? 0) > 0);
-                        } catch (PDOException $e) {
-                            $inWishlist = false;
-                            $inCart = false;
-                        }
-                    }
-                    ?>
-                    <?php if (!$inWishlist): ?>
-                        <button class="wishlist-button" id="add-wishlist-button" type="button">Añadir a la lista de deseos</button>
-                    <?php else: ?>
-                        <button class="wishlist-button" id="remove-wishlist-button" type="button">Quitar de la lista de deseos</button>
-                    <?php endif; ?>
-                    <?php if (!$inCart): ?>
-                        <button class="wishlist-button" id="add-cart-button" type="button">Añadir al carrito</button>
-                    <?php else: ?>
-                        <button class="wishlist-button" id="remove-cart-button" type="button">Quitar del carrito</button>
-                    <?php endif; ?>
-                <?php endif; ?>
-            </div>
-        </div>
-
-        <div class="game-info-card">
-            <h3>Información</h3>
-
-            <div class="game-info-list">
-                <div class="game-info-item">
-                    <span class="label">Desarrollador</span>
-                    <p id="game-developer"><?php echo e($gameDataPhp['desarrollador'] ?? 'Desarrollador desconocido.'); ?></p>
-                </div>
-
-                <div class="game-info-item">
-                    <span class="label">Fecha lanzamiento</span>
-                    <p id="game-release-date"><?php echo e($gameDataPhp['fecha_publicacion'] ?? 'Fecha no disponible.'); ?></p>
-                </div>
-
-                <div class="game-info-item">
-                    <span class="label">Valoraciones</span>
-                    <p id="game-rating"><?php echo (int)$positiveCount; ?> positivas</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="game-category-card">
-            <h3>Categorías</h3>
-            <div id="game-categories" class="game-category-list">
-                <?php if (!empty($categories)): ?>
-                    <?php foreach ($categories as $cat): ?>
-                        <button class="category-button" type="button" onclick="goToShopFilterByCategory('<?php echo e($cat['nombre_categoria']); ?>')"><?php echo e($cat['nombre_categoria']); ?></button>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <span class="game-category">Sin categorías</span>
-                <?php endif; ?>
-            </div>
-        </div>
-
-    </aside>
-            <section class="game-comments-panel">
+        <section class="game-comments-panel">
             <div class="section-title">
                 <h2>Reseñas y comentarios</h2>
                 <p class="reviews-stats">
@@ -494,7 +400,7 @@ if ($gameId > 0) {
                             <?php
                                 $commentTimestamp = !empty($comment['fechaPublicacion']) ? strtotime($comment['fechaPublicacion']) : 0;
                                 $commentLanguage = $comment['id_idioma_comentario'] ?? '';
-                                $searchText = strtolower(trim(($comment['nickname'] ?? '') . ' ' . ($comment['comentario'] ?? '')));
+                                $searchText = strtolower(trim(($comment['nombre_usuario'] ?? '') . ' ' . ($comment['comentario'] ?? '')));
                             ?>
                             <div
                                 class="comment comment-card"
@@ -503,7 +409,7 @@ if ($gameId > 0) {
                                 data-timestamp="<?php echo e((string)$commentTimestamp); ?>"
                                 data-search-text="<?php echo e($searchText); ?>"
                             >
-                                <p><strong><?php echo e($comment['nickname']); ?></strong></p>
+                                <p><strong><?php echo e($comment['nombre_usuario']); ?></strong></p>
                                 <p>Valoración: <span class="rating-<?php echo e($comment['valoracion']); ?>"><?php echo e(ucfirst($comment['valoracion'])); ?></span></p>
                                 <p><?php echo e($comment['comentario']); ?></p>
                                 <p>Fecha: <?php echo e($comment['fechaPublicacion']); ?></p>
@@ -513,9 +419,134 @@ if ($gameId > 0) {
                     <?php endif; ?>
                 </div>
 
-                <p id="no-comment-results" class="no-comment-results" style="display:none;">No se han encontrado reseñas.</p>
+                <p id="no-comment-results" class="no-comment-results" style="display:none;">No se han encontrado reseñas con esos filtros.</p>
             </div>
         </section>
+
+    </div>
+
+    <aside class="game-sidebar">
+
+        <div class="game-purchase-card">
+            <div class="purchase-header">
+                <h3> <?php echo e($gameDataPhp['nombre_juego']); ?></h3>
+            </div>
+            <div id="purchase-section">
+                <?php
+                $price = (float)($gameDataPhp['precio'] ?? 0);
+                $discount = (float)($gameDataPhp['descuento'] ?? 0);
+                $finalPrice = $discount > 0 ? $price * (1 - $discount / 100) : $price;
+                $hasDiscount = (float)$gameDataPhp['descuento'] > 0;
+                $imgUrl = getGameImageUrl((int)$gameDataPhp['id_juego'], 'banner');
+                ?>
+                
+                <hr class="separator">
+                <div class="card-image" style="background-image: url('<?= e($imgUrl) ?>'); background-size: cover; background-position: center; background-repeat: no-repeat;"></div>
+                <?php if ($userBought): ?>
+                    <div class="owned-message">¡Ya tienes este juego en tu biblioteca!</div>
+                    <button class="download-button" type="button" onclick="window.location.href='./libraryGame.php?name=<?php echo urlencode($gameDataPhp['nombre_juego']); ?>'">Descargar</button>
+                <?php else: ?>
+                    <div class="price-widget">
+                        <?php if ($hasDiscount): ?>
+                            <div class="price-discount-badge">-<?= (int)$gameDataPhp['descuento'] ?>%</div>
+                            <div class="price-values">
+                                <?= renderPrecioOriginal($gameDataPhp['precio'], $gameDataPhp['descuento']) ?>
+                                <?= renderPrecioFinal($gameDataPhp['precio'], $gameDataPhp['descuento']) ?>
+                            </div>
+                        <?php else: ?>
+                            <div class="price-values no-discount">
+                                <span class="price-final">
+                                    <?php 
+                                        $price = (float)$gameDataPhp['precio'];
+                                        echo $price <= 0 ? 'Gratis' : number_format($price, 2, ',', '.') . '€';
+                                    ?>
+                                </span>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                    <button class="btn btn-primary" id="buy-button" type="button">Comprar</button>
+                    <?php
+                    $inWishlist = false;
+                    $inCart = false;
+
+                    if (!empty($userNickname)) {
+                        try {
+                            $stmtWishlist = $BBDD->prepare("
+                                SELECT COUNT(*) AS in_wishlist
+                                FROM ListaDeseos
+                                WHERE nickname = ? AND nombre_juego = ?
+                            ");
+                            $stmtWishlist->execute([$userNickname, $gameNamePhp]);
+                            $wishlistResult = $stmtWishlist->fetch(PDO::FETCH_ASSOC);
+                            $inWishlist = !empty($wishlistResult) && ((int)($wishlistResult['in_wishlist'] ?? 0) > 0);
+                        } catch (PDOException $e) {
+                            $inWishlist = false;
+                        }
+
+                        try {
+                            $stmtCart = $BBDD->prepare("
+                                SELECT COUNT(*) AS in_cart
+                                FROM Carrito
+                                WHERE nickname = ? AND nombre_juego = ?
+                            ");
+                            $stmtCart->execute([$userNickname, $gameNamePhp]);
+                            $cartResult = $stmtCart->fetch(PDO::FETCH_ASSOC);
+                            $inCart = !empty($cartResult) && ((int)($cartResult['in_cart'] ?? 0) > 0);
+                        } catch (PDOException $e) {
+                            $inCart = false;
+                        }
+                    }
+                    ?>
+                    <?php if (!$inWishlist): ?>
+                        <button class="wishlist-button" id="add-wishlist-button" type="button">Añadir a la lista de deseos</button>
+                    <?php else: ?>
+                        <button class="wishlist-button" id="remove-wishlist-button" type="button">Quitar de la lista de deseos</button>
+                    <?php endif; ?>
+                    <?php if (!$inCart): ?>
+                        <button class="wishlist-button" id="add-cart-button" type="button">Añadir al carrito</button>
+                    <?php else: ?>
+                        <button class="wishlist-button" id="remove-cart-button" type="button">Quitar del carrito</button>
+                    <?php endif; ?>
+                <?php endif; ?>
+            </div>
+        </div>
+
+        <div class="game-info-card">
+            <h3>Información</h3>
+
+            <div class="game-info-list">
+                <div class="game-info-item">
+                    <span class="label">Desarrollador</span>
+                    <p id="game-developer"><?php echo e($gameDataPhp['desarrollador'] ?? 'Desarrollador desconocido.'); ?></p>
+                </div>
+
+                <div class="game-info-item">
+                    <span class="label">Fecha lanzamiento</span>
+                    <p id="game-release-date"><?php echo e($gameDataPhp['fecha_publicacion'] ?? 'Fecha no disponible.'); ?></p>
+                </div>
+
+                <div class="game-info-item">
+                    <span class="label">Valoraciones</span>
+                    <p id="game-rating"><?php echo (int)$positiveCount; ?> positivas</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-category-card">
+            <h3>Categorías</h3>
+            <div id="game-categories" class="game-category-list">
+                <?php if (!empty($categories)): ?>
+                    <?php foreach ($categories as $cat): ?>
+                        <button class="category-button" type="button" onclick="goToShopFilterByCategory('<?php echo e($cat['nombre_categoria']); ?>')"><?php echo e($cat['nombre_categoria']); ?></button>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <span class="game-category">Sin categorías</span>
+                <?php endif; ?>
+            </div>
+        </div>
+
+    </aside>
+    
 </section>
 
 <?php endif; ?>

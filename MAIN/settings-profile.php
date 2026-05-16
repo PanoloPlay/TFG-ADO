@@ -207,6 +207,10 @@ $fechaRegistro = !empty($usuario['fecha_registro'])
     ? date('d/m/Y H:i', strtotime($usuario['fecha_registro']))
     : 'No disponible';
 
+$stmtDeveloper = $BBDD->prepare("SELECT 1 FROM Desarrollador WHERE nickname = :nickname LIMIT 1");
+$stmtDeveloper->execute([':nickname' => $nicknameSesion]);
+$isDeveloper = (bool) $stmtDeveloper->fetchColumn();
+
 require_once '../GENERAL/[html_START - head_START].php';
 ?>
 <link rel="stylesheet" href="../CSS/settings-profile.css">
@@ -286,6 +290,12 @@ require_once '../GENERAL/[head_END - body_START - header - main_START].php';
                     <span class="material-symbols-outlined">key</span>
                     Seguridad y acceso
                 </a>
+                <?php if ($isDeveloper): ?>
+                    <a href="../DEV/settings-game.php" class="chip">
+                        <span class="material-symbols-outlined">stadia_controller</span>
+                        Ajustes de juegos
+                    </a>
+                <?php endif; ?>
             </div>
         </aside>
 

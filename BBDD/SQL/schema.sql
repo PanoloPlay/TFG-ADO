@@ -142,8 +142,9 @@ CREATE TABLE Logros (
   descripcion_logro TEXT,
   id_juego INT NOT NULL,
   nombre_juego VARCHAR(100) NOT NULL,
-  
-  PRIMARY KEY (id_logro, id_juego, nombre_juego, nombre_logro),
+  rareza ENUM('cobre', 'plata', 'oro', 'platino', 'lotus') NOT NULL,
+  identificador_unico VARCHAR(255),-- (id_logro + '_' + id_juego + '_' rareza)
+  PRIMARY KEY (id_logro, id_juego, nombre_juego),
   INDEX (id_juego, nombre_juego, id_logro, nombre_logro),
   FOREIGN KEY (id_juego, nombre_juego) REFERENCES Juegos(id_juego, nombre_juego)
 ) ENGINE=InnoDB;
@@ -210,8 +211,8 @@ CREATE TABLE LogrosUsuario (
   INDEX (Logros_id_logro, id_juego, Logros_nombre_juego, nombre_logro),
   FOREIGN KEY (id_usuario, nickname) REFERENCES Usuarios(id_usuario, nickname)
      ON DELETE CASCADE ON UPDATE CASCADE,
-  FOREIGN KEY (Logros_id_logro, id_juego, Logros_nombre_juego, nombre_logro)
-    REFERENCES Logros(id_logro, id_juego, nombre_juego, nombre_logro)
+  FOREIGN KEY (Logros_id_logro, id_juego, Logros_nombre_juego)
+    REFERENCES Logros(id_logro, id_juego, nombre_juego)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
@@ -250,6 +251,25 @@ CREATE TABLE Administadores (
   PRIMARY KEY (id_administador, id_usuario, nickname),
   INDEX (id_usuario, nickname),
   FOREIGN KEY (id_usuario, nickname) REFERENCES Usuarios(id_usuario, nickname)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
+-- ----------------------------
+-- Carrito
+-- ----------------------------
+CREATE TABLE Carrito (
+  id_Carrito INT NOT NULL AUTO_INCREMENT,
+  id_usuario INT NOT NULL,
+  nickname VARCHAR(45) NOT NULL,
+  id_juego INT NOT NULL,
+  nombre_juego VARCHAR(100) NOT NULL,
+  numero_orden INT NOT NULL,
+  PRIMARY KEY (id_Carrito),
+  INDEX (id_usuario, nickname),
+  INDEX (id_juego, nombre_juego),
+  FOREIGN KEY (id_usuario, nickname) REFERENCES Usuarios(id_usuario, nickname)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (id_juego, nombre_juego) REFERENCES Juegos(id_juego, nombre_juego)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
