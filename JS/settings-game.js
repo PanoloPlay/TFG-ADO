@@ -183,10 +183,12 @@
     }
 
     function createCarouselRow() {
-        const index = carouselIndex++;
+        const allRows = carouselList ? carouselList.querySelectorAll('.carousel-item-row') : [];
+        const currentIndex = allRows.length;
 
         const row = document.createElement('div');
         row.className = 'carousel-item-row';
+
         row.innerHTML = `
             <div class="carousel-item__handle">
                 <button type="button" class="btn-drag" title="Arrastrar">
@@ -216,7 +218,7 @@
                             name="carousel_orders[]"
                             class="carousel-order-input js-carousel-order"
                             min="1"
-                            value="${index + 1}"
+                            value="${currentIndex + 1}"
                         >
                     </div>
 
@@ -229,8 +231,12 @@
                         </select>
                     </div>
 
-                    <button type="button" class="btn-danger btn-sm js-remove-carousel-item">
-                        <span class="material-symbols-outlined">close</span>
+                    <!-- Inputs ocultos idénticos a tu estructura PHP para nuevos elementos -->
+                    <input type="hidden" name="carousel_media_ids[]" value="0" class="js-media-id">
+                    <input type="hidden" name="carousel_delete_ids[]" value="" class="js-delete-flag">
+
+                    <button type="button" class="btn-danger btn--icon js-remove-carousel-item" title="Eliminar este elemento">
+                        <span class="material-symbols-outlined">delete</span>
                     </button>
                 </div>
             </div>
@@ -294,7 +300,7 @@
         updateCarouselOrders();
     }
 
-    if (carouselList) {
+if (carouselList) {
         carouselList.addEventListener('click', (event) => {
             const removeBtn = event.target.closest('.js-remove-carousel-item');
             if (!removeBtn) return;
@@ -302,10 +308,11 @@
             const row = removeBtn.closest('.carousel-item-row');
             if (!row) return;
 
-            const isExisting = row.dataset.multimediaId && row.dataset.isExisting === 'true';
+            // Detectamos si viene de la BBDD (tu PHP le pone data-is-existing="true")
+            const isExisting = row.dataset.isExisting === 'true';
             
             if (isExisting) {
-                // Para elementos existentes, marcar para eliminar
+                // Para elementos existentes, marcar para eliminar (Soft Delete)
                 const deleteFlag = row.querySelector('.js-delete-flag');
                 const mediaIdField = row.querySelector('.js-media-id');
                 const isMarkedForDelete = deleteFlag && deleteFlag.value !== '';
@@ -330,7 +337,7 @@
                     }
                 }
             } else {
-                // Para elementos nuevos, eliminar directamente del DOM
+                // Para elementos nuevos (los que se añaden con JS o las celdas vacías del PHP), eliminar del DOM
                 const videoPreview = row.querySelector('.js-carousel-video-preview');
                 clearVideoPreview(videoPreview);
                 row.remove();
