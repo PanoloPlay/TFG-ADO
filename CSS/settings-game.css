@@ -555,6 +555,43 @@
     border-color: var(--color-greyneutral-8);
 }
 
+.developer-panel-page .carousel-item-row.is-marked-for-deletion {
+    opacity: 0.65;
+    background: linear-gradient(180deg, rgba(220, 38, 38, 0.08), rgba(220, 38, 38, 0.04));
+    border-color: var(--color-red-9);
+    border-width: 2px;
+    position: relative;
+}
+
+.developer-panel-page .carousel-item-row.is-marked-for-deletion::before {
+    content: 'SERÁ ELIMINADO';
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background-color: var(--color-red-10);
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 3px;
+    letter-spacing: 0.5px;
+    z-index: 10;
+}
+
+.developer-panel-page .carousel-item-row.is-marked-for-deletion .carousel-item__preview {
+    opacity: 0.5;
+}
+
+.developer-panel-page .carousel-item-row.is-marked-for-deletion .carousel-item__video {
+    opacity: 0.5;
+}
+
+.developer-panel-page .carousel-item-row.is-marked-for-deletion .btn-danger.is-active {
+    background-color: var(--color-red-11);
+    border-color: var(--color-red-12);
+    color: white;
+}
+
 .developer-panel-page .sortable-ghost {
     opacity: 0.45 ;
     border: 1px dashed var(--color-blue-8) ;

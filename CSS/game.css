@@ -76,6 +76,7 @@
     min-width: 0;
     display: grid;
     gap: 18px;
+    overflow: visible;
 }
 
 /* Tarjetas base */
@@ -641,17 +642,21 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 /* Sidebar */
-.game-sidebar {
+.game-page {
+    width: min(1500px, calc(100% - 32px));
+    margin: 26px auto 40px;
     display: grid;
-    gap: 18px;
-    position: sticky;
-    top: 92px;
+    grid-template-columns: minmax(0, 1.7fr) minmax(320px, 0.95fr);
+    gap: 18px 22px;
+    align-items: start;
+    overflow: visible;
 }
 
 .game-purchase-card,
 .game-info-card,
 .game-category-card {
     padding: 18px;
+    margin-bottom: 8px;
 }
 
 .purchase-header,
@@ -754,53 +759,106 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     line-height: 1;
 }
 /* =========================
-   BUTTONS
+   PURCHASE ACTION BUTTONS
    ========================= */
+
 .is-hidden {
     display: none !important;
 }
 
-button:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-}
 #buy-button,
 #add-wishlist-button,
-#remove-wishlist-button {
-    min-width: 230px;
-    justify-content: center;
+#remove-wishlist-button,
+#add-cart-button,
+#remove-cart-button,
+.download-button,
+.coming-soon-message {
+    width: 100%;
+    min-height: 46px;
+
     display: inline-flex;
     align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    padding: 10px 14px;
+    border-radius: 4px;
+
+    font-weight: 700;
+    line-height: 1;
+
+    transition:
+        transform .18s ease,
+        background .18s ease,
+        border-color .18s ease,
+        box-shadow .18s ease;
 }
 
-#buy-button:disabled,
-.download-button:disabled,
-.wishlist-button:disabled,
-#submit-comment-button:disabled,
-#edit-comment-button:disabled,
-#save-comment-button:disabled,
-#delete-comment-button:disabled {
-    opacity: 1;
-    background: rgba(255, 255, 255, 0.06) !important;
-    border-color: rgba(59, 158, 255, 0.18) !important;
+/* ICONOS */
+#buy-button .material-symbols-outlined,
+#add-wishlist-button .material-symbols-outlined,
+#remove-wishlist-button .material-symbols-outlined,
+#add-cart-button .material-symbols-outlined,
+#remove-cart-button .material-symbols-outlined,
+.download-button .material-symbols-outlined,
+.coming-soon-message .material-symbols-outlined {
+    font-size: 20px;
+    line-height: 1;
+    flex-shrink: 0;
 }
 
-#buy-button:disabled .spinner-border,
-.download-button:disabled .spinner-border,
-.wishlist-button:disabled .spinner-border,
-#submit-comment-button:disabled .spinner-border,
-#edit-comment-button:disabled .spinner-border,
-#save-comment-button:disabled .spinner-border,
-#delete-comment-button:disabled .spinner-border {
-    width: 1rem;
-    height: 1rem;
-    border-width: 0.15em;
+/* TEXTO */
+#buy-button span:last-child,
+#add-wishlist-button span:last-child,
+#remove-wishlist-button span:last-child,
+#add-cart-button span:last-child,
+#remove-cart-button span:last-child,
+.download-button span:last-child,
+.coming-soon-message span:last-child {
+    line-height: 1;
+    white-space: nowrap;
 }
 
-#buy-button,
-.download-button,
-.wishlist-button,
-#submit-comment-button,
+/* COMPRA */
+#buy-button {
+    border: 1px solid rgba(59, 158, 255, 0.28);
+    background:
+        linear-gradient(180deg,
+        rgba(59, 158, 255, 0.22),
+        rgba(59, 158, 255, 0.12));
+    color: var(--color-slate-12);
+    box-shadow: 0 10px 24px rgba(59, 158, 255, 0.14);
+}
+
+#buy-button:hover {
+    transform: translateY(-1px);
+    border-color: rgba(59, 158, 255, 0.42);
+    background:
+        linear-gradient(180deg,
+        rgba(59, 158, 255, 0.28),
+        rgba(59, 158, 255, 0.16));
+}
+
+/* DESCARGAR */
+.download-button {
+    border: 1px solid rgba(92, 126, 16, 0.28);
+    background:
+        linear-gradient(180deg,
+        rgba(92, 126, 16, 0.20),
+        rgba(92, 126, 16, 0.10));
+    color: var(--color-green-12);
+}
+
+.download-button:hover {
+    transform: translateY(-1px);
+    border-color: rgba(92, 126, 16, 0.40);
+    background:
+        linear-gradient(180deg,
+        rgba(92, 126, 16, 0.26),
+        rgba(92, 126, 16, 0.14));
+}
+
+/* COMMENTS BUTTONS */
 #edit-comment-button,
 #save-comment-button,
 #delete-comment-button {
@@ -812,13 +870,9 @@ button:disabled {
     color: var(--color-slate-12);
     cursor: pointer;
     font-weight: 700;
-    transition: transform .18s ease, background .18s ease, border-color .18s ease;
+    transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
 }
 
-#buy-button:hover,
-.download-button:hover,
-.wishlist-button:hover,
-#submit-comment-button:hover,
 #edit-comment-button:hover,
 #save-comment-button:hover,
 #delete-comment-button:hover {
@@ -828,20 +882,94 @@ button:disabled {
     text-decoration: none;
 }
 
-#buy-button {
-    background: linear-gradient(180deg, rgba(59, 158, 255, 0.20), rgba(59, 158, 255, 0.10));
-    border-color: rgba(59, 158, 255, 0.28);
+#edit-comment-button:disabled,
+#save-comment-button:disabled,
+#delete-comment-button:disabled {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.06) !important;
+    border-color: rgba(59, 158, 255, 0.18) !important;
 }
 
-.download-button {
-    background: linear-gradient(180deg, rgba(92, 126, 16, 0.18), rgba(92, 126, 16, 0.10));
-    border-color: rgba(92, 126, 16, 0.25);
+#edit-comment-button:disabled .spinner-border,
+#save-comment-button:disabled .spinner-border,
+#delete-comment-button:disabled .spinner-border {
+    width: 1rem;
+    height: 1rem;
+    border-width: 0.15em;
 }
 
-.wishlist-button {
-    background: rgba(255, 255, 255, 0.03);
+/* WISHLIST / CART */
+#wishlist-button,
+#add-wishlist-button,
+#remove-wishlist-button,
+#add-cart-button,
+#remove-cart-button {
+    border: 1px solid var(--color-greyneutral-7);
+    background:
+        linear-gradient(180deg,
+        rgba(255,255,255,0.04),
+        rgba(255,255,255,0.02));
+    color: var(--color-slate-12);
 }
 
+#add-wishlist-button:hover,
+#remove-wishlist-button:hover,
+#add-cart-button:hover,
+#remove-cart-button:hover {
+    transform: translateY(-1px);
+    border-color: rgba(59, 158, 255, 0.24);
+    background:
+        linear-gradient(180deg,
+        rgba(255,255,255,0.07),
+        rgba(255,255,255,0.03));
+}
+
+/* PRÓXIMAMENTE */
+.coming-soon-message {
+    border: 1px solid rgba(214, 166, 69, 0.24);
+    background:
+        linear-gradient(180deg,
+        rgba(214, 166, 69, 0.14),
+        rgba(214, 166, 69, 0.08));
+    color: var(--color-yellow-12);
+
+    cursor: default;
+    user-select: none;
+}
+
+/* ESPACIADO ENTRE BOTONES */
+#purchase-section {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 700px) {
+    #buy-button,
+    #add-wishlist-button,
+    #remove-wishlist-button,
+    #add-cart-button,
+    #remove-cart-button,
+    #edit-comment-button,
+    #save-comment-button,
+    #delete-comment-button, 
+    .download-button,
+    .coming-soon-message {
+        min-height: 44px;
+        font-size: 0.95rem;
+    }
+
+    #buy-button .material-symbols-outlined,
+    #add-wishlist-button .material-symbols-outlined,
+    #remove-wishlist-button .material-symbols-outlined,
+    #add-cart-button .material-symbols-outlined,
+    #remove-cart-button .material-symbols-outlined,
+    .download-button .material-symbols-outlined,
+    .coming-soon-message .material-symbols-outlined {
+        font-size: 18px;
+    }
+}
 
 /* =========================
    REVIEW VOTE TOGGLE

@@ -22,6 +22,14 @@ function initInteractions() {
         buyGame();
     });
 
+    $("#add-wishlist-button").on("click", function () {
+        addWishlist();
+    });
+
+    $("#remove-wishlist-button").on("click", function () {
+        removeWishlist();
+    });
+
     $("#add-cart-button").on("click", function () {
         addCart();
     });

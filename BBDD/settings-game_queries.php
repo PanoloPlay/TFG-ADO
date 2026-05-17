@@ -249,6 +249,34 @@ function saveCarouselMedia(PDO $BBDD, array $file, int $idJuego, string $nombreJ
     ];
 }
 
+function deleteCarouselMedia(PDO $BBDD, int $idMultimedia, int $idJuego): bool
+{
+    $stmt = $BBDD->prepare("SELECT url_multimedia, tipo FROM MultimediaJuego WHERE id_multimedia = :id_multimedia AND id_juego = :id_juego LIMIT 1");
+    $stmt->execute([':id_multimedia' => $idMultimedia, ':id_juego' => $idJuego]);
+    $media = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$media) {
+        return false;
+    }
+
+    $url = (string) $media['url_multimedia'];
+    $tipo = (string) $media['tipo'];
+
+    $basePath = dirname(__DIR__);
+    if ($tipo === 'video') {
+        $filePath = $basePath . '/MEDIA/VIDEO/juegos/' . $idJuego . '/' . basename($url);
+    } else {
+        $filePath = $basePath . '/MEDIA/IMG/juegos/' . $idJuego . '/carusel/' . basename($url);
+    }
+
+    if (is_file($filePath)) {
+        @unlink($filePath);
+    }
+
+    $delStmt = $BBDD->prepare("DELETE FROM MultimediaJuego WHERE id_multimedia = :id_multimedia AND id_juego = :id_juego");
+    return $delStmt->execute([':id_multimedia' => $idMultimedia, ':id_juego' => $idJuego]);
+}
+
 $developer = getCurrentDeveloper($BBDD, $nickname);
 if (!$developer) {
     header('Location: developer-reguister.php');
@@ -299,9 +327,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $categoriasPost = $_POST['categorias'] ?? [];
             $idiomasPost = $_POST['idiomas'] ?? [];
 
-            if ($nombreJuego === '' || $fechaPublicacion === '') {
-                throw new RuntimeException('El nombre del juego y la fecha de publicación son obligatorios.');
+            if ($nombreJuego === '') {
+                throw new RuntimeException('El nombre del juego es obligatorio.');
             }
+            
+            $fechaPublicacion = $fechaPublicacion !== '' ? $fechaPublicacion : null;
 
             $BBDD->beginTransaction();
 
@@ -405,15 +435,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
 
+            // Eliminar multimedia marcada para borrar
+            $carouselDeleteIds = $_POST['carousel_delete_ids'] ?? [];
+            if (is_array($carouselDeleteIds)) {
+                foreach ($carouselDeleteIds as $idMultimedia) {
+                    $idMultimedia = (int) $idMultimedia;
+                    if ($idMultimedia > 0) {
+                        deleteCarouselMedia($BBDD, $idMultimedia, $idJuego);
+                    }
+                }
+            }
+
             $carouselFiles = $_FILES['carousel_files'] ?? null;
             $carouselOrders = $_POST['carousel_orders'] ?? [];
             $carouselTypes = $_POST['carousel_types'] ?? [];
+            $carouselMediaIds = $_POST['carousel_media_ids'] ?? [];
 
             if (is_array($carouselFiles) && isset($carouselFiles['name']) && is_array($carouselFiles['name'])) {
                 $count = count($carouselFiles['name']);
                 for ($i = 0; $i < $count; $i++) {
                     if (($carouselFiles['error'][$i] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
                         continue;
+                    }
+
+                    // Si es un reemplazo de multimedia existente, eliminar la vieja primero
+                    $existingMediaId = isset($carouselMediaIds[$i]) ? (int) $carouselMediaIds[$i] : 0;
+                    if ($existingMediaId > 0) {
+                        deleteCarouselMedia($BBDD, $existingMediaId, $idJuego);
                     }
 
                     $file = [

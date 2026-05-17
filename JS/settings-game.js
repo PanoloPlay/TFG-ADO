@@ -300,7 +300,37 @@
             if (!removeBtn) return;
 
             const row = removeBtn.closest('.carousel-item-row');
-            if (row) {
+            if (!row) return;
+
+            const isExisting = row.dataset.multimediaId && row.dataset.isExisting === 'true';
+            
+            if (isExisting) {
+                // Para elementos existentes, marcar para eliminar
+                const deleteFlag = row.querySelector('.js-delete-flag');
+                const mediaIdField = row.querySelector('.js-media-id');
+                const isMarkedForDelete = deleteFlag && deleteFlag.value !== '';
+                
+                if (isMarkedForDelete) {
+                    // Desmarcar eliminación
+                    deleteFlag.value = '';
+                    row.classList.remove('is-marked-for-deletion');
+                    removeBtn.classList.remove('is-active');
+                    removeBtn.title = 'Eliminar este elemento';
+                    const icon = removeBtn.querySelector('.material-symbols-outlined');
+                    if (icon) icon.textContent = 'delete';
+                } else {
+                    // Marcar para eliminación
+                    if (mediaIdField && mediaIdField.value) {
+                        deleteFlag.value = mediaIdField.value;
+                        row.classList.add('is-marked-for-deletion');
+                        removeBtn.classList.add('is-active');
+                        removeBtn.title = 'Deshacer (se eliminará al guardar)';
+                        const icon = removeBtn.querySelector('.material-symbols-outlined');
+                        if (icon) icon.textContent = 'undo';
+                    }
+                }
+            } else {
+                // Para elementos nuevos, eliminar directamente del DOM
                 const videoPreview = row.querySelector('.js-carousel-video-preview');
                 clearVideoPreview(videoPreview);
                 row.remove();
@@ -320,6 +350,20 @@
 
             const row = input.closest('.carousel-item-row');
             if (!row) return;
+
+            // Si es un elemento existente marcado para eliminar y se carga un archivo nuevo, desmarcar
+            const deleteFlag = row.querySelector('.js-delete-flag');
+            const removeBtn = row.querySelector('.js-remove-carousel-item');
+            if (deleteFlag && deleteFlag.value !== '') {
+                deleteFlag.value = '';
+                row.classList.remove('is-marked-for-deletion');
+                if (removeBtn) {
+                    removeBtn.classList.remove('is-active');
+                    removeBtn.title = 'Eliminar este elemento';
+                    const icon = removeBtn.querySelector('.material-symbols-outlined');
+                    if (icon) icon.textContent = 'delete';
+                }
+            }
 
             const file = input.files[0];
             const imgPreview = row.querySelector('.js-carousel-image-preview');

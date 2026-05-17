@@ -91,7 +91,7 @@ require_once '../GENERAL/[head_END - body_START - header - main_START].php';
 
                             <div class="form-field">
                                 <label class="form-label" for="fecha_publicacion">Fecha de publicación</label>
-                                <input type="datetime-local" id="fecha_publicacion" name="fecha_publicacion" class="form-control" required value="<?= isset($juegoEdit['fecha_publicacion']) ? date('Y-m-d\TH:i', strtotime($juegoEdit['fecha_publicacion'])) : '' ?>">
+                                <input type="datetime-local" id="fecha_publicacion" name="fecha_publicacion" class="form-control" value="<?= isset($juegoEdit['fecha_publicacion']) ? date('Y-m-d\TH:i', strtotime($juegoEdit['fecha_publicacion'])) : '' ?>">
                             </div>
                         </div>
 
@@ -267,7 +267,84 @@ require_once '../GENERAL/[head_END - body_START - header - main_START].php';
                         </div>
 
                         <div id="carouselList" class="carousel-list">
-                            <?php for ($i = 0; $i < 3; $i++): ?>
+                            <?php 
+                            // Mostrar multimedia existente si es edición
+                            if (!empty($multimediaEdit)): 
+                                foreach ($multimediaEdit as $index => $media): 
+                                    $mediaUrl = e($media['url_multimedia']);
+                                    $mediaTipo = e($media['tipo']);
+                                    $mediaId = (int) $media['id_multimedia'];
+                                    $mediaOrden = (int) $media['numero_orden'];
+                            ?>
+                                <div class="carousel-item-row" data-multimedia-id="<?= $mediaId ?>" data-is-existing="true">
+                                    <div class="carousel-item__handle">
+                                        <button type="button" class="btn-drag" title="Arrastrar">
+                                            <span class="material-symbols-outlined">reorder</span>
+                                        </button>
+                                    </div>
+
+                                    <?php if ($mediaTipo === 'video'): ?>
+                                        <div class="carousel-item__preview js-carousel-image-preview" style="background-image: url('<?= e($fallbackImageUrl) ?>'); display:none;"></div>
+                                        <video class="carousel-item__video js-carousel-video-preview" controls style="display:block;">
+                                            <source src="<?= $mediaUrl ?>" />
+                                        </video>
+                                    <?php else: ?>
+                                        <div class="carousel-item__preview js-carousel-image-preview" style="background-image: url('<?= $mediaUrl ?>');"></div>
+                                        <video class="carousel-item__video js-carousel-video-preview" controls style="display:none;"></video>
+                                    <?php endif; ?>
+
+                                    <div class="carousel-item__body">
+                                        <div class="carousel-item__fields">
+                                            <div class="carousel-item__field carousel-item__field--file">
+                                                <label class="form-label mb-1">Archivo</label>
+                                                <input
+                                                    type="file"
+                                                    name="carousel_files[]"
+                                                    class="form-control js-carousel-file"
+                                                    accept="image/png,image/jpeg,image/webp,video/mp4,video/webm,video/ogg"
+                                                    data-is-existing="true"
+                                                    title="Selecciona un nuevo archivo para reemplazar este"
+                                                >
+                                                <small class="text-muted d-block mt-1">Archivo actual: <?= basename($mediaUrl) ?></small>
+                                            </div>
+
+                                            <div class="carousel-item__field carousel-item__field--order">
+                                                <label class="form-label mb-1">Orden</label>
+                                                <input
+                                                    type="number"
+                                                    name="carousel_orders[]"
+                                                    class="carousel-order-input js-carousel-order"
+                                                    min="1"
+                                                    value="<?= $mediaOrden ?>"
+                                                >
+                                            </div>
+
+                                            <div class="carousel-item__field carousel-item__field--type">
+                                                <label class="form-label mb-1">Tipo</label>
+                                                <select name="carousel_types[]" class="form-control js-carousel-type">
+                                                    <option value="">Auto</option>
+                                                    <option value="imagen" <?= $mediaTipo === 'imagen' ? 'selected' : '' ?>>Imagen</option>
+                                                    <option value="video" <?= $mediaTipo === 'video' ? 'selected' : '' ?>>Vídeo</option>
+                                                </select>
+                                            </div>
+
+                                            <input type="hidden" name="carousel_media_ids[]" value="<?= $mediaId ?>" class="js-media-id">
+                                            <input type="hidden" name="carousel_delete_ids[]" value="" class="js-delete-flag">
+
+                                            <button type="button" class="btn-danger btn--icon js-remove-carousel-item" title="Eliminar este elemento">
+                                                <span class="material-symbols-outlined">delete</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php 
+                                endforeach;
+                            endif;
+                            
+                            // Agregar filas vacías para nuevos elementos
+                            $emptyCount = $juegoEdit && !empty($multimediaEdit) ? 3 : 3;
+                            for ($i = 0; $i < $emptyCount; $i++): 
+                            ?>
                                 <div class="carousel-item-row">
                                     <div class="carousel-item__handle">
                                         <button type="button" class="btn-drag" title="Arrastrar">
@@ -297,7 +374,7 @@ require_once '../GENERAL/[head_END - body_START - header - main_START].php';
                                                     name="carousel_orders[]"
                                                     class="carousel-order-input js-carousel-order"
                                                     min="1"
-                                                    value="<?= $i + 1 ?>"
+                                                    value="<?= ($juegoEdit && !empty($multimediaEdit) ? count($multimediaEdit) : 0) + $i + 1 ?>"
                                                 >
                                             </div>
 
@@ -309,6 +386,9 @@ require_once '../GENERAL/[head_END - body_START - header - main_START].php';
                                                     <option value="video">Vídeo</option>
                                                 </select>
                                             </div>
+
+                                            <input type="hidden" name="carousel_media_ids[]" value="0" class="js-media-id">
+                                            <input type="hidden" name="carousel_delete_ids[]" value="" class="js-delete-flag">
 
                                             <button type="button" class="btn-danger btn--icon js-remove-carousel-item">
                                                 <span class="material-symbols-outlined">delete</span>
@@ -332,40 +412,6 @@ require_once '../GENERAL/[head_END - body_START - header - main_START].php';
                     </form>
                 </section>
             <?php endif; ?>
-
-            <?php if ($juegoEdit && $modo !== 'logros'): ?>
-                <section class="panel-card">
-                    <div class="panel-card__header">
-                        <strong>Multimedia actual del juego</strong>
-                    </div>
-
-                    <?php if (!empty($multimediaEdit)): ?>
-                        <div class="media-grid">
-                            <?php foreach ($multimediaEdit as $media): ?>
-                                <div class="media-card">
-                                    <div class="small text-muted mb-1">
-                                        Orden: <?= (int) $media['numero_orden'] ?> · <?= e($media['tipo']) ?>
-                                    </div>
-
-                                    <?php if ($media['tipo'] === 'imagen'): ?>
-                                        <img src="<?= e($media['url_multimedia']) ?>" class="multimedia-media" alt="multimedia">
-                                    <?php else: ?>
-                                        <video class="multimedia-media" controls>
-                                            <source src="<?= e(getGameVideoUrl((int) $media['id_juego'], basename((string) $media['url_multimedia']))) ?>">
-                                        </video>
-                                    <?php endif; ?>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
-                    <?php else: ?>
-                        <div class="empty-state">
-                            <div class="media-preview media-preview--carousel media-preview--contain" style="background-image: url('<?= e($fallbackImageUrl) ?>');"></div>
-                            <div class="empty-state__text">No hay multimedia cargada para el carrusel.</div>
-                        </div>
-                    <?php endif; ?>
-                </section>
-            <?php endif; ?>
-
             <?php if ($modo === 'logros' && $juegoEdit): ?>
                 <section class="panel-card">
                     <div class="panel-card__header">
@@ -507,7 +553,7 @@ require_once '../GENERAL/[head_END - body_START - header - main_START].php';
                 <section class="panel-card">
                     <div class="panel-card__header">
                         <strong>Tus juegos</strong>
-                        <a href="#new" class="btn-primary btn-sm">
+                        <a href="?modo=nuevo" class="btn-primary btn-sm">
                             <span class="material-symbols-outlined icon-add-new">add</span>
                             Nuevo juego
                         </a>
