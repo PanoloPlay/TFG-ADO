@@ -860,6 +860,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 /* COMMENTS BUTTONS */
 #edit-comment-button,
+#submit-comment-button,
 #save-comment-button,
 #delete-comment-button {
     min-height: 42px;
@@ -874,6 +875,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 #edit-comment-button:hover,
+#submit-comment-button:hover,
 #save-comment-button:hover,
 #delete-comment-button:hover {
     transform: translateY(-1px);
@@ -883,6 +885,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 #edit-comment-button:disabled,
+#submit-comment-button:disabled,
 #save-comment-button:disabled,
 #delete-comment-button:disabled {
     opacity: 1;
@@ -891,6 +894,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 #edit-comment-button:disabled .spinner-border,
+#submit-comment-button:disabled .spinner-border,
 #save-comment-button:disabled .spinner-border,
 #delete-comment-button:disabled .spinner-border {
     width: 1rem;
@@ -952,6 +956,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     #add-cart-button,
     #remove-cart-button,
     #edit-comment-button,
+    #submit-comment-button,
     #save-comment-button,
     #delete-comment-button, 
     .download-button,

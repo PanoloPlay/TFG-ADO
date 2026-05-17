@@ -3,9 +3,11 @@
 <?php require_once '../GENERAL/[html_START - head_START].php'; ?>
 
 <script src="../JS/checkIfXExists.js" defer></script>
+<script src="../JS/carousel.js" defer></script>
 <script src="../JS/game.js" defer></script>
 <script src="../JS/game-alerts.js" defer></script>
 
+<link rel="stylesheet" href="../CSS/carousel.css">
 <link rel="stylesheet" href="../CSS/game.css">
 
 <?php require_once '../GENERAL/[head_END - body_START - header - main_START].php'; ?>
@@ -103,74 +105,151 @@ function renderPrecioFinal($precio, $descuento) {
             <?php echo e($gameDataPhp['nombre_juego']); ?>
         </h1>
 
-        <section class="game-media-panel">
-            <div id="carouselExampleIndicators" class="carousel slide game-carousel">
-                <div id="carousel-container" class="carousel-inner">
-                    <?php
-                    $active = true;
-                    $exists = false;
-                    $gameId = (int)$gameDataPhp['id_juego'];
+<section class="game-media-panel">
+    <div id="carouselExampleIndicators" class="carousel slide game-carousel">
+        <div id="carousel-container" class="carousel-inner">
+            <?php
+            $exists = false;
+            $mediaItems = [];
+            $gameId = (int)$gameDataPhp['id_juego'];
+            $gameName = $gameDataPhp['nombre_juego'];
 
-                    // Obtener videos
-                    $videoPath = dirname(__DIR__) . '/MEDIA/VIDEO/juegos/' . $gameId;
-                    $videoArray = (is_dir($videoPath)) ? array_diff(scandir($videoPath) ?: [], ['.', '..']) : [];
-                    $videoArray = array_filter($videoArray, fn($f) => is_file($videoPath . '/' . $f) && preg_match('/\.(mp4|webm|ogg|avi|mov)$/i', $f));
+            try {
+                $stmtMedia = $BBDD->prepare("
+                    SELECT url_multimedia, tipo, numero_orden
+                    FROM MultimediaJuego
+                    WHERE id_juego = ? AND nombre_juego = ?
+                    ORDER BY numero_orden ASC, id_multimedia ASC
+                ");
+                $stmtMedia->execute([$gameId, $gameName]);
+                $mediaItems = $stmtMedia->fetchAll(PDO::FETCH_ASSOC);
+            } catch (PDOException $e) {
+                $mediaItems = [];
+            }
 
-                    foreach ($videoArray as $videoFile) {
-                        $videoUrl = '../MEDIA/VIDEO/juegos/' . $gameId . '/' . rawurlencode($videoFile);
-                        ?>
-                        <div class="carousel-item <?php echo $active ? 'active' : ''; ?>">
-                            <video class="video-carousel d-block w-100" controls>
-                                <source src="<?php echo e($videoUrl); ?>" type="video/mp4">
-                                <source src="<?php echo e($videoUrl); ?>" type="video/webm">
-                                Your browser does not support the video tag.
-                            </video>
-                        </div>
-                        <?php
-                        $active = false;
-                        $exists = true;
-                    }
+            // Fallback: si no hay registros en la tabla, intenta leer del sistema de archivos
+            if (empty($mediaItems)) {
+                $allowedImageExt = '/\.(jpg|jpeg|png|webp|gif)$/i';
+                $allowedVideoExt = '/\.(mp4|webm|ogg|avi|mov)$/i';
 
-                    // Obtener imágenes si no hay videos
-                    if (!$exists) {
-                        $imagePath = dirname(__DIR__) . '/MEDIA/IMG/juegos/' . $gameId;
-                        $imageArray = (is_dir($imagePath)) ? array_diff(scandir($imagePath) ?: [], ['.', '..']) : [];
-                        $imageArray = array_filter($imageArray, fn($f) => is_file($imagePath . '/' . $f) && preg_match('/\.(jpg|jpeg|png|webp|gif)$/i', $f));
+                $scanFolder = function (string $path, string $type, string $regex, string $prefix) use (&$mediaItems) {
+                    if (!is_dir($path)) return;
 
-                        foreach ($imageArray as $imageFile) {
-                            $imageUrl = '../MEDIA/IMG/juegos/' . $gameId . '/' . rawurlencode($imageFile);
-                            ?>
-                            <div class="carousel-item <?php echo $active ? 'active' : ''; ?>">
-                                <img src="<?php echo e($imageUrl); ?>" class="d-block w-100 game-image" alt="Game image">
-                            </div>
-                            <?php
-                            $active = false;
-                            $exists = true;
+                    $files = array_diff(scandir($path) ?: [], ['.', '..']);
+                    foreach ($files as $file) {
+                        $fullPath = $path . '/' . $file;
+                        if (is_file($fullPath) && preg_match($regex, $file)) {
+                            $mediaItems[] = [
+                                'tipo' => $type,
+                                'url_multimedia' => $prefix . rawurlencode($file),
+                                'numero_orden' => 9999
+                            ];
                         }
                     }
+                };
 
-                    if (!$exists) {
-                        ?>
-                        <div class="carousel-item active">
-                            <img src="../MEDIA/IMG/juegos/gamePlaceholderIMG_Large.png" class="d-block w-100 game-image" alt="Placeholder">
-                        </div>
-                        <?php
+                $videoPath = dirname(__DIR__) . '/MEDIA/VIDEO/juegos/' . $gameId;
+                $scanFolder(
+                    $videoPath,
+                    'video',
+                    $allowedVideoExt,
+                    '../MEDIA/VIDEO/juegos/' . $gameId . '/'
+                );
+
+                $imagePathCarousel = dirname(__DIR__) . '/MEDIA/IMG/juegos/' . $gameId . '/carusel';
+                $scanFolder(
+                    $imagePathCarousel,
+                    'imagen',
+                    $allowedImageExt,
+                    '../MEDIA/IMG/juegos/' . $gameId . '/carusel/'
+                );
+
+                $imagePathRoot = dirname(__DIR__) . '/MEDIA/IMG/juegos/' . $gameId;
+                if (is_dir($imagePathRoot)) {
+                    $files = array_diff(scandir($imagePathRoot) ?: [], ['.', '..']);
+                    foreach ($files as $file) {
+                        $fullPath = $imagePathRoot . '/' . $file;
+                        if (is_file($fullPath) && preg_match($allowedImageExt, $file)) {
+                            $mediaItems[] = [
+                                'tipo' => 'imagen',
+                                'url_multimedia' => '../MEDIA/IMG/juegos/' . $gameId . '/' . rawurlencode($file),
+                                'numero_orden' => 9999
+                            ];
+                        }
                     }
-                    ?>
-                </div>
+                }
 
-                <?php if ($exists): ?>
-                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev" onclick="pauseVideoIfPlaying()">
-                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Previous</span>
-                    </button>
-                    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next" onclick="pauseVideoIfPlaying()">
-                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Next</span>
-                    </button>
-                <?php endif; ?>
-            </div>
-        </section>
+                usort($mediaItems, function ($a, $b) {
+                    $oa = (int)($a['numero_orden'] ?? 9999);
+                    $ob = (int)($b['numero_orden'] ?? 9999);
+                    if ($oa === $ob) {
+                        return strnatcasecmp((string)($a['url_multimedia'] ?? ''), (string)($b['url_multimedia'] ?? ''));
+                    }
+                    return $oa <=> $ob;
+                });
+            }
+
+            foreach ($mediaItems as $index => $item) {
+                $exists = true;
+                $isActive = ($index === 0);
+                $tipo = strtolower(trim((string)($item['tipo'] ?? 'imagen')));
+                $url = trim((string)($item['url_multimedia'] ?? ''));
+
+                if ($url === '') {
+                    continue;
+                }
+
+                if ($tipo === 'video') {
+                    $ext = strtolower(pathinfo(parse_url($url, PHP_URL_PATH) ?? $url, PATHINFO_EXTENSION));
+                    $mime = match ($ext) {
+                        'webm' => 'video/webm',
+                        'ogg'  => 'video/ogg',
+                        default => 'video/mp4',
+                    };
+                    ?>
+                    <div class="carousel-item <?php echo $isActive ? 'active' : ''; ?>">
+                        <video class="video-carousel d-block w-100" controls playsinline preload="metadata">
+                            <source src="<?php echo e($url); ?>" type="<?php echo e($mime); ?>">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                    <?php
+                } else {
+                    ?>
+                    <div class="carousel-item <?php echo $isActive ? 'active' : ''; ?>">
+                        <img src="<?php echo e($url); ?>"
+                             class="d-block w-100 game-image"
+                             alt="Game carousel image"
+                             loading="lazy">
+                    </div>
+                    <?php
+                }
+            }
+
+            if (!$exists) {
+                ?>
+                <div class="carousel-item active">
+                    <img src="../MEDIA/IMG/juegos/fallback/default.jpg"
+                         class="d-block w-100 game-image"
+                         alt="Game placeholder">
+                </div>
+                <?php
+            }
+            ?>
+        </div>
+
+        <?php if ($exists && count($mediaItems) > 1): ?>
+            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        <?php endif; ?>
+    </div>
+</section>
 
         <section class="game-description-panel">
             <h2>Acerca del juego</h2>
