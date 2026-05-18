@@ -138,7 +138,7 @@
         cropState.input.files = dt.files;
 
         const previewUrl = URL.createObjectURL(blob);
-        setPreviewBox(cropState.previewBox, previewUrl, cropState.spec.fit);
+        setPreviewBox(cropState.previewBox, previewUrl, 'contain');
 
         if (cropState.previewUrl) {
             revokeObjectUrl(cropState.previewUrl);
