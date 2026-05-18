@@ -186,3 +186,13 @@ INSERT INTO LogrosUsuario (id_usuario, nickname, Logros_id_logro, id_juego, Logr
 -- ----------------------------
 INSERT INTO Administadores (id_administador, id_usuario, nickname) VALUES
 (1, 2, 'PanoloPlay');
+
+-- ----------------------------
+-- 15. MultimediaJuego
+-- ----------------------------
+INSERT INTO `multimediajuego` (`id_multimedia`, `id_juego`, `nombre_juego`, `url_multimedia`, `tipo`, `numero_orden`) VALUES
+(1, 3, 'Subnautica', '../MEDIA/IMG/juegos/3/carusel/media_3_1779057902_80007a9c.jpg', 'imagen', 1),
+(2, 3, 'Subnautica', '../MEDIA/IMG/juegos/3/carusel/media_3_1779057902_797864d4.jpg', 'imagen', 2),
+(3, 3, 'Subnautica', '../MEDIA/IMG/juegos/3/carusel/media_3_1779057934_73567d32.jpg', 'imagen', 3),
+(4, 3, 'Subnautica', '../MEDIA/IMG/juegos/3/carusel/media_3_1779057934_b5235eb7.jpg', 'imagen', 4),
+(5, 3, 'Subnautica', '../MEDIA/IMG/juegos/3/carusel/media_3_1779057902_dbe0e704.jpg', 'imagen', 5);

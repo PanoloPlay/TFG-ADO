@@ -317,7 +317,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $accion = $_POST['accion'] ?? '';
 
     try {
-        if ($accion === 'guardar_juego') {
+if ($accion === 'guardar_juego') {
             $idJuego = isset($_POST['id_juego']) && $_POST['id_juego'] !== '' ? (int) $_POST['id_juego'] : null;
             $nombreJuego = trim((string) ($_POST['nombre_juego'] ?? ''));
             $descripcion = trim((string) ($_POST['descripcion'] ?? ''));
@@ -336,21 +336,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $BBDD->beginTransaction();
 
             if ($idJuego) {
+                $checkOwnership = $BBDD->prepare("SELECT COUNT(*) FROM Juegos WHERE id_juego = :id_juego AND desarrollador = :desarrollador");
+                $checkOwnership->execute([':id_juego' => $idJuego, ':desarrollador' => $nombreDesarrollador]);
+                if ((int)$checkOwnership->fetchColumn() === 0) {
+                    throw new RuntimeException('No tienes permisos para modificar este juego.');
+                }
+
                 $sql = "UPDATE Juegos
                         SET nombre_juego = :nombre_juego,
                             descripcion = :descripcion,
                             fecha_publicacion = :fecha_publicacion,
-                            desarrollador = :desarrollador,
                             precio = :precio,
                             descuento = :descuento
-                        WHERE id_juego = :id_juego
-                          AND desarrollador = :desarrollador";
+                        WHERE id_juego = :id_juego";
                 $stmt = $BBDD->prepare($sql);
                 $stmt->execute([
                     ':nombre_juego' => $nombreJuego,
                     ':descripcion' => $descripcion !== '' ? $descripcion : null,
                     ':fecha_publicacion' => $fechaPublicacion,
-                    ':desarrollador' => $nombreDesarrollador,
                     ':precio' => $precio,
                     ':descuento' => $descuento,
                     ':id_juego' => $idJuego,
@@ -374,15 +377,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 throw new RuntimeException('No se ha podido obtener el ID del juego.');
             }
 
-            $delCategorias = $BBDD->prepare("
-                DELETE FROM CategoriasJuego
-                WHERE id_juego = :id_juego
-                  AND nombre_juego = :nombre_juego
-            ");
-            $delCategorias->execute([
-                ':id_juego' => $idJuego,
-                ':nombre_juego' => $nombreJuego,
-            ]);
+            $delCategorias = $BBDD->prepare("DELETE FROM CategoriasJuego WHERE id_juego = :id_juego");
+            $delCategorias->execute([':id_juego' => $idJuego]);
 
             if (!empty($categoriasPost)) {
                 $insCategoria = $BBDD->prepare("
@@ -392,7 +388,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     WHERE c.id_categoria = :id_categoria
                     LIMIT 1
                 ");
-
                 foreach ($categoriasPost as $idCategoria) {
                     $insCategoria->execute([
                         ':id_juego' => $idJuego,
@@ -402,22 +397,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
 
-            $delIdiomas = $BBDD->prepare("
-                DELETE FROM IdiomasJuego
-                WHERE id_juego = :id_juego
-                  AND nombre_juego = :nombre_juego
-            ");
-            $delIdiomas->execute([
-                ':id_juego' => $idJuego,
-                ':nombre_juego' => $nombreJuego,
-            ]);
+            // Limpieza de idiomas basada únicamente en id_juego
+            $delIdiomas = $BBDD->prepare("DELETE FROM IdiomasJuego WHERE id_juego = :id_juego");
+            $delIdiomas->execute([':id_juego' => $idJuego]);
 
             if (!empty($idiomasPost)) {
                 $insIdioma = $BBDD->prepare("
                     INSERT INTO IdiomasJuego (id_juego, nombre_juego, id_idioma)
                     VALUES (:id_juego, :nombre_juego, :id_idioma)
                 ");
-
                 foreach ($idiomasPost as $idIdioma) {
                     $insIdioma->execute([
                         ':id_juego' => $idJuego,
@@ -427,6 +415,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
 
+            // Sincronizar el nombre del juego en la multimedia existente por si acaso cambió el nombre principal
+            $updateMediaNames = $BBDD->prepare("UPDATE MultimediaJuego SET nombre_juego = :nombre_juego WHERE id_juego = :id_juego");
+            $updateMediaNames->execute([':nombre_juego' => $nombreJuego, ':id_juego' => $idJuego]);
+
+            // Guardar imágenes estáticas del juego
             $staticVariants = ['logo', 'header', 'capsule', 'background', 'wide-cover', 'banner', 'cover', 'icon'];
             foreach ($staticVariants as $variant) {
                 $key = 'img_' . $variant;
@@ -435,7 +428,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
 
-            // Eliminar multimedia marcada para borrar
             $carouselDeleteIds = $_POST['carousel_delete_ids'] ?? [];
             if (is_array($carouselDeleteIds)) {
                 foreach ($carouselDeleteIds as $idMultimedia) {
@@ -451,33 +443,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $carouselTypes = $_POST['carousel_types'] ?? [];
             $carouselMediaIds = $_POST['carousel_media_ids'] ?? [];
 
-            if (is_array($carouselFiles) && isset($carouselFiles['name']) && is_array($carouselFiles['name'])) {
-                $count = count($carouselFiles['name']);
-                for ($i = 0; $i < $count; $i++) {
-                    if (($carouselFiles['error'][$i] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
-                        continue;
-                    }
+            if (is_array($carouselOrders)) {
+                foreach ($carouselOrders as $i => $orden) {
+                    $orden = (int)$orden;
+                    $existingMediaId = isset($carouselMediaIds[$i]) ? (int)$carouselMediaIds[$i] : 0;
+                    $forceType = !empty($carouselTypes[$i]) ? $carouselTypes[$i] : null;
 
-                    // Si es un reemplazo de multimedia existente, eliminar la vieja primero
-                    $existingMediaId = isset($carouselMediaIds[$i]) ? (int) $carouselMediaIds[$i] : 0;
-                    if ($existingMediaId > 0) {
-                        deleteCarouselMedia($BBDD, $existingMediaId, $idJuego);
-                    }
+                    $hasNewFile = is_array($carouselFiles) && 
+                                  isset($carouselFiles['error'][$i]) && 
+                                  $carouselFiles['error'][$i] !== UPLOAD_ERR_NO_FILE;
 
-                    $file = [
-                        'name' => $carouselFiles['name'][$i],
-                        'type' => $carouselFiles['type'][$i],
-                        'tmp_name' => $carouselFiles['tmp_name'][$i],
-                        'error' => $carouselFiles['error'][$i],
-                        'size' => $carouselFiles['size'][$i],
-                    ];
+                    if ($hasNewFile) {
+                        if ($existingMediaId > 0) {
+                            deleteCarouselMedia($BBDD, $existingMediaId, $idJuego);
+                        }
 
-                    $orden = isset($carouselOrders[$i]) && $carouselOrders[$i] !== '' ? (int) $carouselOrders[$i] : ($i + 1);
-                    $forceType = $carouselTypes[$i] ?? null;
-                    if ($forceType === '') {
-                        $forceType = null;
+                        $file = [
+                            'name' => $carouselFiles['name'][$i],
+                            'type' => $carouselFiles['type'][$i],
+                            'tmp_name' => $carouselFiles['tmp_name'][$i],
+                            'error' => $carouselFiles['error'][$i],
+                            'size' => $carouselFiles['size'][$i],
+                        ];
+                        saveCarouselMedia($BBDD, $file, $idJuego, $nombreJuego, $orden, $forceType);
+                    } else {
+                        if ($existingMediaId > 0) {
+                            $updateCarouselStmt = $BBDD->prepare("
+                                UPDATE MultimediaJuego 
+                                SET numero_orden = :numero_orden, 
+                                    tipo = :tipo,
+                                    nombre_juego = :nombre_juego
+                                WHERE id_multimedia = :id_multimedia 
+                                  AND id_juego = :id_juego
+                            ");
+                            $updateCarouselStmt->execute([
+                                ':numero_orden' => $orden,
+                                ':tipo' => $forceType ?: 'imagen',
+                                ':nombre_juego' => $nombreJuego,
+                                ':id_multimedia' => $existingMediaId,
+                                ':id_juego' => $idJuego
+                            ]);
+                        }
                     }
-                    saveCarouselMedia($BBDD, $file, $idJuego, $nombreJuego, $orden, $forceType);
                 }
             }
 
