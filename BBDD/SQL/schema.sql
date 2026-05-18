@@ -56,7 +56,8 @@ CREATE TABLE Desarrollador(
   id_desarrollador INT NOT NULL AUTO_INCREMENT,
   nombre_desarrollador VARCHAR(100) NOT NULL,
   nickname VARCHAR(50) NOT NULL,
-  PRIMARY KEY (id_desarrollador, nombre_desarrollador),
+  PRIMARY KEY (id_desarrollador),
+  UNIQUE (nombre_desarrollador),
   INDEX (nombre_desarrollador, nickname),
   FOREIGN KEY (nickname) REFERENCES Usuarios(nickname)
     ON DELETE CASCADE ON UPDATE CASCADE

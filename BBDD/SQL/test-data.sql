@@ -190,7 +190,8 @@ INSERT INTO Administadores (id_administador, id_usuario, nickname) VALUES
 -- ----------------------------
 -- 15. MultimediaJuego
 -- ----------------------------
-INSERT INTO `multimediajuego` (`id_multimedia`, `id_juego`, `nombre_juego`, `url_multimedia`, `tipo`, `numero_orden`) VALUES
+INSERT INTO MultimediaJuego
+(id_multimedia, id_juego, nombre_juego, url_multimedia, tipo, numero_orden) VALUES
 (1, 3, 'Subnautica', '../MEDIA/IMG/juegos/3/carusel/media_3_1779057902_80007a9c.jpg', 'imagen', 1),
 (2, 3, 'Subnautica', '../MEDIA/IMG/juegos/3/carusel/media_3_1779057902_797864d4.jpg', 'imagen', 2),
 (3, 3, 'Subnautica', '../MEDIA/IMG/juegos/3/carusel/media_3_1779057934_73567d32.jpg', 'imagen', 3),
