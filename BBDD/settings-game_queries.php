@@ -174,6 +174,82 @@ function saveStaticGameImage(array $file, int $idJuego, string $variant): string
     return '../MEDIA/IMG/juegos/' . $idJuego . '/icons/' . $variant . '.' . $ext;
 }
 
+function getGameArchiveDir(int $idJuego): string
+{
+    return dirname(__DIR__) . '/APPS/GAMES/' . $idJuego . '/';
+}
+
+function getGameArchiveUrl(int $idJuego, string $fileName): string
+{
+    return '../APPS/GAMES/' . $idJuego . '/' . rawurlencode($fileName);
+}
+
+function getGameArchiveFile(int $idJuego): ?string
+{
+    $dir = getGameArchiveDir($idJuego);
+    if (!is_dir($dir)) {
+        return null;
+    }
+
+    $items = array_values(array_filter(scandir($dir) ?: [], function ($item) use ($dir) {
+        return is_file($dir . $item) && $item !== '.' && $item !== '..';
+    }));
+
+    return $items[0] ?? null;
+}
+
+function deleteGameArchiveFiles(int $idJuego): void
+{
+    $dir = getGameArchiveDir($idJuego);
+    if (!is_dir($dir)) {
+        return;
+    }
+
+    foreach (scandir($dir) ?: [] as $item) {
+        if ($item === '.' || $item === '..') {
+            continue;
+        }
+
+        $path = $dir . $item;
+        if (is_file($path)) {
+            @unlink($path);
+        }
+    }
+}
+
+function saveGameArchiveFile(array $file, int $idJuego): string
+{
+    if (($file['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+        throw new RuntimeException('No se ha encontrado ningún archivo para subir.');
+    }
+    if (($file['error'] ?? UPLOAD_ERR_OK) !== UPLOAD_ERR_OK) {
+        throw new RuntimeException('Error al subir el archivo del juego.');
+    }
+    if (!is_uploaded_file($file['tmp_name'])) {
+        throw new RuntimeException('El archivo del juego no es válido.');
+    }
+    if (($file['size'] ?? 0) > 512 * 1024 * 1024) {
+        throw new RuntimeException('El archivo del juego no puede superar 512 MB.');
+    }
+
+    $originalName = basename($file['name'] ?? 'game_package');
+    $safeName = preg_replace('/[^A-Za-z0-9._-]+/', '_', $originalName);
+    if ($safeName === '') {
+        $safeName = 'game_package';
+    }
+
+    $dir = getGameArchiveDir($idJuego);
+    ensureDir($dir);
+    deleteGameArchiveFiles($idJuego);
+
+    $destination = $dir . $safeName;
+    if (!move_uploaded_file($file['tmp_name'], $destination)) {
+        throw new RuntimeException('No se ha podido guardar el archivo en APPS/GAMES/' . $idJuego . '/');
+    }
+
+    return $safeName;
+}
+
 function saveCarouselMedia(PDO $BBDD, array $file, int $idJuego, string $nombreJuego, int $orden, ?string $forceType = null): ?array
 {
     if (($file['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
@@ -493,6 +569,29 @@ if ($accion === 'guardar_juego') {
             $modo = 'listar';
         }
 
+        if ($accion === 'guardar_archivo') {
+            $idJuego = isset($_POST['id_juego']) && $_POST['id_juego'] !== '' ? (int) $_POST['id_juego'] : 0;
+            if ($idJuego <= 0) {
+                throw new RuntimeException('Juego inválido.');
+            }
+
+            $checkOwnership = $BBDD->prepare("SELECT COUNT(*) FROM Juegos WHERE id_juego = :id_juego AND desarrollador = :desarrollador");
+            $checkOwnership->execute([':id_juego' => $idJuego, ':desarrollador' => $nombreDesarrollador]);
+            if ((int) $checkOwnership->fetchColumn() === 0) {
+                throw new RuntimeException('No puedes subir archivos a un juego que no es tuyo.');
+            }
+
+            $file = $_FILES['game_archive'] ?? null;
+            if (!is_array($file) || ($file['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+                throw new RuntimeException('Selecciona un archivo para subir.');
+            }
+
+            $savedName = saveGameArchiveFile($file, $idJuego);
+            $mensaje = 'Archivo del juego subido correctamente.';
+            $modo = 'archivo';
+            $editId = $idJuego;
+        }
+
         if ($accion === 'guardar_logros') {
             $idJuego = (int) ($_POST['id_juego'] ?? 0);
             $achievementIds = $_POST['achievement_ids'] ?? [];
@@ -622,7 +721,7 @@ if ($accion === 'guardar_juego') {
 }
 
 $juegoEdit = null;
-if (in_array($modo, ['editar', 'logros'], true) && $editId > 0) {
+if (in_array($modo, ['editar', 'logros', 'archivo'], true) && $editId > 0) {
     $stmt = $BBDD->prepare("SELECT * FROM Juegos WHERE id_juego = :id_juego AND desarrollador = :desarrollador LIMIT 1");
     $stmt->execute([':id_juego' => $editId, ':desarrollador' => $nombreDesarrollador]);
     $juegoEdit = $stmt->fetch(PDO::FETCH_ASSOC) ?: null;

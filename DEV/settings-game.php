@@ -41,11 +41,23 @@ require_once '../GENERAL/[head_END - body_START - header - main_START].php';
                 <?php if ($juegoEdit): ?>
                     <a class="panel-nav__item <?= $modo === 'editar' ? 'is-active' : '' ?>" href="?modo=editar&id=<?= (int) $juegoEdit['id_juego'] ?>">
                         <span class="material-symbols-outlined">edit</span>
-                        Editar juego
+                        Multimedia juego
                     </a>
                 <?php else: ?>
                     <span class="panel-nav__item is-disabled" aria-disabled="true">
                         <span class="material-symbols-outlined">edit</span>
+                        Multimedia juego
+                    </span>
+                <?php endif; ?>
+
+                <?php if ($juegoEdit): ?>
+                    <a class="panel-nav__item <?= $modo === 'archivo' ? 'is-active' : '' ?>" href="?modo=archivo&id=<?= (int) $juegoEdit['id_juego'] ?>">
+                        <span class="material-symbols-outlined">cloud_upload</span>
+                        Editar juego
+                    </a>
+                <?php else: ?>
+                    <span class="panel-nav__item is-disabled" aria-disabled="true">
+                        <span class="material-symbols-outlined">cloud_upload</span>
                         Editar juego
                     </span>
                 <?php endif; ?>
@@ -76,7 +88,7 @@ require_once '../GENERAL/[head_END - body_START - header - main_START].php';
             <?php if ($modo === 'nuevo' || $modo === 'editar'): ?>
                 <section class="panel-card">
                     <div class="panel-card__header">
-                        <h3 class="panel-card__title"><?= $modo === 'nuevo' ? 'Subir nuevo juego' : 'Editar juego' ?></h3>
+                        <h3 class="panel-card__title"><?= $modo === 'nuevo' ? 'Subir nuevo juego' : 'Multimedia juego' ?></h3>
                     </div>
 
                     <form method="post" class="settings-game-form" enctype="multipart/form-data" id="gameForm" data-fallback-image="<?= e($fallbackImageUrl) ?>">
@@ -412,6 +424,54 @@ require_once '../GENERAL/[head_END - body_START - header - main_START].php';
                     </form>
                 </section>
             <?php endif; ?>
+            <?php if ($modo === 'archivo' && $juegoEdit): ?>
+                <section class="panel-card">
+                    <div class="panel-card__header">
+                        <h3 class="panel-card__title">Editar juego - <?= e($juegoEdit['nombre_juego']) ?></h3>
+                    </div>
+
+                    <form method="post" class="settings-game-form" enctype="multipart/form-data">
+                        <input type="hidden" name="accion" value="guardar_archivo">
+                        <input type="hidden" name="id_juego" value="<?= (int) $juegoEdit['id_juego'] ?>">
+
+                        <div class="form-field">
+                            <label class="form-label" for="game_archive">Archivo del juego</label>
+                            <input
+                                type="file"
+                                id="game_archive"
+                                name="game_archive"
+                                class="form-control"
+                                accept="*/*"
+                            >
+                            <small class="helper-text">Sube un archivo .zip, .rar u otro paquete de distribución.</small>
+                        </div>
+
+                        <?php $existingArchive = getGameArchiveFile((int) $juegoEdit['id_juego']); ?>
+                        <?php if ($existingArchive): ?>
+                            <div class="form-field">
+                                <label class="form-label">Archivo actual</label>
+                                <p class="mb-2"><?= e($existingArchive) ?></p>
+                                <a href="<?= e(getGameArchiveUrl((int) $juegoEdit['id_juego'], $existingArchive)) ?>" class="btn-secondary btn-sm" target="_blank" rel="noopener noreferrer">
+                                    <span class="material-symbols-outlined">download</span>
+                                    Descargar archivo
+                                </a>
+                            </div>
+                        <?php endif; ?>
+
+                        <div class="form-actions">
+                            <button class="btn-primary btn-md" type="submit">
+                                <span class="material-symbols-outlined icon-save">save</span>
+                                Guardar
+                            </button>
+                            <a href="?modo=editar&id=<?= (int) $juegoEdit['id_juego'] ?>" class="btn-secondary btn-md">
+                                <span class="material-symbols-outlined icon-cancel">cancel</span>
+                                Volver a Multimedia
+                            </a>
+                        </div>
+                    </form>
+                </section>
+            <?php endif; ?>
+
             <?php if ($modo === 'logros' && $juegoEdit): ?>
                 <section class="panel-card">
                     <div class="panel-card__header">
