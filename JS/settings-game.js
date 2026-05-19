@@ -16,8 +16,8 @@
         header: { crop: true, fit: 'cover', aspect: 92 / 43, width: 920, height: 430, type: 'image/jpeg' },
         capsule: { crop: true, fit: 'cover', aspect: 77 / 29, width: 770, height: 290, type: 'image/jpeg' },
         background: { crop: true, fit: 'cover', aspect: 3840 / 1240, width: 3840, height: 1240, type: 'image/jpeg' },
-        'wide-cover': { crop: true, fit: 'cover', aspect: 77 / 29, width: 770, height: 290, type: 'image/jpeg' },
-        banner: { crop: true, fit: 'cover', aspect: 77 / 29, width: 770, height: 290, type: 'image/jpeg' },
+        'wide-cover': { crop: true, fit: 'cover', aspect: 92 / 43, width: 920, height: 430, type: 'image/jpeg' },
+        banner: { crop: true, fit: 'cover', aspect: 92 / 43, width: 920, height: 430, type: 'image/jpeg' },
         cover: { crop: true, fit: 'cover', aspect: 600 / 900, width: 600, height: 900, type: 'image/jpeg' },
         icon: { crop: true, fit: 'cover', aspect: 1, width: 64, height: 64, type: 'image/png' },
         carousel: { crop: true, fit: 'cover', aspect: 16 / 9, width: 1600, height: 900, type: 'image/jpeg' }

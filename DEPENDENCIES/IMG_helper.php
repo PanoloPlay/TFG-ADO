@@ -1,38 +1,34 @@
 <?php
 function getGameImageUrl(int $idJuego, string $variant): string
 {
-    //  Normalizar variante (para evitar problemas de mayusculas o espacios)
     $variant = strtolower(trim($variant));
 
-    // Mapeo de variantes
     $variants = [
         'logo' => ['logo.png'],
         'background' => ['background.jpg', 'background.jpeg'],
         'wide-cover' => ['wide-cover.jpg', 'wide-cover.jpeg'],
         'banner' => ['banner.jpg', 'banner.jpeg'],
         'cover' => ['cover.jpg', 'cover.jpeg'],
-        'capsule'=> ['capsule.jpg', 'capsule.jpeg'],
+        'capsule' => ['capsule.jpg', 'capsule.jpeg'],
         'icon' => ['icon.png', 'icon.jpg', 'icon.jpeg', 'icon.ico']
     ];
-    
-    // Ruta física de la imagen del juego
+
     $baseFs = dirname(__DIR__) . '/MEDIA/IMG/juegos/' . $idJuego . '/icons/';
 
-    // Intentar imagen del juego
-    foreach ($variants[$variant] as $file) {
+    foreach ($variants[$variant] ?? [] as $file) {
         if (is_file($baseFs . $file)) {
             return '../MEDIA/IMG/juegos/' . $idJuego . '/icons/' . $file;
         }
     }
 
-    // FALLBACK (si el juego no tiene imagen, usar una genérica segun el tipo)
     $fallbackFs = dirname(__DIR__) . '/MEDIA/IMG/juegos/fallback/';
 
     $fallbackFiles = [
         $variant . '.jpg',
         $variant . '.jpeg',
         $variant . '.png',
-        $variant . '.ico'
+        $variant . '.ico',
+        $variant . '.webp'
     ];
 
     foreach ($fallbackFiles as $file) {
@@ -41,6 +37,26 @@ function getGameImageUrl(int $idJuego, string $variant): string
         }
     }
 
-    // por si TODO falla 
     return '../MEDIA/IMG/juegos/fallback/default.jpg';
+}
+
+function getAchievementImageUrl(string $tipo): string
+{
+    $tipo = strtolower(trim($tipo));
+    $baseFs = dirname(__DIR__) . '/MEDIA/IMG/juegos/fallback/achivements/';
+
+    $files = [
+        $tipo . '.jpg',
+        $tipo . '.jpeg',
+        $tipo . '.png',
+        $tipo . '.webp'
+    ];
+
+    foreach ($files as $file) {
+        if (is_file($baseFs . $file)) {
+            return '../MEDIA/IMG/juegos/fallback/achivements/' . $file;
+        }
+    }
+
+    return '../MEDIA/IMG/juegos/fallback/achivements/default.jpg';
 }
