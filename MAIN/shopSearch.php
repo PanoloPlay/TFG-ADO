@@ -71,8 +71,8 @@ $AllLanguages = get_languages($BBDD);
 
 $languages = [];
 foreach ($AllLanguages as $language) {
-    if (isset($_POST[$language['Idioma']])) {
-        array_push($languages, $_POST[$language['Idioma']]);
+    if (isset($_POST[$language['id_idioma']])) {
+        array_push($languages, $_POST[$language['id_idioma']]);
     }
 }
 
@@ -171,7 +171,7 @@ function renderPrecioFinal($precio, $descuento) {
                         foreach ($AllLanguages as $language) {
                         ?>
                             <label class="checkbox-filter">
-                                <input type="checkbox" name="<?= e($language['Idioma']) ?>" class="categoria-checkbox" value="<?= e($language['id_idioma']) ?>" <?php if (in_array($language['id_idioma'], $languages)) { ?> checked <?php } ?>>
+                                <input type="checkbox" name="<?= e($language['id_idioma']) ?>" class="categoria-checkbox" value="<?= e($language['id_idioma']) ?>" <?php if (in_array($language['id_idioma'], $languages)) { ?> checked <?php } ?>>
                                 <span><?= e($language['Idioma']) ?> (<?= e($language['id_idioma']) ?>)</span>
                             </label>
                         <?php
