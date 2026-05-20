@@ -1,0 +1,183 @@
+/* =========================
+   CAROUSEL STYLES
+   ========================= */
+
+.game-media-panel {
+    position: relative;
+}
+
+.game-carousel,
+#carouselExampleIndicators {
+    width: 100%;
+    position: relative;
+}
+
+#carousel-container {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: var(--color-greyneutral-2);
+    display: block;
+    overflow: hidden;
+}
+
+#carousel-container .carousel-item {
+    width: 100%;
+    height: 100%;
+}
+
+#carousel-container .carousel-item img,
+#carousel-container .carousel-item video {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    background: var(--color-greyneutral-2);
+}
+
+/* Botones superiores: agrandar y fullscreen */
+.carousel-actions {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: flex;
+    gap: 8px;
+    z-index: 30;
+    pointer-events: auto;
+    
+    /* Ocultos por defecto y con transición suave */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+/* Mostrar los botones solo cuando se hace hover en el contenedor principal */
+.game-media-panel:hover .carousel-actions {
+    opacity: 1;
+    visibility: visible;
+}
+
+.carousel-action-btn {
+    width: 42px;
+    height: 42px;
+    border: 0;
+    border-radius: 4px;
+    background: rgba(6, 10, 14, 0.75);
+    color: #fff;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.carousel-action-btn:hover {
+    background: rgba(6, 10, 14, 0.95);
+    transform: translateY(-1px);
+}
+
+/* Modo agrandado */
+.game-media-panel.carousel-expanded {
+    position: fixed;
+    inset: 24px;
+    z-index: 1050;
+    background: var(--color-greyneutral-2);
+    padding: 12px;
+    border-radius: 4px;
+    margin: 12px 100px;
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.65);
+}
+
+.game-media-panel.carousel-expanded #carouselExampleIndicators {
+    height: 100%;
+}
+
+.game-media-panel.carousel-expanded #carousel-container {
+    height: 100%;
+    aspect-ratio: auto;
+}
+
+/* Flechas del carrusel */
+#carouselExampleIndicators .carousel-control-prev,
+#carouselExampleIndicators .carousel-control-next {
+    width: 46px;
+    height: 64px;
+    top: 50%;
+    bottom: auto;
+    transform: translateY(-50%);
+    opacity: 0.55;
+    border: 0;
+    border-radius: 4px;
+    transition: opacity 0.2s ease, background 0.2s ease, transform 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 25;
+}
+
+#carouselExampleIndicators:hover .carousel-control-prev,
+#carouselExampleIndicators:hover .carousel-control-next {
+    opacity: 1;
+}
+
+#carouselExampleIndicators .carousel-control-prev:hover,
+#carouselExampleIndicators .carousel-control-next:hover {
+    transform: translateY(-50%) scale(1.02);
+}
+
+#carouselExampleIndicators .carousel-control-prev {
+    left: 12px;
+}
+
+#carouselExampleIndicators .carousel-control-next {
+    right: 12px;
+}
+
+#carouselExampleIndicators .carousel-control-prev-icon,
+#carouselExampleIndicators .carousel-control-next-icon {
+    width: 50px;
+    height: 60px;
+    background-size: 100% 100%;
+}
+
+/* Vídeos por debajo de las flechas y botones */
+#carouselExampleIndicators .carousel-item video {
+    position: relative;
+    z-index: 1;
+}
+
+#carouselExampleIndicators .carousel-item img {
+    position: relative;
+    z-index: 1;
+}
+
+/* En móvil */
+@media (max-width: 768px) {
+    #carousel-container {
+        aspect-ratio: 16 / 10;
+    }
+
+    #carouselExampleIndicators .carousel-control-prev,
+    #carouselExampleIndicators .carousel-control-next {
+        width: 40px;
+        height: 54px;
+    }
+
+    #carouselExampleIndicators .carousel-control-prev {
+        left: 10px;
+    }
+
+    #carouselExampleIndicators .carousel-control-next {
+        right: 10px;
+    }
+
+    .carousel-actions {
+        top: 10px;
+        right: 10px;
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .carousel-action-btn {
+        width: 40px;
+        height: 40px;
+    }
+}

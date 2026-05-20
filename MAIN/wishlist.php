@@ -60,7 +60,6 @@ function renderPrecioFinal($precio, $descuento) {
 ?>
 
 <?php include '../GENERAL/[html_START - head_START].php'; ?>
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.7/Sortable.min.js"></script>
 <link rel="stylesheet" href="../CSS/wishlist.css">
 
 <?php include '../GENERAL/[head_END - body_START - header - main_START].php'; ?>

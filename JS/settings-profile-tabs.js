@@ -9,7 +9,8 @@ document.addEventListener('DOMContentLoaded', function() {
         '#seccion-avatar', 
         '#seccion-datos', 
         '#seccion-privacidad', 
-        '#seccion-password'
+        '#seccion-password',
+        '../DEV/settings-game.php'
     ];
 
     function showSection(targetId) {
@@ -29,11 +30,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     links.forEach(link => {
         link.addEventListener('click', function(e) {
-            e.preventDefault(); 
-            
-            if (settingsPanel) settingsPanel.classList.remove('no-anim');
-
             const targetId = this.getAttribute('href');
+            if (!targetId || !targetId.startsWith('#')) {
+                return; // dejar navegar enlaces externos normalmente
+            }
+
+            e.preventDefault();
+            if (settingsPanel) settingsPanel.classList.remove('no-anim');
             showSection(targetId);
             history.pushState(null, null, targetId);
         });

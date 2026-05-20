@@ -3,9 +3,11 @@
 <?php require_once '../GENERAL/[html_START - head_START].php'; ?>
 
 <script src="../JS/checkIfXExists.js" defer></script>
+<script src="../JS/carousel.js" defer></script>
 <script src="../JS/game.js" defer></script>
 <script src="../JS/game-alerts.js" defer></script>
 
+<link rel="stylesheet" href="../CSS/carousel.css">
 <link rel="stylesheet" href="../CSS/game.css">
 
 <?php require_once '../GENERAL/[head_END - body_START - header - main_START].php'; ?>
@@ -56,6 +58,17 @@ if ($gameId > 0) {
         }
     }
 }
+function renderPrecioOriginal($precio, $descuento) {
+    if ($descuento > 0) {
+        return '<span class="price-original">' . number_format($precio, 2, ',', '.') . '€</span>';
+    }
+    return '';
+}
+
+function renderPrecioFinal($precio, $descuento) {
+    $final = $precio - ($precio * ($descuento / 100));
+    return '<span class="price-final">' . ($final <= 0 ? 'Gratis' : number_format($final, 2, ',', '.') . '€') . '</span>';
+}
 ?>
 
 <input type="hidden" id="hdnSession" data-value="<?php echo e($userNickname ?? ''); ?>" />
@@ -92,183 +105,158 @@ if ($gameId > 0) {
             <?php echo e($gameDataPhp['nombre_juego']); ?>
         </h1>
 
-        <section class="game-media-panel">
-            <div id="carouselExampleIndicators" class="carousel slide game-carousel">
-                <div id="carousel-container" class="carousel-inner">
-                    <?php
-                    $active = true;
-                    $exists = false;
+<section class="game-media-panel">
+    <div id="carouselExampleIndicators" class="carousel slide game-carousel">
+        <div id="carousel-container" class="carousel-inner">
+            <?php
+            $exists = false;
+            $mediaItems = [];
+            $gameId = (int)$gameDataPhp['id_juego'];
+            $gameName = $gameDataPhp['nombre_juego'];
 
-                    $gameFolder = $gameNamePhp;
-                    $gameFolder = str_replace([".", ",", ":", ";"], "", $gameFolder);
-                    $gameFolder = trim($gameFolder);
+            try {
+                $stmtMedia = $BBDD->prepare("
+                    SELECT url_multimedia, tipo, numero_orden
+                    FROM MultimediaJuego
+                    WHERE id_juego = ? AND nombre_juego = ?
+                    ORDER BY numero_orden ASC, id_multimedia ASC
+                ");
+                $stmtMedia->execute([$gameId, $gameName]);
+                $mediaItems = $stmtMedia->fetchAll(PDO::FETCH_ASSOC);
+            } catch (PDOException $e) {
+                $mediaItems = [];
+            }
 
-                    $path = "../MEDIA/VIDEO/" . $gameFolder . "/*.*";
-                    $array = glob($path) ?: [];
+            // Fallback: si no hay registros en la tabla, intenta leer del sistema de archivos
+            if (empty($mediaItems)) {
+                $allowedImageExt = '/\.(jpg|jpeg|png|webp|gif)$/i';
+                $allowedVideoExt = '/\.(mp4|webm|ogg|avi|mov)$/i';
 
-                    foreach ($array as $value) {
-                        $finalValue = trim($value);
-                        ?>
-                        <div class="carousel-item <?php echo $active ? 'active' : ''; ?>">
-                            <video class="video-carousel d-block w-100" controls>
-                                <source src="<?php echo e($finalValue); ?>" type="video/mp4">
-                                <source src="<?php echo e($finalValue); ?>" type="video/ogg">
-                                Your browser does not support the video tag.
-                            </video>
-                        </div>
-                        <?php
-                        $active = false;
-                        $exists = true;
+                $scanFolder = function (string $path, string $type, string $regex, string $prefix) use (&$mediaItems) {
+                    if (!is_dir($path)) return;
+
+                    $files = array_diff(scandir($path) ?: [], ['.', '..']);
+                    foreach ($files as $file) {
+                        $fullPath = $path . '/' . $file;
+                        if (is_file($fullPath) && preg_match($regex, $file)) {
+                            $mediaItems[] = [
+                                'tipo' => $type,
+                                'url_multimedia' => $prefix . rawurlencode($file),
+                                'numero_orden' => 9999
+                            ];
+                        }
                     }
+                };
 
-                    $path = "../MEDIA/IMG/juegos/" . $gameFolder . "/*.*";
-                    $array = glob($path) ?: [];
+                $videoPath = dirname(__DIR__) . '/MEDIA/VIDEO/juegos/' . $gameId;
+                $scanFolder(
+                    $videoPath,
+                    'video',
+                    $allowedVideoExt,
+                    '../MEDIA/VIDEO/juegos/' . $gameId . '/'
+                );
 
-                    foreach ($array as $value) {
-                        $finalValue = trim($value);
-                        ?>
-                        <div class="carousel-item <?php echo $active ? 'active' : ''; ?>">
-                            <img src="<?php echo e($finalValue); ?>" class="d-block w-100 game-image" alt="Game image">
-                        </div>
-                        <?php
-                        $active = false;
-                        $exists = true;
+                $imagePathCarousel = dirname(__DIR__) . '/MEDIA/IMG/juegos/' . $gameId . '/carusel';
+                $scanFolder(
+                    $imagePathCarousel,
+                    'imagen',
+                    $allowedImageExt,
+                    '../MEDIA/IMG/juegos/' . $gameId . '/carusel/'
+                );
+
+                $imagePathRoot = dirname(__DIR__) . '/MEDIA/IMG/juegos/' . $gameId;
+                if (is_dir($imagePathRoot)) {
+                    $files = array_diff(scandir($imagePathRoot) ?: [], ['.', '..']);
+                    foreach ($files as $file) {
+                        $fullPath = $imagePathRoot . '/' . $file;
+                        if (is_file($fullPath) && preg_match($allowedImageExt, $file)) {
+                            $mediaItems[] = [
+                                'tipo' => 'imagen',
+                                'url_multimedia' => '../MEDIA/IMG/juegos/' . $gameId . '/' . rawurlencode($file),
+                                'numero_orden' => 9999
+                            ];
+                        }
                     }
+                }
 
-                    if (!$exists) {
-                        ?>
-                        <div class="carousel-item active">
-                            <img src="../MEDIA/IMG/juegos/gamePlaceholderIMG_Large.png" class="d-block w-100 game-image" alt="Placeholder">
-                        </div>
-                        <?php
+                usort($mediaItems, function ($a, $b) {
+                    $oa = (int)($a['numero_orden'] ?? 9999);
+                    $ob = (int)($b['numero_orden'] ?? 9999);
+                    if ($oa === $ob) {
+                        return strnatcasecmp((string)($a['url_multimedia'] ?? ''), (string)($b['url_multimedia'] ?? ''));
                     }
+                    return $oa <=> $ob;
+                });
+            }
+
+            foreach ($mediaItems as $index => $item) {
+                $exists = true;
+                $isActive = ($index === 0);
+                $tipo = strtolower(trim((string)($item['tipo'] ?? 'imagen')));
+                $url = trim((string)($item['url_multimedia'] ?? ''));
+
+                if ($url === '') {
+                    continue;
+                }
+
+                if ($tipo === 'video') {
+                    $ext = strtolower(pathinfo(parse_url($url, PHP_URL_PATH) ?? $url, PATHINFO_EXTENSION));
+                    $mime = match ($ext) {
+                        'webm' => 'video/webm',
+                        'ogg'  => 'video/ogg',
+                        default => 'video/mp4',
+                    };
                     ?>
-                </div>
+                    <div class="carousel-item <?php echo $isActive ? 'active' : ''; ?>">
+                        <video class="video-carousel d-block w-100" controls playsinline preload="metadata">
+                            <source src="<?php echo e($url); ?>" type="<?php echo e($mime); ?>">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                    <?php
+                } else {
+                    ?>
+                    <div class="carousel-item <?php echo $isActive ? 'active' : ''; ?>">
+                        <img src="<?php echo e($url); ?>"
+                             class="d-block w-100 game-image"
+                             alt="Game carousel image"
+                             loading="lazy">
+                    </div>
+                    <?php
+                }
+            }
 
-                <?php if ($exists): ?>
-                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev" onclick="pauseVideoIfPlaying()">
-                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Previous</span>
-                    </button>
-                    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next" onclick="pauseVideoIfPlaying()">
-                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Next</span>
-                    </button>
-                <?php endif; ?>
-            </div>
-        </section>
+            if (!$exists) {
+                ?>
+                <div class="carousel-item active">
+                    <img src="../MEDIA/IMG/juegos/fallback/default.jpg"
+                         class="d-block w-100 game-image"
+                         alt="Game placeholder">
+                </div>
+                <?php
+            }
+            ?>
+        </div>
+
+        <?php if ($exists && count($mediaItems) > 1): ?>
+            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        <?php endif; ?>
+    </div>
+</section>
 
         <section class="game-description-panel">
             <h2>Acerca del juego</h2>
             <p id="game-description"><?php echo e($gameDataPhp['descripcion'] ?? 'Descripción no disponible.'); ?></p>
         </section>
 
-
-
-    </div>
-
-    <aside class="game-sidebar">
-
-        <div class="game-purchase-card">
-            <div class="purchase-header">
-                <h3>Comprar juego</h3>
-            </div>
-            <div id="purchase-section">
-                <?php
-                $price = (float)($gameDataPhp['precio'] ?? 0);
-                $discount = (float)($gameDataPhp['descuento'] ?? 0);
-                $finalPrice = $discount > 0 ? $price * (1 - $discount / 100) : $price;
-                ?>
-                <?php if ($userBought): ?>
-                    <div class="owned-message">¡Ya tienes este juego en tu biblioteca!</div>
-                    <div class="game-title">Descargar: <?php echo e($gameDataPhp['nombre_juego']); ?></div>
-                    <button class="download-button" type="button" onclick="window.location.href='./libraryGame.php?name=<?php echo urlencode($gameDataPhp['nombre_juego']); ?>'">Descargar</button>
-                <?php else: ?>
-                    <div class="game-title">Comprar: <?php echo e($gameDataPhp['nombre_juego']); ?></div>
-                    <p class="game-price">Precio: <?php echo number_format($finalPrice, 2); ?>€</p>
-                    <?php if ($discount > 0): ?>
-                        <p class="game-discount">Descuento: <?php echo $discount; ?>%</p>
-                    <?php endif; ?>
-                    <button class="btn btn-primary" id="buy-button" type="button">Comprar</button>
-                    <?php
-                    $inWishlist = false;
-                    $inCart = false;
-
-                    if (!empty($userNickname)) {
-                        try {
-                            $stmtWishlist = $BBDD->prepare("
-                                SELECT COUNT(*) AS in_wishlist
-                                FROM ListaDeseos
-                                WHERE nickname = ? AND nombre_juego = ?
-                            ");
-                            $stmtWishlist->execute([$userNickname, $gameNamePhp]);
-                            $wishlistResult = $stmtWishlist->fetch(PDO::FETCH_ASSOC);
-                            $inWishlist = !empty($wishlistResult) && ((int)($wishlistResult['in_wishlist'] ?? 0) > 0);
-
-                            $stmtCart = $BBDD->prepare("
-                                SELECT COUNT(*) AS in_cart
-                                FROM Carrito
-                                WHERE nickname = ? AND nombre_juego = ?
-                            ");
-                            $stmtCart->execute([$userNickname, $gameNamePhp]);
-                            $cartResult = $stmtCart->fetch(PDO::FETCH_ASSOC);
-                            $inCart = !empty($cartResult) && ((int)($cartResult['in_cart'] ?? 0) > 0);
-                        } catch (PDOException $e) {
-                            $inWishlist = false;
-                            $inCart = false;
-                        }
-                    }
-                    ?>
-                    <?php if (!$inWishlist): ?>
-                        <button class="wishlist-button" id="add-wishlist-button" type="button">Añadir a la lista de deseos</button>
-                    <?php else: ?>
-                        <button class="wishlist-button" id="remove-wishlist-button" type="button">Quitar de la lista de deseos</button>
-                    <?php endif; ?>
-                    <?php if (!$inCart): ?>
-                        <button class="wishlist-button" id="add-cart-button" type="button">Añadir al carrito</button>
-                    <?php else: ?>
-                        <button class="wishlist-button" id="remove-cart-button" type="button">Quitar del carrito</button>
-                    <?php endif; ?>
-                <?php endif; ?>
-            </div>
-        </div>
-
-        <div class="game-info-card">
-            <h3>Información</h3>
-
-            <div class="game-info-list">
-                <div class="game-info-item">
-                    <span class="label">Desarrollador</span>
-                    <p id="game-developer"><?php echo e($gameDataPhp['desarrollador'] ?? 'Desarrollador desconocido.'); ?></p>
-                </div>
-
-                <div class="game-info-item">
-                    <span class="label">Fecha lanzamiento</span>
-                    <p id="game-release-date"><?php echo e($gameDataPhp['fecha_publicacion'] ?? 'Fecha no disponible.'); ?></p>
-                </div>
-
-                <div class="game-info-item">
-                    <span class="label">Valoraciones</span>
-                    <p id="game-rating"><?php echo (int)$positiveCount; ?> positivas</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="game-category-card">
-            <h3>Categorías</h3>
-            <div id="game-categories" class="game-category-list">
-                <?php if (!empty($categories)): ?>
-                    <?php foreach ($categories as $cat): ?>
-                        <button class="category-button" type="button" onclick="goToShopFilterByCategory('<?php echo e($cat['nombre_categoria']); ?>')"><?php echo e($cat['nombre_categoria']); ?></button>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <span class="game-category">Sin categorías</span>
-                <?php endif; ?>
-            </div>
-        </div>
-
-    </aside>
-            <section class="game-comments-panel">
+        <section class="game-comments-panel">
             <div class="section-title">
                 <h2>Reseñas y comentarios</h2>
                 <p class="reviews-stats">
@@ -494,7 +482,7 @@ if ($gameId > 0) {
                             <?php
                                 $commentTimestamp = !empty($comment['fechaPublicacion']) ? strtotime($comment['fechaPublicacion']) : 0;
                                 $commentLanguage = $comment['id_idioma_comentario'] ?? '';
-                                $searchText = strtolower(trim(($comment['nickname'] ?? '') . ' ' . ($comment['comentario'] ?? '')));
+                                $searchText = strtolower(trim(($comment['nombre_usuario'] ?? '') . ' ' . ($comment['comentario'] ?? '')));
                             ?>
                             <div
                                 class="comment comment-card"
@@ -503,7 +491,7 @@ if ($gameId > 0) {
                                 data-timestamp="<?php echo e((string)$commentTimestamp); ?>"
                                 data-search-text="<?php echo e($searchText); ?>"
                             >
-                                <p><strong><?php echo e($comment['nickname']); ?></strong></p>
+                                <p><strong><?php echo e($comment['nombre_usuario']); ?></strong></p>
                                 <p>Valoración: <span class="rating-<?php echo e($comment['valoracion']); ?>"><?php echo e(ucfirst($comment['valoracion'])); ?></span></p>
                                 <p><?php echo e($comment['comentario']); ?></p>
                                 <p>Fecha: <?php echo e($comment['fechaPublicacion']); ?></p>
@@ -513,9 +501,174 @@ if ($gameId > 0) {
                     <?php endif; ?>
                 </div>
 
-                <p id="no-comment-results" class="no-comment-results" style="display:none;">No se han encontrado reseñas.</p>
+                <p id="no-comment-results" class="no-comment-results" style="display:none;">No se han encontrado reseñas con esos filtros.</p>
             </div>
         </section>
+
+    </div>
+
+    <aside class="game-sidebar">
+
+        <div class="game-purchase-card">
+            <div class="purchase-header">
+                <h3> <?php echo e($gameDataPhp['nombre_juego']); ?></h3>
+            </div>
+            <div id="purchase-section">
+                <?php
+                $price = (float)($gameDataPhp['precio'] ?? 0);
+                $discount = (float)($gameDataPhp['descuento'] ?? 0);
+                $finalPrice = $discount > 0 ? $price * (1 - $discount / 100) : $price;
+                $hasDiscount = (float)$gameDataPhp['descuento'] > 0;
+                $imgUrl = getGameImageUrl((int)$gameDataPhp['id_juego'], 'banner');
+                ?>
+
+                <hr class="separator">
+
+                <div class="card-image" style="background-image: url('<?= e($imgUrl) ?>'); background-size: cover; background-position: center; background-repeat: no-repeat;"></div>
+
+                <?php if ($userBought): ?>
+                    <div class="owned-message">¡Ya tienes este juego en tu biblioteca!</div>
+
+                    <button class="download-button" type="button" onclick="window.location.href='./libraryGame.php?name=<?php echo urlencode($gameDataPhp['nombre_juego']); ?>'">
+                        <span class="material-symbols-outlined">download</span>
+                        <span>Descargar</span>
+                    </button>
+                <?php else: ?>
+                    <div class="price-widget">
+                        <?php if ($hasDiscount): ?>
+                            <div class="price-discount-badge">-<?= (int)$gameDataPhp['descuento'] ?>%</div>
+                            <div class="price-values">
+                                <?= renderPrecioOriginal($gameDataPhp['precio'], $gameDataPhp['descuento']) ?>
+                                <?= renderPrecioFinal($gameDataPhp['precio'], $gameDataPhp['descuento']) ?>
+                            </div>
+                        <?php else: ?>
+                            <div class="price-values no-discount">
+                                <span class="price-final">
+                                    <?php
+                                        $price = (float)$gameDataPhp['precio'];
+                                        echo $price <= 0 ? 'Gratis' : number_format($price, 2, ',', '.') . '€';
+                                    ?>
+                                </span>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+
+                    <?php
+                    $inWishlist = false;
+                    $inCart = false;
+                    $fechaPublicacion = $gameDataPhp['fecha_publicacion'] ?? null;
+                    $juegoDisponible = !empty($fechaPublicacion) && strtotime($fechaPublicacion) <= time();
+
+                    if (!empty($userNickname)) {
+                        try {
+                            $stmtWishlist = $BBDD->prepare("
+                                SELECT COUNT(*) AS in_wishlist
+                                FROM ListaDeseos
+                                WHERE nickname = ? AND nombre_juego = ?
+                            ");
+                            $stmtWishlist->execute([$userNickname, $gameNamePhp]);
+                            $wishlistResult = $stmtWishlist->fetch(PDO::FETCH_ASSOC);
+                            $inWishlist = !empty($wishlistResult) && ((int)($wishlistResult['in_wishlist'] ?? 0) > 0);
+                        } catch (PDOException $e) {
+                            $inWishlist = false;
+                        }
+
+                        try {
+                            $stmtCart = $BBDD->prepare("
+                                SELECT COUNT(*) AS in_cart
+                                FROM Carrito
+                                WHERE nickname = ? AND nombre_juego = ?
+                            ");
+                            $stmtCart->execute([$userNickname, $gameNamePhp]);
+                            $cartResult = $stmtCart->fetch(PDO::FETCH_ASSOC);
+                            $inCart = !empty($cartResult) && ((int)($cartResult['in_cart'] ?? 0) > 0);
+                        } catch (PDOException $e) {
+                            $inCart = false;
+                        }
+                    }
+                    ?>
+
+                    <?php if ($juegoDisponible): ?>
+                        <button class="btn btn-primary" id="buy-button" type="button">
+                            <span class="material-symbols-outlined">shopping_cart</span>
+                            <span>Comprar</span>
+                        </button>
+                    <?php else: ?>
+                        <div class="coming-soon-message">
+                            <span class="material-symbols-outlined">schedule</span>
+                            <span>Próximamente</span>
+                        </div>
+                    <?php endif; ?>
+
+                    <?php if (!empty($userNickname)): ?>
+                        <?php if (!$inWishlist): ?>
+                            <button class="wishlist-button" id="add-wishlist-button" type="button">
+                                <span class="material-symbols-outlined">favorite</span>
+                                <span>Añadir a la lista de deseos</span>
+                            </button>
+                        <?php else: ?>
+                            <button class="wishlist-button" id="remove-wishlist-button" type="button">
+                                <span class="material-symbols-outlined">heart_minus</span>
+                                <span>Quitar de la lista de deseos</span>
+                            </button>
+                        <?php endif; ?>
+
+                        <?php if ($juegoDisponible): ?>
+                            <?php if (!$inCart): ?>
+                                <button class="wishlist-button" id="add-cart-button" type="button">
+                                    <span class="material-symbols-outlined">add_shopping_cart</span>
+                                    <span>Añadir al carrito</span>
+                                </button>
+                            <?php else: ?>
+                                <button class="wishlist-button" id="remove-cart-button" type="button">
+                                    <span class="material-symbols-outlined">remove_shopping_cart</span>
+                                    <span>Quitar del carrito</span>
+                                </button>
+                            <?php endif; ?>
+                        <?php endif; ?>
+                    <?php else: ?>
+                        <p class="login-message">Inicia sesión para añadir a la lista de deseos</p>
+                    <?php endif; ?>
+                <?php endif; ?>
+            </div>
+        </div>
+
+        <div class="game-info-card">
+            <h3>Información</h3>
+
+            <div class="game-info-list">
+                <div class="game-info-item">
+                    <span class="label">Desarrollador</span>
+                    <p id="game-developer"><?php echo e($gameDataPhp['desarrollador'] ?? 'Desarrollador desconocido.'); ?></p>
+                </div>
+
+                <div class="game-info-item">
+                    <span class="label">Fecha lanzamiento</span>
+                    <p id="game-release-date"><?php echo empty($gameDataPhp['fecha_publicacion']) ? 'Por confirmarse' : e($gameDataPhp['fecha_publicacion']); ?></p>
+                </div>
+
+                <div class="game-info-item">
+                    <span class="label">Valoraciones</span>
+                    <p id="game-rating"><?php echo (int)$positiveCount; ?> positivas</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-category-card">
+            <h3>Categorías</h3>
+            <div id="game-categories" class="game-category-list">
+                <?php if (!empty($categories)): ?>
+                    <?php foreach ($categories as $cat): ?>
+                        <button class="category-button" type="button" onclick="goToShopFilterByCategory('<?php echo e($cat['nombre_categoria']); ?>')"><?php echo e($cat['nombre_categoria']); ?></button>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <span class="game-category">Sin categorías</span>
+                <?php endif; ?>
+            </div>
+        </div>
+
+    </aside>
+    
 </section>
 
 <?php endif; ?>

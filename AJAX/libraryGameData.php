@@ -81,7 +81,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'get_logros') {
 
     $nameJuego = $_POST['value_1'];
 
-    $stmt = $BBDD->prepare("SELECT `nombre_logro`, `descripcion_logro`, `nombre_juego` 
+    $stmt = $BBDD->prepare("SELECT `nombre_logro`, `descripcion_logro`, `rareza`, `nombre_juego` 
                             FROM `Logros` AS l
                             WHERE `nombre_juego` = :nmJuego AND `nombre_logro` NOT IN (SELECT `nombre_logro` FROM `LogrosUsuario` WHERE `nickname` = :nick AND `Logros_nombre_juego` = :nmJuego)");
     $stmt->bindParam(":nmJuego", $nameJuego);
@@ -106,9 +106,9 @@ if (isset($_POST['action']) && $_POST['action'] === 'get_logros_user') {
 
     $nameJuego = $_POST['value_1'];
 
-    $stmt = $BBDD->prepare("SELECT lu.`nickname`, lu.`Logros_nombre_juego`, lu.`nombre_logro`, lu.`fecha_obtencion`, l.`descripcion_logro` 
+    $stmt = $BBDD->prepare("SELECT lu.`nickname`, lu.`Logros_nombre_juego`, lu.`nombre_logro`, lu.`fecha_obtencion`, l.`descripcion_logro`, l.`rareza` 
                             FROM `LogrosUsuario` AS lu
-                            JOIN `Logros` AS l ON lu.`nombre_logro` = l.`nombre_logro`
+                            JOIN `Logros` AS l ON lu.`nombre_logro` = l.`nombre_logro` AND lu.`Logros_nombre_juego` = l.`nombre_juego`
                             WHERE lu.`Logros_nombre_juego` = :nmJuego AND lu.`nickname` = :nick");
     $stmt->bindParam(":nmJuego", $nameJuego);
     $stmt->bindParam(":nick", $_SESSION["nickname"]);

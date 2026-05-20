@@ -257,67 +257,60 @@ async function setUpAchivements(game) {
     achievements_obtainedRecent = await checkField_1(gameName, "get_logros_user", "../AJAX/libraryGameData.php");
     //await (achievements_obtainedRecent = await achievements_obtainedRecent.sort((a, b) => b.fecha_obtencion.localeCompare(a.fecha_obtencion)));
 
-    let achievementObtained = document.createElement("div");
-    achievementObtained.className = "achievement-obtained d-flex justify-content-start";
+    const achievementTypes = ['cobre', 'plata', 'oro', 'platino', 'lotus'];
 
-    if (achievements_obtained != null) {
-        for (let i = 0; i < achievements_obtained.length; i++) {
+    let achievementPreview = document.createElement("div");
+    achievementPreview.className = "achievement-preview d-flex flex-column gap-2";
 
-            let achivementIcoName = await achievements_obtained[i]["nombre_logro"].replaceAll(" ", "_");
+    let previewTitleColor = document.createElement("p");
+    previewTitleColor.textContent = "Vista de logros - color";
+    previewTitleColor.className = "achievement-preview-title";
+    achievementPreview.appendChild(previewTitleColor);
 
-            achivementIcoName = await achivementIcoName.replaceAll(".", "");
-            achivementIcoName = await achivementIcoName.replaceAll(",", "");
-            achivementIcoName = await achivementIcoName.replaceAll(":", "");
-            achivementIcoName = await achivementIcoName.replaceAll(";", "");
+    let achievementColorRow = document.createElement("div");
+    achievementColorRow.className = "achievement-preview-row d-flex justify-content-start gap-2";
 
-            let achievementObtainedImg = document.createElement("img");
-            achievementObtainedImg.src = "../MEDIA/IMG/juegos/" + gameIcoPath + "/achivements/" + achivementIcoName + ".svg";
-            achievementObtainedImg.alt = achievements_obtained[i]["nombre_logro"];
-            achievementObtainedImg.width = 50;
-            achievementObtainedImg.height = 50;
+    let achievementGrayRow = document.createElement("div");
+    achievementGrayRow.className = "achievement-preview-row d-flex justify-content-start gap-2";
+    achievementGrayRow.style.filter = "grayscale(100%)";
 
-            achievementObtained.appendChild(achievementObtainedImg);
-        }
+    for (let i = 0; i < achievementTypes.length; i++) {
+        let tipo = achievementTypes[i];
+        let achievementColorImg = document.createElement("img");
+        achievementColorImg.src = "../MEDIA/IMG/juegos/fallback/achivements/" + tipo + ".jpg";
+        achievementColorImg.alt = "Logro de ejemplo " + tipo;
+        achievementColorImg.width = 80;
+        achievementColorImg.height = 80;
+        achievementColorRow.appendChild(achievementColorImg);
+
+        let achievementGrayImg = document.createElement("img");
+        achievementGrayImg.src = "../MEDIA/IMG/juegos/fallback/achivements/" + tipo + ".jpg";
+        achievementGrayImg.alt = "Logro de ejemplo " + tipo + " en blanco y negro";
+        achievementGrayImg.width = 80;
+        achievementGrayImg.height = 80;
+        achievementGrayRow.appendChild(achievementGrayImg);
     }
 
-    if (achievements_unknown != null) {
-        for (let i = 0; i < achievements_unknown.length; i++) {
+    let previewTitleGray = document.createElement("p");
+    previewTitleGray.textContent = "Vista de logros - blanco y negro";
+    previewTitleGray.className = "achievement-preview-title";
 
-            let achivementIcoName = await achievements_unknown[i]["nombre_logro"].replaceAll(" ", "_");
+    achievementPreview.appendChild(achievementColorRow);
+    achievementPreview.appendChild(previewTitleGray);
+    achievementPreview.appendChild(achievementGrayRow);
 
-            achivementIcoName = await achivementIcoName.replaceAll(".", "");
-            achivementIcoName = await achivementIcoName.replaceAll(",", "");
-            achivementIcoName = await achivementIcoName.replaceAll(":", "");
-            achivementIcoName = await achivementIcoName.replaceAll(";", "");
-
-            let achievementObtainedImg = document.createElement("img");
-            achievementObtainedImg.src = "../MEDIA/IMG/juegos/" + gameIcoPath + "/achivements/" + achivementIcoName + ".svg";
-            achievementObtainedImg.style.filter = "grayscale(100%)";
-            achievementObtainedImg.alt = achievements_unknown[i]["nombre_logro"];
-            achievementObtainedImg.width = 50;
-            achievementObtainedImg.height = 50;
-
-            achievementObtained.appendChild(achievementObtainedImg);
-        }
-    }
-
-    libraryMainAllAchievements.appendChild(achievementObtained);
+    libraryMainAllAchievements.appendChild(achievementPreview);
 
     for (let i = 0; i < achievements_obtainedRecent.length; i++) {
 
-        let achivementIcoName = await achievements_obtainedRecent[i]["nombre_logro"].replaceAll(" ", "_");
-
-        achivementIcoName = await achivementIcoName.replaceAll(".", "");
-        achivementIcoName = await achivementIcoName.replaceAll(",", "");
-        achivementIcoName = await achivementIcoName.replaceAll(":", "");
-        achivementIcoName = await achivementIcoName.replaceAll(";", "");
+        let rarity = achievements_obtainedRecent[i]["rareza"] || 'default';
 
         let achievementObtained = document.createElement("div");
         achievementObtained.className = "achievement-obtained d-flex justify-content-start w-100";
 
         let achievementObtainedImg = document.createElement("img");
-        achievementObtainedImg.src = "../MEDIA/IMG/juegos/" + gameIcoPath + "/achivements/" + achivementIcoName + ".svg";
-        achievementObtainedImg.alt = achievements_obtainedRecent[i]["nombre_logro"];
+        achievementObtainedImg.src = "../MEDIA/IMG/juegos/fallback/achivements/" + rarity + ".jpg";
+        achievementObtainedImg.alt = achievements_obtainedRecent[i]["nombre_logro"] + " (" + rarity + ")";
         achievementObtainedImg.width = 100;
         achievementObtainedImg.height = 100;
 
