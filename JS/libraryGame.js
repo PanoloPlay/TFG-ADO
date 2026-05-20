@@ -255,7 +255,7 @@ async function setUpAchivements(game) {
     achievements_unknown = await checkField_1(gameName, "get_logros", "../AJAX/libraryGameData.php");
     achievements_obtained = await checkField_1(gameName, "get_logros_user", "../AJAX/libraryGameData.php");
     achievements_obtainedRecent = await checkField_1(gameName, "get_logros_user", "../AJAX/libraryGameData.php");
-    await (achievements_obtainedRecent = await achievements_obtainedRecent.sort((a, b) => b.fecha_obtencion.localeCompare(a.fecha_obtencion)));
+    //await (achievements_obtainedRecent = await achievements_obtainedRecent.sort((a, b) => b.fecha_obtencion.localeCompare(a.fecha_obtencion)));
 
     let achievementObtained = document.createElement("div");
     achievementObtained.className = "achievement-obtained d-flex justify-content-start";
