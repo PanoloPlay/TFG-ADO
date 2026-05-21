@@ -111,7 +111,7 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item d-flex align-items-center gap-2" href="../MAIN/friends.php">
+                                    <a class="dropdown-item d-flex align-items-center gap-2" href="../MAIN/user-friends.php">
                                         <span class="material-symbols-outlined">group</span>
                                         <span>Amigos</span>
                                     </a>
