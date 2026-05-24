@@ -10,6 +10,9 @@
         background-color: #000000;
         color: white;
     }
+    .grayscale {
+        filter : grayscale(100%);
+    }
 </style>
 
 <?php 
@@ -20,7 +23,15 @@ include_once '../GENERAL/auth_guard.php';
 
 <input type="hidden" id="hdnSession" data-value="<?php echo $_SESSION['nickname']; ?>" />
 
-<div id="error-section">
+<div id="error-section" style="display: none;">
+    <section class="game-page">
+        <div class="error-message">
+            <span class="material-symbols-outlined">videogame_asset_off</span>
+            <h2>Biblioteca vacia</h2>
+            <p>No tienes juegos en tu libreria</p>
+            <a class="btn" href="./">Volver al inicio</a>
+        </div>
+    </section>
 </div>
 
 <div class="row hero-library-game" style="height: 82vh;">

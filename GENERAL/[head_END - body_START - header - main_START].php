@@ -30,22 +30,26 @@
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item d-flex align-items-center gap-2" href="../MAIN/shop-new.php">
+                                <a class="dropdown-item d-flex align-items-center gap-2" href="../MAIN/shopSearch.php?recent">
                                     <span class="material-symbols-outlined">new_releases</span>
                                     <span>Últimos lanzamientos</span>
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item d-flex align-items-center gap-2" href="../MAIN/shop-category.php">
-                                    <span class="material-symbols-outlined">shoppingmode</span>
-                                    <span>Categorías</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item d-flex align-items-center gap-2" href="../MAIN/shop-offers.php">
+                                <a class="dropdown-item d-flex align-items-center gap-2" href="../MAIN/shopSearch.php?discount">
                                     <span class="material-symbols-outlined">percent_discount</span>
                                     <span>Ofertas</span>
                                 </a>
+                            </li>
+                            <li>
+                                <form method="POST" action="../MAIN/shopSearch.php">
+                                    <input type="hidden" name="minPrice" value="0">
+                                    <input type="hidden" name="maxPrice" value="0">
+                                    <button class="dropdown-item d-flex align-items-center gap-2" > 
+                                        <span class="material-symbols-outlined">paid</span>
+                                        <span>Gratis</span>
+                                    </button>
+                                </form>
                             </li>
                         </ul>
                     </div>

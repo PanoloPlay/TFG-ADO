@@ -6,7 +6,7 @@ require_once '../BBDD/gameSearch_queries.php';
 $orden = $_POST['orden'] ?? 'ninguno';
 $errorWishlist = '';
 
-$search = $_GET["search"] ?? null;
+$search = $_POST["search"] ?? null;
 
 $allCategories;
 if (isset($_POST['minPrice'])) {
@@ -37,7 +37,7 @@ else if ($maxPrice < $minPrice) {
     $maxPrice = $minPrice;
 }
 
-if (isset($_GET['descuentos'])) {
+if (isset($_GET['discount'])) {
     $onlyDiscount = true;
     $_POST['onlyDiscount'] = true;
 }
@@ -45,7 +45,7 @@ else {
     $onlyDiscount = isset($_POST['onlyDiscount']) ?? false;
 }
 
-if (isset($_GET['recientes'])) {
+if (isset($_GET['recent'])) {
     $onlyRecent = true;
     $_POST['onlyRecent'] = true;
 }

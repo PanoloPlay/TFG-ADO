@@ -23,12 +23,73 @@ let librarySorted = null;
 let isOrdered = 0;
 let orderType = "Ninguno";
 
+let fileExists = false;
+let gameEXE;
+
+function isValidImage(src) {
+  return new Promise((resolve) => {
+    const img = new Image();
+
+    img.onload = () => resolve(true);
+    img.onerror = () => resolve(false);
+
+    img.src = src;
+  });
+}
+
+async function doesFileExists(filePath) {
+
+    await ($.ajax({
+
+        url: "../AJAX/libraryGameData.php",
+        type: "POST",
+        async: true,
+
+        data:{
+
+			action:"fileExists",
+            obj: filePath
+		}
+    }).done(function(respuesta){
+        if (respuesta == "exists") {
+            fileExists = true;
+        }
+        else {
+            fileExists = false;
+        }
+    }));
+}
+
+async function getFileName(filePath) {
+
+    await ($.ajax({
+
+        url: "../AJAX/libraryGameData.php",
+        type: "POST",
+        async: true,
+
+        data:{
+
+			action:"getFileName",
+            obj: filePath
+		}
+    }).done(function(respuesta){
+        if (respuesta != "Not Found") {
+            gameEXE = respuesta;
+        }
+        else {
+            gameEXE = "";
+        }
+    }));
+}
+
 $(window).on('load', async function() {
+    await (errorSection.style.display = "none");
     if (await getAllData()) {
         await setUp();
     }
     else {
-        window.location.href = "../AUTH/login.php";
+        await (errorSection.style.display = "block");
     }
 });
 
@@ -41,30 +102,15 @@ async function getAllData() {
         return false;
     }
     library = await checkField_1(userNickname, "get_library", "../AJAX/libraryGameData.php");
-    console.log(library);
 
     if (library != null) {
         librarySorted = await checkField_1(userNickname, "get_library", "../AJAX/libraryGameData.php");
-        //await (librarySorted[0]["nombre_juego"] = "Zelda: Breath of the Wild");
-        //await (librarySorted[0]["nombre_juego"] = "Asphalt 9: Legends");
-        //await (librarySorted[1]["nombre_juego"] = "Asphalt 9: Legends");
-        //await orderByNameAsc();
-        //await orderByNameDesc();
-        //await orderByDateAsc();
-        //await orderByDateDesc();
-        //await orderByPriceAsc();
-        //await orderByPriceDesc();
-        //await orderByDiscountAsc();
-        //await orderByDiscountDesc();
-        //await orderByCommentAmountAsc();
-        //await orderByCommentAmountDesc();
-        //await orderByPositiveReviewsAmountAsc();
-        //await orderByPositiveReviewsAmountDesc();
-        //await orderByPositiveRatioAsc();
-        //await orderByPositiveRatioDesc();
+        return true;
     }
-
-    return true;
+    else {
+        return false;
+    }
+    
 }
 
 async function orderByNone() {
@@ -177,10 +223,19 @@ async function setUpSideLibrary() {
         }
 
         let gameSideImg = document.createElement("img");
-        gameSideImg.src = "../MEDIA/IMG/juegos/" + gameSideIco + "/icons/icon.svg";
+        let ico = "../MEDIA/IMG/juegos/" + library[i]["id_juego"] + "/" + "/icons/icon.ico";
+        isValidImage(ico)
+        .then(isValid => {
+            if (isValid) {
+                gameSideImg.src = ico;
+            } else {
+                gameSideImg.src = "../MEDIA/IMG/app_icons/loto-color.svg";
+            }
+        });
         gameSideImg.alt = gameSideName;
         gameSideImg.width = 25;
         gameSideImg.height = 25;
+        gameSideImg.style.marginRight = "5px";
 
         gameSide.appendChild(gameSideImg);
 
@@ -221,10 +276,25 @@ async function setUpGame(game) {
     gameMainIco = await gameMainIco.replaceAll(";", "");
 
     let mainGameIMG = document.createElement("img");
-    mainGameIMG.src = "../MEDIA/IMG/juegos/" + gameMainIco + "/icons/banner.svg";
+    let ico = "../MEDIA/IMG/juegos/" + library[game.id]["id_juego"] + "/" + "/icons/wide-cover";
+    isValidImage(ico + ".jpg")
+    .then(isValid => {
+        if (isValid) {
+            mainGameIMG.src = ico + ".jpg";
+        } else {
+            isValidImage(ico + ".jpeg")
+            .then(isValid => {
+                if (isValid) {
+                    mainGameIMG.src = ico + ".jpeg";
+                } else {
+                    mainGameIMG.src = "../MEDIA/IMG/juegos/fallback/default.jpg";
+                }
+            });
+        }
+    });
     mainGameIMG.alt = library[game.id]["nombre_juego"];
     mainGameIMG.className = "d-block w-100";
-    mainGameIMG.height = 200;
+    mainGameIMG.height = 450;
     
     libraryMainHeader.appendChild(mainGameIMG);
 
@@ -232,9 +302,23 @@ async function setUpGame(game) {
     mainDowlaodButton.id = "download-button";
     mainDowlaodButton.className = "download-button d-block w-100";
     mainDowlaodButton.textContent = "Descargar: " + library[game.id]["nombre_juego"];
-    mainDowlaodButton.addEventListener("click", async function() {
-        await dowloadGame();
-    });
+
+    
+    let gamePATH = "../APPS/GAMES/" + library[game.id]["id_juego"] + "/";
+    await getFileName(gamePATH);
+    gamePATH = gamePATH + gameEXE;
+
+    await (doesFileExists(gamePATH));
+    if (fileExists) {
+        mainDowlaodButton.addEventListener("click", async function() {
+            await dowloadGame(library[game.id]["id_juego"] ,gameEXE);
+        });
+    }
+    else {
+        mainDowlaodButton.addEventListener("click", async function() {
+            alert("Juego no disponible todavia...");
+        });
+    }
 
     libraryMainHeader.appendChild(mainDowlaodButton);
 
@@ -255,85 +339,145 @@ async function setUpAchivements(game) {
     achievements_unknown = await checkField_1(gameName, "get_logros", "../AJAX/libraryGameData.php");
     achievements_obtained = await checkField_1(gameName, "get_logros_user", "../AJAX/libraryGameData.php");
     achievements_obtainedRecent = await checkField_1(gameName, "get_logros_user", "../AJAX/libraryGameData.php");
-    //await (achievements_obtainedRecent = await achievements_obtainedRecent.sort((a, b) => b.fecha_obtencion.localeCompare(a.fecha_obtencion)));
+    if (achievements_obtained != null && achievements_obtainedRecent != null) {
+        await (achievements_obtainedRecent = await achievements_obtainedRecent.sort((a, b) => b.fecha_obtencion.localeCompare(a.fecha_obtencion)));
+    }
+    let aa = null;
+    if (aa != null) {
 
-    const achievementTypes = ['cobre', 'plata', 'oro', 'platino', 'lotus'];
+        const achievementTypes = ['cobre', 'plata', 'oro', 'platino', 'lotus'];
 
-    let achievementPreview = document.createElement("div");
-    achievementPreview.className = "achievement-preview d-flex flex-column gap-2";
+        let achievementPreview = document.createElement("div");
+        achievementPreview.className = "achievement-preview d-flex flex-column gap-2";
 
-    let previewTitleColor = document.createElement("p");
-    previewTitleColor.textContent = "Vista de logros - color";
-    previewTitleColor.className = "achievement-preview-title";
-    achievementPreview.appendChild(previewTitleColor);
+        let previewTitleColor = document.createElement("p");
+        previewTitleColor.textContent = "Vista de logros - color";
+        previewTitleColor.className = "achievement-preview-title";
+        achievementPreview.appendChild(previewTitleColor);
 
-    let achievementColorRow = document.createElement("div");
-    achievementColorRow.className = "achievement-preview-row d-flex justify-content-start gap-2";
+        let achievementColorRow = document.createElement("div");
+        achievementColorRow.className = "achievement-preview-row d-flex justify-content-start gap-2";
 
-    let achievementGrayRow = document.createElement("div");
-    achievementGrayRow.className = "achievement-preview-row d-flex justify-content-start gap-2";
-    achievementGrayRow.style.filter = "grayscale(100%)";
+        let achievementGrayRow = document.createElement("div");
+        achievementGrayRow.className = "achievement-preview-row d-flex justify-content-start gap-2";
+        achievementGrayRow.style.filter = "grayscale(100%)";
 
-    for (let i = 0; i < achievementTypes.length; i++) {
-        let tipo = achievementTypes[i];
-        let achievementColorImg = document.createElement("img");
-        achievementColorImg.src = "../MEDIA/IMG/juegos/fallback/achivements/" + tipo + ".jpg";
-        achievementColorImg.alt = "Logro de ejemplo " + tipo;
-        achievementColorImg.width = 80;
-        achievementColorImg.height = 80;
-        achievementColorRow.appendChild(achievementColorImg);
+        for (let i = 0; i < achievementTypes.length; i++) {
+            let tipo = achievementTypes[i];
+            let achievementColorImg = document.createElement("img");
+            achievementColorImg.src = "../MEDIA/IMG/juegos/fallback/achivements/" + tipo + ".jpg";
+            achievementColorImg.alt = "Logro de ejemplo " + tipo;
+            achievementColorImg.width = 80;
+            achievementColorImg.height = 80;
+            achievementColorRow.appendChild(achievementColorImg);
 
-        let achievementGrayImg = document.createElement("img");
-        achievementGrayImg.src = "../MEDIA/IMG/juegos/fallback/achivements/" + tipo + ".jpg";
-        achievementGrayImg.alt = "Logro de ejemplo " + tipo + " en blanco y negro";
-        achievementGrayImg.width = 80;
-        achievementGrayImg.height = 80;
-        achievementGrayRow.appendChild(achievementGrayImg);
+            let achievementGrayImg = document.createElement("img");
+            achievementGrayImg.src = "../MEDIA/IMG/juegos/fallback/achivements/" + tipo + ".jpg";
+            achievementGrayImg.alt = "Logro de ejemplo " + tipo + " en blanco y negro";
+            achievementGrayImg.width = 80;
+            achievementGrayImg.height = 80;
+            achievementGrayRow.appendChild(achievementGrayImg);
+        }
+
+        let previewTitleGray = document.createElement("p");
+        previewTitleGray.textContent = "Vista de logros - blanco y negro";
+        previewTitleGray.className = "achievement-preview-title";
+
+        achievementPreview.appendChild(achievementColorRow);
+        achievementPreview.appendChild(previewTitleGray);
+        achievementPreview.appendChild(achievementGrayRow);
+
+        libraryMainAllAchievements.appendChild(achievementPreview);
+
     }
 
-    let previewTitleGray = document.createElement("p");
-    previewTitleGray.textContent = "Vista de logros - blanco y negro";
-    previewTitleGray.className = "achievement-preview-title";
+    if (achievements_obtained != null) {
+        for (let pos = 0; pos < achievements_obtained.length; pos++) {
 
-    achievementPreview.appendChild(achievementColorRow);
-    achievementPreview.appendChild(previewTitleGray);
-    achievementPreview.appendChild(achievementGrayRow);
+            let rarity = achievements_obtained[pos]["rareza"] || 'default';
 
-    libraryMainAllAchievements.appendChild(achievementPreview);
+            let achivementIMG = document.createElement("img");
+            let ico = "../MEDIA/IMG/juegos/fallback/achivements/" + rarity + ".jpg";
+            isValidImage(ico)
+            .then(isValid => {
+                if (isValid) {
+                    achivementIMG.src = ico;
+                } else {
+                    achivementIMG.src = "../MEDIA/IMG/juegos/fallback/default.jpg";
+                }
+            });
+            achivementIMG.width = 85;
+            achivementIMG.height = 85;
+            achivementIMG.style.marginRight = "2px";
 
-    for (let i = 0; i < achievements_obtainedRecent.length; i++) {
+            libraryMainAllAchievements.appendChild(achivementIMG);
+        }
+    }
 
-        let rarity = achievements_obtainedRecent[i]["rareza"] || 'default';
+    if (achievements_unknown != null) {
+        for (let pos = 0; pos < achievements_unknown.length; pos++) {
 
-        let achievementObtained = document.createElement("div");
-        achievementObtained.className = "achievement-obtained d-flex justify-content-start w-100";
+            let rarity = achievements_unknown[pos]["rareza"] || 'default';
 
-        let achievementObtainedImg = document.createElement("img");
-        achievementObtainedImg.src = "../MEDIA/IMG/juegos/fallback/achivements/" + rarity + ".jpg";
-        achievementObtainedImg.alt = achievements_obtainedRecent[i]["nombre_logro"] + " (" + rarity + ")";
-        achievementObtainedImg.width = 100;
-        achievementObtainedImg.height = 100;
+            let achivementIMG = document.createElement("img");
+            let ico = "../MEDIA/IMG/juegos/fallback/achivements/" + rarity + ".jpg";
+            isValidImage(ico)
+            .then(isValid => {
+                if (isValid) {
+                    achivementIMG.src = ico;
+                } else {
+                    achivementIMG.src = "../MEDIA/IMG/juegos/fallback/default.jpg";
+                }
+            });
+            achivementIMG.width = 85;
+            achivementIMG.height = 85;
+            achivementIMG.style.marginRight = "2px";
+            achivementIMG.className = "grayscale";
 
-        achievementObtained.appendChild(achievementObtainedImg);
+            libraryMainAllAchievements.appendChild(achivementIMG);
+        }
+    }
 
-        let achievementObtainedData = document.createElement("div");
-        achievementObtainedData.className = "achievement-obtained-data";
+    if (achievements_obtainedRecent != null) {
+        for (let i = 0; i < achievements_obtainedRecent.length; i++) {
 
-        let achievementObtainedName = document.createElement("p");
-        achievementObtainedName.className = "achievement-obtained-name";
-        achievementObtainedName.textContent = achievements_obtainedRecent[i]["nombre_logro"] + " [" + achievements_obtainedRecent[i]["fecha_obtencion"] + "]";
+            let br = document.createElement("br");
 
-        achievementObtainedData.appendChild(achievementObtainedName);
+            libraryMainRecentAchievements.appendChild(br);
 
-        let achievementObtainedDescription = document.createElement("p");
-        achievementObtainedDescription.className = "achievement-obtained-description";
-        achievementObtainedDescription.textContent = achievements_obtainedRecent[i]["descripcion_logro"];
+            let rarity = achievements_obtainedRecent[i]["rareza"] || 'default';
 
-        achievementObtainedData.appendChild(achievementObtainedDescription);
+            let achievementObtained = document.createElement("div");
+            achievementObtained.className = "achievement-obtained d-flex justify-content-start w-100";
 
-        achievementObtained.appendChild(achievementObtainedData);
+            let achievementObtainedImg = document.createElement("img");
+            achievementObtainedImg.src = "../MEDIA/IMG/juegos/fallback/achivements/" + rarity + ".jpg";
+            achievementObtainedImg.alt = achievements_obtainedRecent[i]["nombre_logro"] + " (" + rarity + ")";
+            achievementObtainedImg.width = 100;
+            achievementObtainedImg.height = 100;
+            achievementObtainedImg.style.marginRight = "7px";
 
-        libraryMainRecentAchievements.appendChild(achievementObtained);
+            achievementObtained.appendChild(achievementObtainedImg);
+
+            let achievementObtainedData = document.createElement("div");
+            achievementObtainedData.className = "achievement-obtained-data";
+
+            let achievementObtainedName = document.createElement("p");
+            achievementObtainedName.className = "achievement-obtained-name";
+            achievementObtainedName.textContent = achievements_obtainedRecent[i]["nombre_logro"] + " [" + achievements_obtainedRecent[i]["fecha_obtencion"] + "]";
+
+            achievementObtainedData.appendChild(achievementObtainedName);
+
+            let achievementObtainedDescription = document.createElement("p");
+            achievementObtainedDescription.className = "achievement-obtained-description";
+            achievementObtainedDescription.textContent = achievements_obtainedRecent[i]["descripcion_logro"];
+
+            achievementObtainedData.appendChild(achievementObtainedDescription);
+
+            achievementObtained.appendChild(achievementObtainedData);
+
+            libraryMainRecentAchievements.appendChild(achievementObtained);
+        }
     }
 }
 
@@ -411,7 +555,7 @@ async function setUpMainLibraryList() {
         gameList.className = "game-list card";
         gameList.style.margin = "2px";
         gameList.style.width = "250px";
-        gameList.style.height = "300px";
+        gameList.style.height = "350px";
 
         gameList.addEventListener("click", async function() {
             gameName = librarySorted[i]["nombre_juego"];
@@ -420,28 +564,38 @@ async function setUpMainLibraryList() {
         });
 
         let gameListImg = document.createElement("img");
-        gameListImg.src = "../MEDIA/IMG/juegos/" + gameListName + "/icons/icon.svg";
+        let ico = "../MEDIA/IMG/juegos/" + librarySorted[i]["id_juego"] + "/" + "/icons/cover";
+        isValidImage(ico + ".jpg")
+        .then(isValid => {
+            if (isValid) {
+                gameListImg.src = ico + ".jpg";
+            } else {
+                isValidImage(ico + ".jpeg")
+                .then(isValid => {
+                    if (isValid) {
+                        gameListImg.src = ico + ".jpeg";
+                    } else {
+                        gameListImg.src = "../MEDIA/IMG/juegos/fallback/default.jpg";
+                    }
+                });
+            }
+        });
         gameListImg.className = "game-list-img card-img-top";
         gameListImg.alt = librarySorted[i]["nombre_juego"];
-        gameListImg.width = 150;
-        gameListImg.height = 150;
+        gameListImg.width = 120;
+        gameListImg.height = 280;
 
         gameList.appendChild(gameListImg);
 
         let gameListData = document.createElement("div");
         gameListData.className = "game-list-data card-body";
 
-        let gameListP = document.createElement("h5");
-        gameListP.className = "game-list-name card-title";
-        gameListP.textContent = librarySorted[i]["nombre_juego"];
-        gameListP.style.height = "75px";
-
-        gameListData.appendChild(gameListP);
-
         let gameListDescripcion = document.createElement("p");
         gameListDescripcion.className = "game-list-descripcion card-text";
-        
-        
+
+        if (orderType == "Ninguno" || orderType == "Nombre (A-Z)" || orderType == "Nombre (Z-A)") {
+            gameListDescripcion.textContent = librarySorted[i]["nombre_juego"];
+        } 
         if (orderType == "Fecha publicación (asc)" || orderType == "Fecha publicación (desc)") {
             gameListDescripcion.textContent = librarySorted[i]["fecha_publicacion"];
         } 
@@ -471,6 +625,16 @@ async function setUpMainLibraryList() {
     libraryMainAllGames.appendChild(libraryMainAllGamesList);
 }
 
-async function dowloadGame() {
-    alert("Descargando juego...");
+async function dowloadGame(id, filepath) {
+    let href = "../MAIN/download.php";
+
+    if (filepath != null && filepath != "") {
+        href += "?id=" + id + "&file=" + filepath;
+    }
+
+    Object.assign(document.createElement('a'), {
+        target: '_blank',
+        rel: 'noopener noreferrer',
+        href: href,
+    }).click();
 }

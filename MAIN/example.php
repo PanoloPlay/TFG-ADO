@@ -27,9 +27,17 @@
 
 <?php require_once '../GENERAL/[head_END - body_START - header - main_START].php'; ?>
 
+    <br>
+    <form method="POST" action="./shopSearch.php" class="hero__panel-top">
+        <span class="material-symbols-outlined">Buscar Juegos</span>
+        <input type="search" name="search"><button type="submit" class="btn-secondary"><span class="material-symbols-outlined">search</span></button>
+    </form>
+    <br><br>
+
     <section class="hero">
        
         <aside class="hero__panel">
+            
             <div class="hero__panel-top">
                 <span class="material-symbols-outlined">sports_esports</span>
                 <strong>Destacados de hoy</strong>
