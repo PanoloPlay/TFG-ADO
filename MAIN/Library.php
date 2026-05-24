@@ -96,33 +96,36 @@ $juegosActuales = $todosJuegos;
                         : 'N/A';
                     ?>
                     <!-- Tarjeta de juego que muestra la información básica del juego, como nombre, desarrollador, descripción corta, fecha de publicación, descuento y precio final -->
-                    <article class="game-card game-card-library" data-juego-id="<?= (int) $juego['id_juego'] ?>">
-                        <div class="game-thumb">
-                            <?= e(mb_substr($juego['nombre_juego'], 0, 1, 'UTF-8')) ?>
-                        </div>
-
-                        <div class="game-content">
-                            <!-- Se muestra el nombre del juego, el desarrollador, una descripción corta, la fecha de publicación, el descuento aplicado (si lo hay) y el precio final después de aplicar el descuento -->
-                            <h3><?= e($juego['nombre_juego']) ?></h3>
-                            <p class="game-developer"><?= e($juego['desarrollador']) ?></p>
-                            <p class="game-description"><?= e($descripcion) ?></p>
-
-                            <div class="game-meta">
-                                <span class="game-date">
-                                    <span class="material-symbols-outlined">event</span>
-                                    <?= e($fecha) ?>
-                                </span>
-                                <span class="game-discount">
-                                    <span class="material-symbols-outlined">local_fire_department</span>
-                                    <?= !empty($juego['descuento']) ? e($juego['descuento']) . '% dto.' : 'Sin descuento' ?>
-                                </span>
-                                <span class="game-price">
-                                    <?= number_format((float) $precioFinal, 2, ',', '.') ?> €
-                                </span>
+                    <form action="../MAIN/libraryGame.php" method="post">
+                        <input type="hidden" name="name" value="<?= e($juego['nombre_juego'])?>">
+                        <button class="game-card game-card-library" data-juego-id="<?= (int) $juego['id_juego'] ?>" style="width:100%">
+                            <div class="game-thumb">
+                                <?= e(mb_substr($juego['nombre_juego'], 0, 1, 'UTF-8')) ?>
                             </div>
-                        </div>
-                    </article>
-                <?php endforeach; ?>
+
+                            <div class="game-content">
+                                <!-- Se muestra el nombre del juego, el desarrollador, una descripción corta, la fecha de publicación, el descuento aplicado (si lo hay) y el precio final después de aplicar el descuento -->
+                                <h3><?= e($juego['nombre_juego']) ?></h3>
+                                <p class="game-developer"><?= e($juego['desarrollador']) ?></p>
+                                <p class="game-description"><?= e($descripcion) ?></p>
+
+                                <div class="game-meta">
+                                    <span class="game-date">
+                                        <span class="material-symbols-outlined">event</span>
+                                        <?= e($fecha) ?>
+                                    </span>
+                                    <span class="game-discount">
+                                        <span class="material-symbols-outlined">local_fire_department</span>
+                                        <?= !empty($juego['descuento']) ? e($juego['descuento']) . '% dto.' : 'Sin descuento' ?>
+                                    </span>
+                                    <span class="game-price">
+                                        <?= number_format((float) $precioFinal, 2, ',', '.') ?> €
+                                    </span>
+                                </div>
+                            </div>
+                        </button>
+                    </form>
+                    <?php endforeach; ?>
             </div>
         <?php else: ?>
             <div class="empty-state">

@@ -23,6 +23,10 @@ include_once '../GENERAL/auth_guard.php';
 
 <input type="hidden" id="hdnSession" data-value="<?php echo $_SESSION['nickname']; ?>" />
 
+<?php if (isset($_POST['name'])) { ?>
+<input type="hidden" id="hdName" data-value="<?php echo $_POST['name']; ?>" />
+<?php } ?>
+
 <div id="error-section" style="display: none;">
     <section class="game-page">
         <div class="error-message">

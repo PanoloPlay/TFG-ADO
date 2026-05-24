@@ -176,6 +176,10 @@ async function orderByPositiveRatioDesc() {
 async function setUp() {
     let getGameName = await params.get("name");
 
+    if (getGameName == null) {
+        await (getGameName = await $("#hdName").data('value'));
+    }
+
     if (getGameName != null) {
         getGameName = await getGameName.replaceAll("_", " ");
         gameName = await getGameName;
