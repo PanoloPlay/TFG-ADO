@@ -659,7 +659,10 @@ function renderPrecioFinal($precio, $descuento) {
             <div id="game-categories" class="game-category-list">
                 <?php if (!empty($categories)): ?>
                     <?php foreach ($categories as $cat): ?>
-                        <button class="category-button" type="button" onclick="goToShopFilterByCategory('<?php echo e($cat['nombre_categoria']); ?>')"><?php echo e($cat['nombre_categoria']); ?></button>
+                        <form action="../MAIN/shopSearch.php" method="post">
+                            <input type="hidden" name="categorias" value="<?= e($cat['nombre_categoria']) ?>">
+                            <button class="category-button" type="submit"><?php echo e($cat['nombre_categoria']); ?></button>
+                        </form>
                     <?php endforeach; ?>
                 <?php else: ?>
                     <span class="game-category">Sin categorías</span>

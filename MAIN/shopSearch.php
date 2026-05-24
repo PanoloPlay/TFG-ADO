@@ -55,8 +55,8 @@ else {
 
 $genres = get_genres($BBDD);
 
-if (isset($_GET['categorias'])) {
-    $categories = [$_GET['categorias']];
+if (isset($_POST['categorias'])) {
+    $categories = [$_POST['categorias']];
 }
 else {
     $categories = [];
