@@ -147,7 +147,15 @@ function getBiblioteca(PDO $BBDD, int $idUsuario, string $nickname): array
             J.desarrollador,
             J.fecha_publicacion,
             J.precio,
-            J.descuento
+            J.descuento,
+            (
+                SELECT COUNT(*)
+                FROM LogrosUsuario LU
+                WHERE LU.id_usuario = B.id_usuario
+                  AND LU.nickname = B.nickname
+                  AND LU.id_juego = J.id_juego
+                  AND LU.Logros_nombre_juego = J.nombre_juego
+            ) AS total_logros
         FROM Biblioteca B
         INNER JOIN Juegos J
             ON B.id_juego = J.id_juego
@@ -166,20 +174,30 @@ function getAmigos(PDO $BBDD, int $idUsuario, string $nickname): array
     $query = $BBDD->prepare("
         SELECT
             CASE
-                WHEN id_usuario1 = ? AND nickname1 = ? THEN nickname2
-                ELSE nickname1
-            END AS amigo
-        FROM Amigos
+                WHEN A.id_usuario1 = ? AND A.nickname1 = ? THEN U2.nickname
+                ELSE U1.nickname
+            END AS amigo_nickname,
+            CASE
+                WHEN A.id_usuario1 = ? AND A.nickname1 = ? THEN U2.nombre_usuario
+                ELSE U1.nombre_usuario
+            END AS amigo_apodo
+        FROM Amigos A
+        INNER JOIN Usuarios U1
+            ON U1.id_usuario = A.id_usuario1
+           AND U1.nickname = A.nickname1
+        INNER JOIN Usuarios U2
+            ON U2.id_usuario = A.id_usuario2
+           AND U2.nickname = A.nickname2
         WHERE (
-            (id_usuario1 = ? AND nickname1 = ?)
+            (A.id_usuario1 = ? AND A.nickname1 = ?)
             OR
-            (id_usuario2 = ? AND nickname2 = ?)
+            (A.id_usuario2 = ? AND A.nickname2 = ?)
         )
-        AND estado = 'aceptada'
-        ORDER BY amigo ASC
+        AND A.estado = 'aceptada'
+        ORDER BY amigo_apodo ASC
         LIMIT 8
     ");
-    $query->execute([$idUsuario, $nickname, $idUsuario, $nickname, $idUsuario, $nickname]);
+    $query->execute([$idUsuario, $nickname, $idUsuario, $nickname, $idUsuario, $nickname, $idUsuario, $nickname]);
 
     return $query->fetchAll(PDO::FETCH_ASSOC);
 }
@@ -190,6 +208,7 @@ function getLogros(PDO $BBDD, int $idUsuario, string $nickname): array
         SELECT
             LU.fecha_obtencion,
             L.nombre_logro,
+            L.rareza AS tipo,
             J.nombre_juego
         FROM LogrosUsuario LU
         INNER JOIN Logros L
@@ -238,7 +257,6 @@ function getProfilePageData(PDO $BBDD, int $idUsuario, string $nickname): array
     return $data;
 }
 
-// Query que obtiene todos los juegos de la biblioteca de un usuario
 function getAllLibraryGames(PDO $BBDD, int $idUsuario, string $nickname): array
 {
     $query = $BBDD->prepare("
@@ -262,7 +280,6 @@ function getAllLibraryGames(PDO $BBDD, int $idUsuario, string $nickname): array
     return $query->fetchAll(PDO::FETCH_ASSOC);
 }
 
-// Query que obtiene todos los juegos de la lista de deseos de un usuario
 function getAllWishlistGames(PDO $BBDD, int $idUsuario, string $nickname): array
 {
     $query = $BBDD->prepare("
@@ -285,7 +302,6 @@ function getAllWishlistGames(PDO $BBDD, int $idUsuario, string $nickname): array
     return $query->fetchAll(PDO::FETCH_ASSOC);
 }
 
-// Query que obtiene todas las categorías disponibles
 function getAllCategories(PDO $BBDD): array
 {
     $query = $BBDD->prepare("
@@ -300,19 +316,15 @@ function getAllCategories(PDO $BBDD): array
     return $query->fetchAll(PDO::FETCH_ASSOC);
 }
 
-// Obtiene los juegos de la biblioteca de un usuario filtrados por categorías
 function getLibraryGamesByCategories(PDO $BBDD, int $idUsuario, string $nickname, array $categorias): array
 {
-    // Comprobamos que el array de categorías no esté vacío para evitar errores durante la query
     if (empty($categorias)) {
         return [];
     }
 
-    // Creamos una cadena de placeholders para la cantidad de categorías recibidas
     $placeholders = implode(',', array_fill(0, count($categorias), '?'));
     $params = array_merge([$idUsuario, $nickname], $categorias);
 
-    // La query selecciona los juegos de la biblioteca del usuario que pertenecen a las categorías especificadas
     $query = $BBDD->prepare("
         SELECT DISTINCT
             J.id_juego,
@@ -338,3 +350,4 @@ function getLibraryGamesByCategories(PDO $BBDD, int $idUsuario, string $nickname
 
     return $query->fetchAll(PDO::FETCH_ASSOC);
 }
+?>

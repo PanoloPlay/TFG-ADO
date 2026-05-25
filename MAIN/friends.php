@@ -102,11 +102,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['buscar_nickname'])) {
                         <?php
                         $avatarData = getProfileAvatarData($usuario['nickname']);
                         $avatarPath = $avatarData['avatarPath'];
+                        $avatarClass = $avatarData['avatarClass'];
                         $initial = $avatarData['initial'];
                         ?>
                         <article class="friend-card">
                             <a class="friend-card-link" href="../MAIN/profile.php?user=<?= e($usuario['nickname']) ?>">
-                                <div class="friend-avatar" <?php if ($avatarPath): ?>style="background-image: url('<?= e($avatarPath) ?>'); background-size: cover; background-position: center;"<?php endif; ?> >
+                                <div class="friend-avatar profile-avatar avatar-64px <?= e($avatarClass) ?>" <?php if ($avatarPath): ?>style="background-image: url('<?= e($avatarPath) ?>'); background-size: cover; background-position: center;"<?php endif; ?> >
                                     <?php if (!$avatarPath): ?>
                                         <?= e($initial) ?>
                                     <?php endif; ?>
@@ -114,7 +115,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['buscar_nickname'])) {
                                 <div class="friend-card-divider"></div>
                                 <div class="friend-details">
                                     <strong><?= e($usuario['nombre_usuario']) ?></strong>
-                                    <small>@<?= e($usuario['nickname']) ?></small>
+                                    <small><?= e($usuario['nickname']) ?></small>
                                     <div class="friend-extra"><?= e($usuario['descripcion'] ?? 'Sin descripción') ?></div>
                                 </div>
                             </a>
