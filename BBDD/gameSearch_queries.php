@@ -8,7 +8,7 @@ if (!function_exists('wishlist_e')) {
     }
 }
 
-function shop_get_games(PDO $BBDD, string $creator = '', string $order = 'ninguno', array $genre = [], array $languages, float $minPrice = 0, float $maxPrice = 999, bool $discount, bool $recent, string $minDate, string $maxDate): array
+function shop_get_games(PDO $BBDD, string $creator, string $order, array $genre, array $languages, float $minPrice, float $maxPrice, bool $discount, bool $recent, string $minDate, string $maxDate): array
 {
     $allowedOrders = [
         'ninguno'        => '',
