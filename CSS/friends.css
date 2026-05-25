@@ -116,16 +116,21 @@
     margin-top: 0;
 }
 .friend-avatar {
-    width: 68px;
-    height: 68px;
-    border-radius: 4px;
-    background: #1e293b;
-    color: #f8fbff;
     display: grid;
     place-items: center;
-    font-weight: 700;
-    font-size: 1.35rem;
     overflow: hidden;
+}
+
+.profile-avatar {
+    border-radius: 4px;
+    display: grid;
+    place-items: center;
+    background-size: cover;
+    background-position: center;
+    color: inherit;
+    font-weight: 800;
+    font-size: 18px;
+    line-height: 1;
 }
 .friend-avatar img {
     width: 100%;

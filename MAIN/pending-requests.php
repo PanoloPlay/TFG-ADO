@@ -62,11 +62,12 @@ $recibidas = getReceivedFriendRequests($BBDD, $idSesion, $nicknameSesion);
                             <?php
                             $avatarData = getProfileAvatarData($solicitud['nickname']);
                             $avatarPath = $avatarData['avatarPath'];
+                            $avatarClass = $avatarData['avatarClass'];
                             $initial = $avatarData['initial'];
                             ?>
                             <article class="friend-card">
                                 <a class="friend-card-link" href="../MAIN/profile.php?user=<?= e($solicitud['nickname']) ?>">
-                                    <div class="friend-avatar" <?php if ($avatarPath): ?>style="background-image: url('<?= e($avatarPath) ?>'); background-size: cover; background-position: center;"<?php endif; ?> >
+                                    <div class="friend-avatar profile-avatar avatar-64px <?= e($avatarClass) ?>" <?php if ($avatarPath): ?>style="background-image: url('<?= e($avatarPath) ?>'); background-size: cover; background-position: center;"<?php endif; ?> >
                                         <?php if (!$avatarPath): ?>
                                             <?= e($initial) ?>
                                         <?php endif; ?>
@@ -74,7 +75,7 @@ $recibidas = getReceivedFriendRequests($BBDD, $idSesion, $nicknameSesion);
                                     <div class="friend-card-divider"></div>
                                     <div class="friend-details">
                                         <strong><?= e($solicitud['nombre_usuario']) ?></strong>
-                                        <small>@<?= e($solicitud['nickname']) ?></small>
+                                        <small><?= e($solicitud['nickname']) ?></small>
                                         <div class="friend-extra">Solicitud enviada</div>
                                     </div>
                                 </a>
@@ -103,11 +104,12 @@ $recibidas = getReceivedFriendRequests($BBDD, $idSesion, $nicknameSesion);
                             <?php
                             $avatarData = getProfileAvatarData($solicitud['nickname']);
                             $avatarPath = $avatarData['avatarPath'];
+                            $avatarClass = $avatarData['avatarClass'];
                             $initial = $avatarData['initial'];
                             ?>
                             <article class="friend-card">
                                 <a class="friend-card-link" href="../MAIN/profile.php?user=<?= e($solicitud['nickname']) ?>">
-                                    <div class="friend-avatar" <?php if ($avatarPath): ?>style="background-image: url('<?= e($avatarPath) ?>'); background-size: cover; background-position: center;"<?php endif; ?> >
+                                    <div class="friend-avatar profile-avatar avatar-64px <?= e($avatarClass) ?>" <?php if ($avatarPath): ?>style="background-image: url('<?= e($avatarPath) ?>'); background-size: cover; background-position: center;"<?php endif; ?> >
                                         <?php if (!$avatarPath): ?>
                                             <?= e($initial) ?>
                                         <?php endif; ?>
@@ -115,7 +117,7 @@ $recibidas = getReceivedFriendRequests($BBDD, $idSesion, $nicknameSesion);
                                     <div class="friend-card-divider"></div>
                                     <div class="friend-details">
                                         <strong><?= e($solicitud['nombre_usuario']) ?></strong>
-                                        <small>@<?= e($solicitud['nickname']) ?></small>
+                                        <small><?= e($solicitud['nickname']) ?></small>
                                         <div class="friend-extra">Solicitud recibida</div>
                                     </div>
                                 </a>
