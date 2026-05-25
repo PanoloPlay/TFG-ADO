@@ -32,7 +32,7 @@
 .friend-sidebar,
 .friend-main {
     border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 12px;
+    border-radius: 4px;
     background: rgba(7, 12, 20, 0.92);
     padding: 20px;
 }
@@ -50,7 +50,7 @@
     align-items: center;
     gap: 10px;
     padding: 12px 14px;
-    border-radius: 8px;
+    border-radius: 4px;
     border: 1px solid rgba(255, 255, 255, 0.08);
     background: rgba(255, 255, 255, 0.03);
     color: #e8edf5;
@@ -77,7 +77,7 @@
     justify-content: space-between;
     gap: 16px;
     padding: 18px;
-    border-radius: 16px;
+    border-radius: 4px;
     border: 1px solid rgba(255, 255, 255, 0.08);
     background: rgba(255, 255, 255, 0.03);
     min-height: 180px;
@@ -95,7 +95,7 @@
 }
 .friend-card-link:hover {
     background: rgba(255, 255, 255, 0.04);
-    border-radius: 14px;
+    border-radius: 4px;
 }
 .friend-card-divider {
     width: 4px;
@@ -118,7 +118,7 @@
 .friend-avatar {
     width: 68px;
     height: 68px;
-    border-radius: 18px;
+    border-radius: 4px;
     background: #1e293b;
     color: #f8fbff;
     display: grid;
@@ -160,7 +160,7 @@
     justify-content: center;
     padding: 10px 16px;
     border: none;
-    border-radius: 8px;
+    border-radius: 4px;
     color: #fff;
     text-decoration: none;
     cursor: pointer;
@@ -204,7 +204,7 @@
 .form-group input {
     width: 100%;
     padding: 12px 14px;
-    border-radius: 10px;
+    border-radius: 4px;
     border: 1px solid rgba(255, 255, 255, 0.1);
     background: rgba(255, 255, 255, 0.04);
     color: #f8fbff;
@@ -220,7 +220,7 @@
 }
 .empty-state {
     padding: 24px;
-    border-radius: 14px;
+    border-radius: 4px;
     border: 1px solid rgba(255,255,255,0.08);
     background: rgba(255,255,255,0.03);
     color: #c3cfe2;
