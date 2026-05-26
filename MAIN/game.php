@@ -262,6 +262,7 @@ function renderPrecioFinal($precio, $descuento) {
                 <p class="reviews-stats">
                     <?php echo (int)$positiveCount; ?> positivas · <?php echo (int)$negativeCount; ?> negativas
                 </p>
+                <a href="comment.php?id=<?= (int)$gameId; ?>" class="chip chip-soft">Ver todos los comentarios</a>
             </div>
                     
             <div id="comment-section">
@@ -483,6 +484,7 @@ function renderPrecioFinal($precio, $descuento) {
                                 $commentTimestamp = !empty($comment['fechaPublicacion']) ? strtotime($comment['fechaPublicacion']) : 0;
                                 $commentLanguage = $comment['id_idioma_comentario'] ?? '';
                                 $searchText = strtolower(trim(($comment['nombre_usuario'] ?? '') . ' ' . ($comment['comentario'] ?? '')));
+                                $commentAvatarData = getProfileAvatarData($comment['nickname'] ?? $comment['nombre_usuario']);
                             ?>
                             <div
                                 class="comment comment-card"
@@ -491,10 +493,15 @@ function renderPrecioFinal($precio, $descuento) {
                                 data-timestamp="<?php echo e((string)$commentTimestamp); ?>"
                                 data-search-text="<?php echo e($searchText); ?>"
                             >
-                                <p><strong><?php echo e($comment['nombre_usuario']); ?></strong></p>
-                                <p>Valoración: <span class="rating-<?php echo e($comment['valoracion']); ?>"><?php echo e(ucfirst($comment['valoracion'])); ?></span></p>
-                                <p><?php echo e($comment['comentario']); ?></p>
-                                <p>Fecha: <?php echo e($comment['fechaPublicacion']); ?></p>
+                                <div class="comment-author-row d-flex align-items-start gap-2 mb-2">
+                                    <div class="avatar-32px <?php echo e($commentAvatarData['avatarClass']); ?>"<?php if (!empty($commentAvatarData['avatarPath'])): ?> style="background-image: url('<?php echo e($commentAvatarData['avatarPath']); ?>');"<?php endif; ?>></div>
+                                    <div class="comment-author-details">
+                                        <p class="mb-1"><strong><?php echo e($comment['nombre_usuario']); ?></strong></p>
+                                        <p class="mb-0 comment-meta">Valoración: <span class="rating-<?php echo e($comment['valoracion']); ?>"><?php echo e(ucfirst($comment['valoracion'])); ?></span></p>
+                                    </div>
+                                </div>
+                                <div class="comment-body"><?php echo e($comment['comentario']); ?></div>
+                                <p class="comment-date">Fecha: <?php echo e($comment['fechaPublicacion']); ?></p>
                             </div>
                         <?php endforeach; ?>
                     <?php else: ?>

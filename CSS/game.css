@@ -178,6 +178,9 @@
     font-weight: 800;
     color: var(--color-slate-12);
 }
+.section-title a {
+    width: max-content;
+}
 /* =========================
    REVIEWS FILTERS – STEAM STYLE
    ========================= */
