@@ -204,7 +204,7 @@ function renderPrecioFinal($precio, $descuento) {
                         <div class="wishlist-info">
                             <h2><?= e($juego['nombre_juego']) ?></h2>
                             <div class="wishlist-meta">
-                                <span>Lanzamiento: <?= date('d M Y', strtotime($juego['fecha_publicacion'])) ?></span>
+                                <span>Lanzamiento: <?= date('d M Y', strtotime($juego['fecha_publicacion'] ?? '')) == '01 Jan 1970' ? 'Por confirmarse' : date('d M Y', strtotime($juego['fecha_publicacion'] ?? '')) ?></span>
                                 <span class="developer"><?= e($juego['desarrollador'] ?? 'Desconocido') ?></span>
                             </div>
                             <div class="wishlist-reviews">
