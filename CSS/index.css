@@ -17,7 +17,6 @@
 .feature-card {
     border: 1px solid var(--color-greyneutral-7);
     background: linear-gradient(180deg, var(--color-greyneutral-4), var(--color-greyneutral-5));
-
 }
 
 .hero__content {
@@ -116,15 +115,162 @@
     gap: 14px;
 }
 
+.hero__panel .search-form {
+    width: 100%;
+    margin: 0;
+}
+
+.hero__panel .search-form__group {
+    width: 100%;
+    max-width: 100%;
+}
+
 .hero__panel-top {
     display: flex;
     align-items: center;
     gap: 10px;
     color: var(--color-slate-12);
+    flex-wrap: wrap;
 }
 
 .hero__panel-top .material-symbols-outlined {
     color: var(--color-blue-10);
+}
+
+.hero__panel-top a {
+    margin-left: auto;
+    color: var(--color-greyneutral-11);
+    text-decoration: none;
+}
+
+.hero__panel-top a:hover {
+    color: var(--color-blue-12);
+}
+
+.search-form {
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+}
+
+.search-form__group {
+    display: flex;
+    align-items: stretch;
+    gap: 12px;
+    width: 100%;
+    max-width: 760px;
+    min-width: 240px;
+}
+
+.search-form__field {
+    position: relative;
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+}
+
+.search-form__icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-greyneutral-10);
+    pointer-events: none;
+    font-size: 22px;
+}
+
+.search-form__input {
+    width: 100%;
+    min-width: 180px;
+    padding: 14px 16px 14px 44px;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.03));
+    color: var(--color-slate-12);
+    font: inherit;
+    outline: none;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.10);
+    transition:
+        border-color .18s ease,
+        box-shadow .18s ease,
+        background .18s ease,
+        transform .18s ease;
+}
+
+.search-form__input::placeholder {
+    color: var(--color-greyneutral-10);
+    opacity: 1;
+}
+
+.search-form__input:hover {
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.065), rgba(255, 255, 255, 0.04));
+    border-color: rgba(255, 255, 255, 0.18);
+}
+
+.search-form__input:focus {
+    outline: none;
+    border-color: rgba(26, 159, 255, 0.65);
+    box-shadow:
+        0 0 0 4px rgba(26, 159, 255, 0.14),
+        0 14px 30px rgba(0, 0, 0, 0.14);
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.045));
+}
+
+.search-form__button {
+    min-width: 120px;
+    padding: 14px 18px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.search-form__button:hover {
+    transform: translateY(-1px);
+}
+
+.price-widget {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    height: 45px;
+    border: 1px solid var(--color-greyneutral-7);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-left: auto;
+}
+
+.price-discount-badge {
+    background-color: var(--color-blue-9);
+    color: var(--color-slate-12);
+    font-weight: bold;
+    font-size: 0.88rem;
+    padding: 0 10px;
+    display: flex;
+    align-items: center;
+    border-radius: 3px 0 0 3px;
+    min-height: 40px;
+}
+
+.price-values {
+    background-color: rgba(0, 0, 0, 0.36);
+    border-left: 1px solid var(--color-greyneutral-7);
+    padding: 0 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-end;
+    min-width: 96px;
+    min-height: 40px;
+}
+
+.price-values.no-discount {
+    border-left: none;
+    border-radius: 0 3px 3px 0;
+    align-items: center;
+    min-height: 40px;
 }
 
 .feature-stack {
@@ -152,11 +298,23 @@
     background: linear-gradient(180deg, var(--color-greyneutral-8), var(--color-greyneutral-4));
     color: var(--color-slate-12);
     border: 1px solid var(--color-greyneutral-7);
+    overflow: hidden;
+}
+
+.feature-card__body {
+    display: grid;
+    gap: 6px;
+}
+
+.feature-card__meta {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
 }
 
 .feature-card__body h3,
 .game-card h3 {
-    margin: 0 0 4px;
+    margin: 0;
     font-size: 1rem;
 }
 
@@ -168,11 +326,22 @@
     font-size: .92rem;
 }
 
-.feature-card__body span {
-    display: inline-block;
+.feature-card__price {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
     margin-top: 8px;
-    color: var(--color-blue-12);
-    font-weight: 700;
+}
+
+.price-original {
+    color: var(--color-greyneutral-10);
+    text-decoration: line-through;
+    font-size: .88rem;
+}
+
+.price-final {
+    color: var(--color-slate-12);
+    font-weight: 800;
 }
 
 /* Game links */
@@ -235,6 +404,7 @@
     padding: 16px;
     display: grid;
     gap: 14px;
+    height: 100%;
 }
 
 .game-card__art {
@@ -242,6 +412,7 @@
     height: 128px;
     border-radius: 4px;
     font-size: 2rem;
+    overflow: hidden;
 }
 
 .game-card__info {
@@ -274,6 +445,116 @@
 .panel {
     border-radius: 4px;
     padding: 22px;
+}
+
+.panel.panel--search {
+    margin-bottom: 24px;
+    padding: 18px 22px;
+    border: 1px solid var(--color-greyneutral-7);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.wishlist-search-form {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    border: none;
+}
+
+.wishlist-search-form label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+.wishlist-search-form__group {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    width: 100%;
+    flex-wrap: nowrap;
+}
+
+.wishlist-search-form__field {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.wishlist-search {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 4px 0 0 4px;
+    border: 1px solid var(--color-greyneutral-7);
+    border-right: none;
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--color-slate-12);
+    outline: none;
+    transition: border-color .18s ease, background .18s ease, transform .18s ease;
+    min-height: 46px;
+}
+
+.wishlist-search-form__field,
+.wishlist-search {
+    min-width: 0;
+}
+
+.wishlist-search:hover,
+.wishlist-search:focus {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.18);
+}
+
+.wishlist-search:focus {
+    box-shadow: 0 0 0 4px rgba(26, 159, 255, 0.12);
+}
+
+.wishlist-search__icon {
+    font-size: 20px;
+    color: var(--color-slate-12);
+    margin-right: 8px;
+}
+
+.wishlist-search__button {
+    min-width: 120px;
+    padding: 0 18px;
+    border-radius: 0 4px 4px 0;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-left: none;
+    background: linear-gradient(180deg, var(--color-blue-10), var(--color-blue-8));
+    color: white;
+    transition: transform .15s ease, background .15s ease, border-color .15s ease;
+}
+
+.wishlist-search__button:hover {
+    transform: translateY(-1px);
+    background: linear-gradient(180deg, var(--color-blue-9), var(--color-blue-7));
+}
+
+@media (max-width: 768px) {
+    .wishlist-search-form__group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .wishlist-search__button {
+        width: 100%;
+    }
 }
 
 .quick-grid {
@@ -312,6 +593,16 @@
     gap: 12px;
 }
 
+.recommend-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.recommend-grid .game-card {
+    height: 100%;
+}
+
 .recommend-item {
     display: grid;
     grid-template-columns: 54px 1fr;
@@ -347,4 +638,42 @@
 .empty-box .material-symbols-outlined {
     font-size: 34px;
     color: var(--color-blue-10);
+}
+
+@media (max-width: 1024px) {
+    .game-grid,
+    .recommend-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .search-form__group {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero {
+        gap: 28px;
+    }
+
+    .search-form__group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-form__button {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .game-grid,
+    .recommend-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .section,
+    .panel,
+    .hero__panel {
+        padding: 16px;
+    }
 }

@@ -39,14 +39,14 @@ function deleteGameMedia(int $idJuego): void
     rrmdir(dirname(__DIR__) . '/MEDIA/VIDEO/juegos/' . $idJuego);
 }
 
-function sanitizeMoney($value): ?string
+function sanitizeMoney($value): string
 {
     if ($value === '' || $value === null) {
-        return null;
+        return '0.00';
     }
     $value = str_replace(',', '.', (string) $value);
     if (!is_numeric($value)) {
-        return null;
+        return '0.00';
     }
     return number_format((float) $value, 2, '.', '');
 }

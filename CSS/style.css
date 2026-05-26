@@ -239,7 +239,10 @@ select:disabled {
 .checkbox-filter {
     display: inline-flex;
     align-items: center;
-    gap: 10px;
+    justify-content: flex-start;
+    gap: 12px;
+    flex-wrap: nowrap;
+    width: 100%;
     padding: 10px 12px;
     border-radius: 4px;
     background: rgba(255, 255, 255, 0.03);
@@ -251,16 +254,21 @@ select:disabled {
     font-size: .9rem;
 }
 
+.checkbox-filter span {
+    flex: 1;
+    line-height: 1.2;
+}
+
 /* ocultamos checkbox nativo */
 .checkbox-filter input[type="checkbox"] {
     appearance: none;
     -webkit-appearance: none;
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
     border-radius: 4px;
     border: 1px solid var(--color-greyneutral-8);
     background: var(--color-greyneutral-4);
-    display: grid;
+    display: inline-grid;
     place-content: center;
     cursor: pointer;
     transition: all .15s ease;

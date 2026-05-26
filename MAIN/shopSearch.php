@@ -8,32 +8,27 @@ $errorWishlist = '';
 
 $search = $_POST["search"] ?? null;
 
-$allCategories;
-if (isset($_POST['minPrice'])) {
-    $minPrice =  number_format((double) $_POST['minPrice'], 2) ?? 0;
+$minPrice = 0;
+$maxPrice = 1000;
+$minPriceInputValue = '';
+$maxPriceInputValue = '';
+
+if (isset($_POST['minPrice']) && $_POST['minPrice'] !== '') {
+    $minPriceInputValue = trim((string) $_POST['minPrice']);
+    $minPrice = (int) $_POST['minPrice'];
+    $minPrice = max(0, min(1000, round($minPrice / 5) * 5));
 }
-else {
-    $minPrice = 0;
-}
-if (isset($_POST['maxPrice'])) {
-    if ($_POST['maxPrice'] != null) {
-        $maxPrice = number_format((double) $_POST['maxPrice'], 2) ?? 999;
-    }
-    else {
-        $maxPrice = 999;
-    }
-}
-else {
-    $maxPrice = 999;
+
+if (isset($_POST['maxPrice']) && $_POST['maxPrice'] !== '') {
+    $maxPriceInputValue = trim((string) $_POST['maxPrice']);
+    $maxPrice = (int) $_POST['maxPrice'];
+    $maxPrice = max(0, min(1000, round($maxPrice / 5) * 5));
 }
 
 if ($minPrice < 0) {
     $minPrice = 0;
 }
-if ($maxPrice == null) {
-    $maxPrice = 999;
-} 
-else if ($maxPrice < $minPrice) {
+if ($maxPrice < $minPrice) {
     $maxPrice = $minPrice;
 }
 
@@ -50,19 +45,17 @@ if (isset($_GET['recent'])) {
     $_POST['onlyRecent'] = true;
 }
 else {
-    $onlyRecent = isset($_POST['onlyRecent']) ?? true;
+    $onlyRecent = isset($_POST['onlyRecent']);
 }
 
 $genres = get_genres($BBDD);
 
-if (isset($_POST['categorias'])) {
-    $categories = [$_POST['categorias']];
-}
-else {
-    $categories = [];
-    foreach ($genres as $genre) {
-        if (isset($_POST[$genre['Categoria']])) {
-            array_push($categories, $_POST[$genre['Categoria']]);
+$categories = [];
+if (isset($_POST['genres']) && is_array($_POST['genres'])) {
+    foreach ($_POST['genres'] as $genreOption) {
+        $genreOption = trim((string) $genreOption);
+        if ($genreOption !== '') {
+            $categories[] = $genreOption;
         }
     }
 }
@@ -70,15 +63,12 @@ else {
 $AllLanguages = get_languages($BBDD);
 
 $languages = [];
-foreach ($AllLanguages as $language) {
-    if (isset($_POST[$language['id_idioma']])) {
-        array_push($languages, $_POST[$language['id_idioma']]);
-    }
-}
-
-if (isset($_POST['minDate']) && isset($_POST['maxDate'])) {
-    if ($_POST['maxDate'] < $_POST['minDate']) {
-        $_POST['maxDate'] = $_POST['minDate'];
+if (isset($_POST['languages']) && is_array($_POST['languages'])) {
+    foreach ($_POST['languages'] as $languageOption) {
+        $languageOption = trim((string) $languageOption);
+        if ($languageOption !== '') {
+            $languages[] = $languageOption;
+        }
     }
 }
 
@@ -91,11 +81,19 @@ if (isset($_POST['minDate']) && isset($_POST['maxDate'])) {
 $minDate = $_POST['minDate'] ?? "";
 $maxDate = $_POST['maxDate'] ?? "";
 
-$wishlist = shop_get_games($BBDD, '', $orden, $categories, $languages, $minPrice, $maxPrice, $onlyDiscount, $onlyRecent, $minDate, $maxDate);
+$wishlist = shop_get_games($BBDD, $search ?? '', $orden, $categories, $languages, $minPrice, $maxPrice, $onlyDiscount, $onlyRecent, $minDate, $maxDate);
 
-foreach ($genres as $genre) {
-    if (isset($_POST[$genre['Categoria']])) {
-        array_push($categories, $_POST[$genre['Categoria']]);
+// Etiquetas de precio para los controles deslizantes
+$minPriceLabelText = 'Mínimo';
+$maxPriceLabelText = 'Máximo';
+if ($minPrice === 0 && $maxPrice === 0) {
+    $minPriceLabelText = $maxPriceLabelText = 'Gratis';
+} else {
+    if ($minPrice > 0) {
+        $minPriceLabelText = number_format($minPrice, 0, ',', '.') . '€';
+    }
+    if ($maxPrice < 1000) {
+        $maxPriceLabelText = number_format($maxPrice, 0, ',', '.') . '€';
     }
 }
 
@@ -117,6 +115,7 @@ function renderPrecioFinal($precio, $descuento) {
 <?php include '../GENERAL/[html_START - head_START].php'; ?>
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.7/Sortable.min.js"></script>
 <link rel="stylesheet" href="../CSS/wishlist.css">
+<link rel="stylesheet" href="../CSS/shopSearch.css">
 
 <?php include '../GENERAL/[head_END - body_START - header - main_START].php'; ?>
 <div class="wishlist-container">
@@ -126,105 +125,61 @@ function renderPrecioFinal($precio, $descuento) {
                 <div class="profile-info">
                     <h1>Tienda de Juegos</h1>
                     <div class="profile-badges">
-                        <span class="badge badge-dark"><?= count($wishlist) ?> artículos</span>
+                        <span id="shop-result-count" class="badge badge-dark"><?= count($wishlist) ?> artículos</span>
                         <span class="badge badge-primary">Orden <?php echo $orden ?></span>
                     </div>
                 </div>
             </div>
-            <form id="formOG1" method="post" action="./shopSearch.php" class="wishlist-sort-form col-12">
-                <div class="row">
-                    <div class="col-10">
-                        <label>Precio entre</label><br>
-                        <input type="number" name="minPrice" step="0.01" placeholder="Mínimo" style="width: 45%;" class="wishlist-select" <?php if (isset($_POST['minPrice'])) { ?> value="<?php if($_POST['minPrice'] != null){(double) $_POST['minPrice'];} ?>" <?php } ?>></input> y
-                        <input type="number" name="maxPrice" step="0.01" placeholder="Máximo" style="width: 45%;" class="wishlist-select" <?php if (isset($_POST['maxPrice'])) { ?> value="<?php (double) $_POST['maxPrice'] ?>" <?php } else { ?> 999 <?php }?>></input> €
-                        <br><br>
-                        <label class="checkbox-filter">
-                            <input type="checkbox" class="categoria-checkbox" name="onlyDiscount" <?php if (isset($_POST['onlyDiscount'])) { ?> checked <?php } ?>>
-                            <span>Solo Descuentos</span>
-                        </label>
-                        <label class="checkbox-filter">
-                            <input type="checkbox" class="categoria-checkbox" name="onlyRecent" <?php if (isset($_POST['onlyRecent'])) { ?> checked <?php } ?>>
-                            <span>Solo Recientemente</span>
-                        </label>
-                        <br><br>
-                        <label>Publicado entre</label><br>
-                        <input type="date" style="width: 45%;" class="wishlist-select" name="minDate" <?php if (isset($_POST['minDate'])) { ?> value="<?= e($_POST['minDate']) ?>" <?php } ?>></input> y
-                        <input type="date" style="width: 45%;" class="wishlist-select" name="maxDate" <?php if (isset($_POST['maxDate'])) { ?> value="<?= e($_POST['maxDate']) ?>" <?php } ?>></input>
-                        <?php if ($genres != null) { ?>
-                        <br><br>
-                        <label>Géneros</label><br>
-                        <?php
-                        foreach ($genres as $genre) {
-                        ?>
-                            <label class="checkbox-filter">
-                                <input type="checkbox" name="<?= e($genre['Categoria']) ?>" class="categoria-checkbox" value="<?= e($genre['Categoria']) ?>" <?php if (in_array($genre['Categoria'], $categories)) { ?> checked <?php } ?>>
-                                <span><?= e($genre['Categoria']) ?></span>
-                            </label>
-                        <?php
-                        }}
-                        ?>
-
-                        <?php if ($AllLanguages != null) { ?>
-                        <br><br>
-                        <label>Géneros</label><br>
-                        <?php
-                        foreach ($AllLanguages as $language) {
-                        ?>
-                            <label class="checkbox-filter">
-                                <input type="checkbox" name="<?= e($language['id_idioma']) ?>" class="categoria-checkbox" value="<?= e($language['id_idioma']) ?>" <?php if (in_array($language['id_idioma'], $languages)) { ?> checked <?php } ?>>
-                                <span><?= e($language['Idioma']) ?> (<?= e($language['id_idioma']) ?>)</span>
-                            </label>
-                        <?php
-                        }}
-                        ?>
-                    </div>
-                    <div class="col-2">
-                        <div class="row">
-                            <div class="col-12">
-                                <label for="orden">Ordenar por:</label><br>
-                                <select name="orden" id="orden" class="wishlist-select" onchange="this.form.submit()">
-                                    <option value="ninguno" <?= $orden === 'ninguno' ? 'selected' : '' ?>>Ninguno</option>
-                                    <option value="aleatorio" <?= $orden === 'aleatorio' ? 'selected' : '' ?>>Aleatorio</option>
-                                    <option value="nombre(↑)" <?= $orden === 'nombre(↑)' ? 'selected' : '' ?>>Nombre ↑</option>
-                                    <option value="nombre(↓)" <?= $orden === 'nombre(↓)' ? 'selected' : '' ?>>Nombre ↓</option>
-                                    <option value="precio(↑)" <?= $orden === 'precio(↑)' ? 'selected' : '' ?>>Precio ↑</option>
-                                    <option value="precio(↓)" <?= $orden === 'precio(↓)' ? 'selected' : '' ?>>Precio ↓</option>
-                                    <option value="descuento(↑)" <?= $orden === 'descuento(↑)' ? 'selected' : '' ?>>Descuento ↑</option>
-                                    <option value="descuento(↓)" <?= $orden === 'descuento(↓)' ? 'selected' : '' ?>>Descuento ↓</option>
-                                    <option value="fecha(↑)" <?= $orden === 'fecha(↑)' ? 'selected' : '' ?>>Lanzamiento ↑</option>
-                                    <option value="fecha(↓)" <?= $orden === 'fecha(↓)' ? 'selected' : '' ?>>Lanzamiento ↓</option>
-                                    <option value="resenas(↑)" <?= $orden === 'resenas(↑)' ? 'selected' : '' ?>>Reseñas ↑</option>
-                                    <option value="resenas(↓)" <?= $orden === 'resenas(↓)' ? 'selected' : '' ?>>Reseñas ↓</option>
-                                    <option value="positivas" <?= $orden === 'positivas' ? 'selected' : '' ?>>Reseñas +</option>
-                                    <option value="negativas" <?= $orden === 'negativas' ? 'selected' : '' ?>>Reseñas -</option>
-                                </select>
-                                <br><br>
-                                <button type="submit" class="wishlist-select">Filtrar</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </form>
         </div>
     </div>
-    <form id="formOG2" class="wishlist-search-form" onsubmit="return false;">
-        <label for="wishlist-search">Buscar juego:</label>
-        <input
-            type="search"
-            id="wishlist-search"
-            class="wishlist-search"
-            placeholder="Escribe el nombre del juego..."
-            autocomplete="off"
-            <?php if (isset($search)) { ?> value="<?= e($search) ?>"<?php }?>
-        >
-    </form>
-    <div id="wishlist-empty-search" class="wishlist-alert alert-info" hidden>
-        No se han encontrado juegos con ese nombre.
-    </div>
 
-    <div id="wishlist-status" class="wishlist-alert hidden"></div>
+    <form id="shopSearchForm" method="post" action="./shopSearch.php">
+        <div class="shop-search-layout">
+            <main class="shop-search-main">
+                <div class="shop-search-top">
+                    <div class="wishlist-search-form">
+                        <label for="wishlist-search">Buscar juego:</label>
+                        <div class="search-input-row">
+                            <input
+                                type="search"
+                                id="wishlist-search"
+                                name="search"
+                                class="wishlist-search"
+                                placeholder="Escribe el nombre del juego..."
+                                autocomplete="off"
+                                <?php if (isset($search)) { ?> value="<?= e($search) ?>"<?php }?>
+                            >
+                            <button type="submit" class="shop-search-submit">Buscar</button>
+                        </div>
+                    </div>
+                    <div class="panel-card shop-search-order-card">
+                        <label for="orden">Ordenar por:</label>
+                        <select name="orden" id="orden" class="wishlist-select">
+                            <option value="ninguno" <?= $orden === 'ninguno' ? 'selected' : '' ?>>Ninguno</option>
+                            <option value="aleatorio" <?= $orden === 'aleatorio' ? 'selected' : '' ?>>Aleatorio</option>
+                            <option value="nombre(↑)" <?= $orden === 'nombre(↑)' ? 'selected' : '' ?>>Nombre ↑</option>
+                            <option value="nombre(↓)" <?= $orden === 'nombre(↓)' ? 'selected' : '' ?>>Nombre ↓</option>
+                            <option value="precio(↑)" <?= $orden === 'precio(↑)' ? 'selected' : '' ?>>Precio ↑</option>
+                            <option value="precio(↓)" <?= $orden === 'precio(↓)' ? 'selected' : '' ?>>Precio ↓</option>
+                            <option value="descuento(↑)" <?= $orden === 'descuento(↑)' ? 'selected' : '' ?>>Descuento ↑</option>
+                            <option value="descuento(↓)" <?= $orden === 'descuento(↓)' ? 'selected' : '' ?>>Descuento ↓</option>
+                            <option value="fecha(↑)" <?= $orden === 'fecha(↑)' ? 'selected' : '' ?>>Lanzamiento ↑</option>
+                            <option value="fecha(↓)" <?= $orden === 'fecha(↓)' ? 'selected' : '' ?>>Lanzamiento ↓</option>
+                            <option value="resenas(↑)" <?= $orden === 'resenas(↑)' ? 'selected' : '' ?>>Reseñas ↑</option>
+                            <option value="resenas(↓)" <?= $orden === 'resenas(↓)' ? 'selected' : '' ?>>Reseñas ↓</option>
+                            <option value="positivas" <?= $orden === 'positivas' ? 'selected' : '' ?>>Reseñas +</option>
+                            <option value="negativas" <?= $orden === 'negativas' ? 'selected' : '' ?>>Reseñas -</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="shop-search-results">
+                    <div id="wishlist-empty-search" class="wishlist-alert alert-info" hidden>
+                        No se han encontrado juegos con ese nombre.
+                    </div>
 
-    <?php if (empty($wishlist)): ?>
+                    <div id="wishlist-status" class="wishlist-alert hidden"></div>
+
+                    <?php if (empty($wishlist)): ?>
         <div class="wishlist-alert alert-info">
             Tu lista de deseos está actualmente vacía. ¡Explora la tienda para añadir juegos!
         </div>
@@ -290,10 +245,178 @@ function renderPrecioFinal($precio, $descuento) {
                 <?php $posicion++; ?>
             <?php endforeach; ?>
         </div>
+        </div>
     <?php endif; ?>
-</div>
+        </main>
+
+        <aside class="shop-search-sidebar shop-search-filters">
+            <details class="panel-card filter-dropdown" open>
+                <summary class="panel-card__header filter-dropdown__summary">
+                    <strong>Precio</strong>
+                    <span class="filter-dropdown__icon material-symbols-outlined">expand_more</span>
+                </summary>
+                <div class="filter-dropdown__content">
+                    <div class="price-range-labels">
+                        <span class="price-range-label price-range-label--from">Desde <strong id="minPriceLabel"><?= e($minPriceLabelText) ?></strong></span>
+                        <span class="price-range-label price-range-label--until">Hasta <strong id="maxPriceLabel"><?= e($maxPriceLabelText) ?></strong></span>
+                        <span class="price-range-label price-range-label--free" id="freePriceLabel" <?= $minPrice === 0 && $maxPrice === 0 ? '' : 'hidden' ?>>
+                            <strong>Gratis</strong>
+                        </span>
+                    </div>
+                    <div class="price-range-sliders">
+                        <input
+                            type="number"
+                            id="minPrice"
+                            name="minPrice"
+                            min="0"
+                            max="1000"
+                            step="0.01"
+                            placeholder="Min"
+                            value="<?= isset($_POST['minPrice']) ? e($minPriceInputValue) : '' ?>"
+                            inputmode="decimal"
+                            aria-label="Precio mínimo"
+                        >
+                        <input
+                            type="number"
+                            id="maxPrice"
+                            name="maxPrice"
+                            min="0"
+                            max="1000"
+                            step="0.01"
+                            placeholder="Max"
+                            value="<?= isset($_POST['maxPrice']) ? e($maxPriceInputValue) : '' ?>"
+                            inputmode="decimal"
+                            aria-label="Precio máximo"
+                        >
+                    </div>
+                    <label class="checkbox-filter">
+                        <input type="checkbox" class="categoria-checkbox" name="onlyDiscount" <?= isset($_POST['onlyDiscount']) ? 'checked' : '' ?>>
+                        <span>Solo descuentos</span>
+                    </label>
+                </div>
+            </details>
+
+            <details class="panel-card filter-dropdown" open>
+                <summary class="panel-card__header filter-dropdown__summary">
+                    <strong>Publicación</strong>
+                    <span class="filter-dropdown__icon material-symbols-outlined">expand_more</span>
+                </summary>
+                <div class="filter-dropdown__content">
+                    <label class="checkbox-filter">
+                        <input type="checkbox" class="categoria-checkbox" name="onlyRecent" <?= isset($_POST['onlyRecent']) ? 'checked' : '' ?> >
+                        <span>Solo recientes</span>
+                    </label>
+                    <div class="filter-section-row">
+                        <div class="filter-field">
+                            <label for="minDate">Desde</label>
+                            <input type="date" id="minDate" name="minDate" class="wishlist-select" <?php if (isset($_POST['minDate'])) { ?> value="<?= e($_POST['minDate']) ?>" <?php } ?> >
+                        </div>
+                        <div class="filter-field">
+                            <label for="maxDate">Hasta</label>
+                            <input type="date" id="maxDate" name="maxDate" class="wishlist-select" <?php if (isset($_POST['maxDate'])) { ?> value="<?= e($_POST['maxDate']) ?>" <?php } ?> >
+                        </div>
+                    </div>
+                </div>
+            </details>
+
+            <?php if ($genres != null) { ?>
+            <details class="panel-card filter-dropdown" open>
+                <summary class="panel-card__header filter-dropdown__summary">
+                    <strong>Géneros</strong>
+                    <span class="filter-dropdown__icon material-symbols-outlined">expand_more</span>
+                </summary>
+                <div class="filter-dropdown__content">
+                    <div class="search-box">
+                        <span class="material-symbols-outlined search-box__icon">search</span>
+                        <input
+                            type="text"
+                            class="form-control js-filter-input"
+                            placeholder="Buscar categoría..."
+                            data-filter-target="categoriesList"
+                        >
+                        <button
+                            type="button"
+                            class="btn-icon js-clear-filter"
+                            data-filter-target="categoriesList"
+                            title="Limpiar búsqueda"
+                        >
+                            <span class="material-symbols-outlined">refresh</span>
+                        </button>
+                    </div>
+                    <div class="option-list option-list--scroll scrollbar-theme" id="categoriesList">
+                        <?php foreach ($genres as $genre): ?>
+                            <?php
+                            $genreId = e($genre['Categoria']);
+                            $checked = in_array((string) $genre['Categoria'], $categories, true);
+                            ?>
+                            <label class="option-item js-filter-item checkbox-filter">
+                                <input
+                                    type="checkbox"
+                                    name="genres[]"
+                                    class="categoria-checkbox"
+                                    value="<?= $genreId ?>"
+                                    <?= $checked ? 'checked' : '' ?>
+                                >
+                                <span><?= e($genre['Categoria']) ?></span>
+                            </label>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            </details>
+            <?php } ?>
+
+            <?php if ($AllLanguages != null) { ?>
+            <details class="panel-card filter-dropdown" open>
+                <summary class="panel-card__header filter-dropdown__summary">
+                    <strong>Idiomas</strong>
+                    <span class="filter-dropdown__icon material-symbols-outlined">expand_more</span>
+                </summary>
+                <div class="filter-dropdown__content">
+                    <div class="search-box">
+                        <span class="material-symbols-outlined search-box__icon">search</span>
+                        <input
+                            type="text"
+                            class="form-control js-filter-input"
+                            placeholder="Buscar idioma..."
+                            data-filter-target="languagesList"
+                        >
+                        <button
+                            type="button"
+                            class="btn-icon js-clear-filter"
+                            data-filter-target="languagesList"
+                            title="Limpiar búsqueda"
+                        >
+                            <span class="material-symbols-outlined">refresh</span>
+                        </button>
+                    </div>
+                    <div class="option-list option-list--scroll scrollbar-theme" id="languagesList">
+                        <?php foreach ($AllLanguages as $language): ?>
+                            <?php
+                            $languageId = e($language['id_idioma']);
+                            $checked = in_array((string) $language['id_idioma'], $languages, true);
+                            ?>
+                            <label class="option-item js-filter-item checkbox-filter">
+                                <input
+                                    type="checkbox"
+                                    name="languages[]"
+                                    class="categoria-checkbox"
+                                    value="<?= $languageId ?>"
+                                    <?= $checked ? 'checked' : '' ?>
+                                >
+                                <span><?= e($language['Idioma']) ?></span>
+                            </label>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            </details>
+            <?php } ?>
+
+        </aside>
+        </div>
+    </form>
 
 <script src="../JS/wishlist.js" defer></script>
+<script src="../JS/shopSearch.js" defer></script>
 
 <?php include '../GENERAL/[main_END - footer].php'; ?>
 <?php include '../GENERAL/[Page_END].php'; ?>

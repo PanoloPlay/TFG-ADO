@@ -115,12 +115,12 @@ require_once '../GENERAL/[head_END - body_START - header - main_START].php';
                         <div class="panel-grid panel-grid--2">
                             <div class="form-field">
                                 <label class="form-label" for="precio">Precio</label>
-                                <input type="text" id="precio" name="precio" class="form-control" placeholder="0.00" value="<?= e((string) ($juegoEdit['precio'] ?? '')) ?>">
+                                <input type="text" id="precio" name="precio" class="form-control" placeholder="0.00" value="<?= e((string) ($juegoEdit['precio'] ?? '0.00')) ?>">
                             </div>
 
                             <div class="form-field">
                                 <label class="form-label" for="descuento">Descuento</label>
-                                <input type="text" id="descuento" name="descuento" class="form-control" placeholder="0.00" value="<?= e((string) ($juegoEdit['descuento'] ?? '')) ?>">
+                                <input type="text" id="descuento" name="descuento" class="form-control" placeholder="0.00" value="<?= e((string) ($juegoEdit['descuento'] ?? '0.00')) ?>">
                             </div>
                         </div>
 

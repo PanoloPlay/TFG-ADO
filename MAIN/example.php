@@ -1,24 +1,56 @@
 <?php require_once '../GENERAL/[General_REQUIRES].php'; ?>
 
 <?php
-    $stmt = $BBDD->prepare("
-        SELECT
-            id_juego,
-            nombre_juego,
-            descripcion,
-            desarrollador,
-            precio,
-            descuento,
-            fecha_publicacion
-        FROM Juegos
-        ORDER BY fecha_publicacion DESC
-        LIMIT 8
-    ");
-    $stmt->execute();
-    $juegos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+function formatFinalPrice(float $price, float $discount = 0): string
+{
+    $final = $price * (1 - ($discount / 100));
+    $final = max(0, $final);
 
-    $destacados = array_slice($juegos, 0, 3);
-    $recientes = array_slice($juegos, 0, 5);
+    return $final <= 0
+        ? 'Gratis'
+        : number_format($final, 2, ',', '.') . ' €';
+}
+
+function formatOriginalPrice(float $price): string
+{
+    return number_format($price, 2, ',', '.') . ' €';
+}
+
+// Ofertas: solo juegos con descuento
+$stmt = $BBDD->prepare("
+    SELECT
+        id_juego,
+        nombre_juego,
+        descripcion,
+        desarrollador,
+        precio,
+        descuento,
+        fecha_publicacion
+    FROM Juegos
+    WHERE COALESCE(descuento, 0) > 0
+    ORDER BY COALESCE(descuento, 0) DESC, fecha_publicacion DESC
+    LIMIT 3
+");
+$stmt->execute();
+$destacados = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Últimos lanzamientos
+$stmt = $BBDD->prepare("
+    SELECT
+        id_juego,
+        nombre_juego,
+        descripcion,
+        desarrollador,
+        precio,
+        descuento,
+        fecha_publicacion
+    FROM Juegos
+    ORDER BY fecha_publicacion DESC
+    LIMIT 8
+");
+$stmt->execute();
+$juegos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 ?>
 
 <?php require_once '../GENERAL/[html_START - head_START].php'; ?>
@@ -27,136 +59,137 @@
 
 <?php require_once '../GENERAL/[head_END - body_START - header - main_START].php'; ?>
 
-    <br>
-    <form method="POST" action="./shopSearch.php" class="hero__panel-top">
-        <span class="material-symbols-outlined">Buscar Juegos</span>
-        <input type="search" name="search"><button type="submit" class="btn-secondary"><span class="material-symbols-outlined">search</span></button>
-    </form>
-    <br><br>
+<section class="panel panel--search">
 
-    <section class="hero">
-       
-        <aside class="hero__panel">
-            
-            <div class="hero__panel-top">
-                <span class="material-symbols-outlined">sports_esports</span>
-                <strong>Destacados de hoy</strong>
+    <form method="POST" action="./shopSearch.php" class="wishlist-search-form">
+        <label for="search">Buscar juego:</label>
+        <div class="wishlist-search-form__group">
+            <div class="wishlist-search-form__field">
+                <input
+                    id="search"
+                    type="search"
+                    name="search"
+                    class="wishlist-search"
+                    placeholder="Buscar juegos..."
+                    autocomplete="off"
+                >
             </div>
+            <button type="submit" class="btn-secondary wishlist-search__button">
+                <span class="material-symbols-outlined wishlist-search__icon">search</span>
+                Buscar
+            </button>
+        </div>
+    </form>
+</section>
 
-            <?php if ($destacados): ?>
-                <div class="feature-stack">
-                    <?php foreach ($destacados as $juego): ?>
-                        <?php
-                            $precioFinal = $juego['precio'];
-                            $descuento = (float)($juego['descuento'] ?? 0);
-                            if ($descuento > 0) {
-                                $precioFinal = (float)$juego['precio'] * (1 - ($descuento / 100));
-                            }
-
-                            $imgUrl = getGameImageUrl((int)$juego['id_juego'], 'icon');
-                        ?>
-                        <a href="game.php?id=<?= (int)$juego['id_juego'] ?>" class="feature-link">
+<section class="hero">
+    <aside class="hero__panel">
+        <div class="hero__panel-top">
+            <span class="material-symbols-outlined">local_offer</span>
+            <strong>Ofertas</strong>
+            <a href="../MAIN/shopSearch.php?discount">Ver todo</a>
+        </div>
+        
+        <?php if (!empty($destacados)): ?>
+            <div class="feature-stack">
+                <?php foreach ($destacados as $juego): ?>
+                    <?php
+                        $descuento = (float)($juego['descuento'] ?? 0);
+                        $imgUrl = getGameImageUrl((int)$juego['id_juego'], 'icon');
+                        $precioOriginal = (float)$juego['precio'];
+                        $precioFinal = $precioOriginal * (1 - ($descuento / 100));
+                        $precioFinal = max(0, $precioFinal);
+                    ?>
+                    <a href="game.php?id=<?= (int)$juego['id_juego'] ?>" class="feature-link">
                         <article class="feature-card">
-                            <div class="feature-card__thumb"
-                                 style="background-image: url('<?= e($imgUrl) ?>'); background-size: cover; background-position: center; background-repeat: no-repeat;">
-                            </div>
+                            <div
+                                class="feature-card__thumb"
+                                style="background-image: url('<?= e($imgUrl) ?>'); background-size: cover; background-position: center; background-repeat: no-repeat;"
+                            ></div>
+
                             <div class="feature-card__body">
                                 <h3><?= e($juego['nombre_juego']) ?></h3>
                                 <p><?= e($juego['desarrollador']) ?></p>
-                                <span><?= number_format((float)$precioFinal, 2, ',', '.') ?> €</span>
+
+                                <div class="price-widget">
+                                    <?php if ($descuento > 0): ?>
+                                        <div class="price-discount-badge">-<?= (int)$juego['descuento'] ?>%</div>
+                                        <div class="price-values">
+                                            <span class="price-original"><?= formatOriginalPrice($precioOriginal) ?></span>
+                                            <strong class="price-final"><?= $precioFinal <= 0 ? 'Gratis' : formatFinalPrice($precioOriginal, $descuento) ?></strong>
+                                        </div>
+                                    <?php else: ?>
+                                        <div class="price-values no-discount">
+                                            <strong class="price-final"><?= formatFinalPrice($precioOriginal, $descuento) ?></strong>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
                             </div>
                         </article>
-                        </a>
-                    <?php endforeach; ?>
-                </div>
-            <?php else: ?>
-                <div class="empty-box large">
-                    <span class="material-symbols-outlined">inventory_2</span>
-                    <p>No hay juegos cargados todavía.</p>
-                </div>
-            <?php endif; ?>
-        </aside>
-    </section>
+                    </a>
+                <?php endforeach; ?>
+            </div>
+        <?php else: ?>
+            <div class="empty-box large">
+                <span class="material-symbols-outlined">inventory_2</span>
+                <p>No hay ofertas activas ahora mismo.</p>
+            </div>
+        <?php endif; ?>
+    </aside>
+</section>
 
-    <section class="section">
-        <div class="section__head">
-            <h2>Últimos lanzamientos</h2>
-            <a href="#">Ver todo</a>
-        </div>
+<section class="section">
+    <div class="section__head">
+        <h2>Últimos lanzamientos</h2>
+        <a href="../MAIN/shopSearch.php?recent">Ver todo</a>
+    </div>
 
-        <?php if ($juegos): ?>
-            <div class="game-grid">
-                <?php foreach ($juegos as $juego): ?>
-                    <?php
-                        $precioFinal = $juego['precio'];
-                        $descuento = (float)($juego['descuento'] ?? 0);
-                        if ($descuento > 0) {
-                            $precioFinal = (float)$juego['precio'] * (1 - ($descuento / 100));
-                        }
-
-                        $imgUrl = getGameImageUrl((int)$juego['id_juego'], 'wide-cover');
-                    ?>
-                    <a href="game.php?id=<?= (int)$juego['id_juego'] ?>" class="game-link">
+    <?php if (!empty($juegos)): ?>
+        <div class="game-grid">
+            <?php foreach ($juegos as $juego): ?>
+                <?php
+                    $descuento = (float)($juego['descuento'] ?? 0);
+                    $imgUrl = getGameImageUrl((int)$juego['id_juego'], 'wide-cover');
+                    $precioOriginal = (float)$juego['precio'];
+                ?>
+                <a href="game.php?id=<?= (int)$juego['id_juego'] ?>" class="game-link">
                     <article class="game-card">
-                        <div class="game-card__art"
-                             style="background-image: url('<?= e($imgUrl) ?>'); background-size: cover; background-position: center; background-repeat: no-repeat;">
-                        </div>
+                        <div
+                            class="game-card__art"
+                            style="background-image: url('<?= e($imgUrl) ?>'); background-size: cover; background-position: center; background-repeat: no-repeat;"
+                        ></div>
 
                         <div class="game-card__info">
                             <h3><?= e($juego['nombre_juego']) ?></h3>
                             <p><?= e($juego['desarrollador']) ?></p>
 
                             <div class="game-card__meta">
-                                <span><?= e($juego['descuento'] ? $juego['descuento'] . '% dto.' : 'Sin descuento') ?></span>
-                                <strong><?= number_format((float)$precioFinal, 2, ',', '.') ?> €</strong>
+                                <div class="price-widget">
+                                    <?php if ($descuento > 0): ?>
+                                        <div class="price-discount-badge">-<?= (int)$juego['descuento'] ?>%</div>
+                                        <div class="price-values">
+                                            <span class="price-original"><?= formatOriginalPrice($precioOriginal) ?></span>
+                                            <strong class="price-final"><?= formatFinalPrice($precioOriginal, $descuento) ?></strong>
+                                        </div>
+                                    <?php else: ?>
+                                        <div class="price-values no-discount">
+                                            <strong class="price-final"><?= formatFinalPrice($precioOriginal, $descuento) ?></strong>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
                             </div>
                         </div>
                     </article>
-                    </a>
-                <?php endforeach; ?>
-            </div>
-        <?php else: ?>
-            <div class="empty-box large">
-                <span class="material-symbols-outlined">search_off</span>
-                <p>No hay juegos disponibles todavía.</p>
-            </div>
-        <?php endif; ?>
-    </section>
-
-    <section class="section section--split">
-        <article class="panel">
-            <div class="section__head">
-                <h2>Recomendado</h2>
-            </div>
-
-            <?php if ($recientes): ?>
-                <div class="recommend-list">
-                    <?php foreach ($recientes as $juego): ?>
-                        <?php
-                            $imgUrl = getGameImageUrl((int)$juego['id_juego'], 'banner');
-                        ?>
-                        <a href="game.php?id=<?= (int)$juego['id_juego'] ?>" class="recommend-link">
-                        <div class="recommend-item">
-                            <div class="recommend-item__thumb"
-                                 style="background-image: url('<?= e($imgUrl) ?>'); background-size: cover; background-position: center; background-repeat: no-repeat;">
-                            </div>
-                            <div class="recommend-item__body">
-                                <strong><?= e($juego['nombre_juego']) ?></strong>
-                                <span><?= e($juego['desarrollador']) ?></span>
-                            </div>
-                        </div>
-                        </a>
-                    <?php endforeach; ?>
-                </div>
-            <?php else: ?>
-                <div class="empty-box">
-                    <span class="material-symbols-outlined">thumb_up_off_alt</span>
-                    <p>Todo listo para empezar.</p>
-                </div>
-            <?php endif; ?>
-        </article>
-    </section>
+                </a>
+            <?php endforeach; ?>
+        </div>
+    <?php else: ?>
+        <div class="empty-box large">
+            <span class="material-symbols-outlined">search_off</span>
+            <p>No hay juegos disponibles todavía.</p>
+        </div>
+    <?php endif; ?>
+</section>
 
 <?php require_once '../GENERAL/[main_END - footer].php'; ?>
-
 <?php require_once '../GENERAL/[Page_END].php'; ?>

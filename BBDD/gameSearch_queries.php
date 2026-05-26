@@ -8,20 +8,20 @@ if (!function_exists('wishlist_e')) {
     }
 }
 
-function shop_get_games(PDO $BBDD, string $creator, string $order, array $genre, array $languages, float $minPrice, float $maxPrice, bool $discount, bool $recent, string $minDate, string $maxDate): array
+function shop_get_games(PDO $BBDD, string $search, string $order, array $genre, array $languages, float $minPrice, float $maxPrice, bool $discount, bool $recent, string $minDate, string $maxDate): array
 {
     $allowedOrders = [
         'ninguno'        => '',
         'aleatorio'       => 'ORDER BY rand()',
         'nombre(↑)'    => 'ORDER BY J.nombre_juego ASC',
-        'precio(↑)'    => 'ORDER BY J.precio DESC, J.nombre_juego ASC',
-        'descuento(↑)' => 'ORDER BY J.descuento DESC, J.nombre_juego ASC',
+        'precio(↑)'    => 'ORDER BY COALESCE(J.precio, 0) DESC, J.nombre_juego ASC',
+        'descuento(↑)' => 'ORDER BY COALESCE(J.descuento, 0) DESC, J.nombre_juego ASC',
         'fecha(↑)'     => 'ORDER BY J.fecha_publicacion DESC, J.nombre_juego ASC',
         'resenas(↑)'   => 'ORDER BY COALESCE(V.total_resenas, 0) DESC, J.nombre_juego ASC',
         'positivas'    => 'ORDER BY COALESCE(((V.positivas / V.total_resenas) * 100), 0) DESC, J.nombre_juego ASC',
         'nombre(↓)'   => 'ORDER BY J.nombre_juego DESC',
-        'precio(↓)'   => 'ORDER BY J.precio ASC, J.nombre_juego ASC',
-        'descuento(↓)'=> 'ORDER BY J.descuento ASC, J.nombre_juego ASC',
+        'precio(↓)'   => 'ORDER BY COALESCE(J.precio, 0) ASC, J.nombre_juego ASC',
+        'descuento(↓)'=> 'ORDER BY COALESCE(J.descuento, 0) ASC, J.nombre_juego ASC',
         'fecha(↓)'    => 'ORDER BY J.fecha_publicacion ASC, J.nombre_juego ASC',
         'resenas(↓)'  => 'ORDER BY COALESCE(V.total_resenas, 0) ASC, J.nombre_juego ASC',
         'negativas'    => 'ORDER BY COALESCE(((V.positivas / V.total_resenas) * 100), 0) ASC, J.nombre_juego ASC',
@@ -37,7 +37,7 @@ function shop_get_games(PDO $BBDD, string $creator, string $order, array $genre,
     }
 
     if ($discount) {
-        $onlyGetDiscounts = 'AND J.descuento > 0';
+        $onlyGetDiscounts = 'AND COALESCE(J.descuento, 0) > 0';
     }
     else {
         $onlyGetDiscounts = '';
@@ -75,47 +75,47 @@ function shop_get_games(PDO $BBDD, string $creator, string $order, array $genre,
         }
     }
 
-    foreach ($genre as $newAllowedGenre) {
-        if ($anyForcedGenre) {
-            $allowedGenre .= " OR C.categoria = '" . $newAllowedGenre . "'";
+    $genreConditions = '';
+    $languageConditions = '';
+    $queryParams = [
+        ':search' => '%' . $search . '%',
+        ':minPrice' => $minPrice,
+        ':maxPrice' => $maxPrice,
+    ];
+
+    if (!empty($genre)) {
+        $genrePlaceholders = [];
+        foreach ($genre as $index => $newAllowedGenre) {
+            $placeholder = ':genre' . $index;
+            $genrePlaceholders[] = $placeholder;
+            $queryParams[$placeholder] = $newAllowedGenre;
         }
-        else {
-            $allowedGenre .= "AND (C.categoria = '" . $newAllowedGenre . "'";
-            $anyForcedGenre = true;
-        }
+        $genreConditions = 'AND C.categoria IN (' . implode(', ', $genrePlaceholders) . ')';
     }
 
-    if ($allowedGenre != '') {
-        $allowedGenre .= ")";
-    }
-
-    foreach ($languages as $newAllowedLanguage) {
-        if ($anyForcedLanguage) {
-            $allowedLanguage .= " OR I.id_idioma  = '" . $newAllowedLanguage . "'";
+    if (!empty($languages)) {
+        $languagePlaceholders = [];
+        foreach ($languages as $index => $newAllowedLanguage) {
+            $placeholder = ':language' . $index;
+            $languagePlaceholders[] = $placeholder;
+            $queryParams[$placeholder] = $newAllowedLanguage;
         }
-        else {
-            $allowedLanguage .= "AND (I.id_idioma  = '" . $newAllowedLanguage . "'";
-            $anyForcedLanguage = true;
-        }
-    }
-
-    if ($allowedLanguage != '') {
-        $allowedLanguage .= ")";
+        $languageConditions = 'AND I.id_idioma IN (' . implode(', ', $languagePlaceholders) . ')';
     }
 
     $orderBy = $allowedOrders[$order] ?? $allowedOrders['ninguno'];
 
-    $creatorTerm = '%' . $creator . '%';
+    $searchTerm = '%' . $search . '%';
 
     $sqlSearchGames = "
-        SELECT
+        SELECT DISTINCT
             J.id_juego,
             J.nombre_juego,
             J.descripcion,
             J.fecha_publicacion,
             J.desarrollador,
-            J.precio,
-            J.descuento,
+            COALESCE(J.precio, 0) AS precio,
+            COALESCE(J.descuento, 0) AS descuento,
             COALESCE(V.total_resenas, 0) AS total_resenas,
             COALESCE(V.positivas, 0) AS positivas,
             COALESCE(V.negativas, 0) AS negativas,
@@ -130,34 +130,21 @@ function shop_get_games(PDO $BBDD, string $creator, string $order, array $genre,
             FROM Valoraciones
             GROUP BY nombre_juego
         ) V ON V.nombre_juego = J.nombre_juego
-        WHERE J.desarrollador LIKE :creator
-          AND J.nombre_juego in (
-            SELECT 
-            C.nombre_juego
-            FROM Categoriasjuego AS C
-            WHERE 
-                C.nombre_juego = J.nombre_juego
-                {$allowedGenre}
-          )
-          AND J.nombre_juego in (
-            SELECT I.nombre_juego
-            FROM Idiomasjuego AS I
-            WHERE 
-                I.nombre_juego = J.nombre_juego
-                {$allowedLanguage}
-          )
-          AND (J.precio - (J.precio * (J.descuento / 100))) >= {$minPrice}
-          AND (J.precio - (J.precio * (J.descuento / 100))) <= {$maxPrice}
+        LEFT JOIN Categoriasjuego AS C ON C.nombre_juego = J.nombre_juego
+        LEFT JOIN Idiomasjuego AS I ON I.nombre_juego = J.nombre_juego
+        WHERE (J.nombre_juego LIKE :search OR J.desarrollador LIKE :search)
+          {$genreConditions}
+          {$languageConditions}
+          AND (COALESCE(J.precio, 0) - (COALESCE(J.precio, 0) * (COALESCE(J.descuento, 0) / 100))) >= :minPrice
+          AND (COALESCE(J.precio, 0) - (COALESCE(J.precio, 0) * (COALESCE(J.descuento, 0) / 100))) <= :maxPrice
           {$onlyGetDiscounts}
           {$minDate2}
           {$maxDate2}
         {$orderBy}
     ";
     $stmt = $BBDD->prepare($sqlSearchGames);
-        
-    $stmt->execute([
-        ':creator' => $creatorTerm,
-    ]);
+
+    $stmt->execute($queryParams);
 
     return ($games = $stmt->fetchAll(PDO::FETCH_ASSOC));
 }
