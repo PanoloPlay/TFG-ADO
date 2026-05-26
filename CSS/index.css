@@ -520,6 +520,27 @@
     box-shadow: 0 0 0 4px rgba(26, 159, 255, 0.12);
 }
 
+.wishlist-search::-webkit-search-cancel-button,
+.wishlist-search::-webkit-search-decoration {
+    -webkit-appearance: none;
+}
+
+.wishlist-search::-webkit-search-cancel-button,
+.wishlist-search::-ms-clear,
+.wishlist-search::-moz-search-clear-button {
+    width: 18px;
+    height: 18px;
+    opacity: 0.55;
+    filter: grayscale(100%) brightness(95%);
+    transition: opacity 0.2s ease, filter 0.2s ease;
+}
+
+.wishlist-search::-webkit-search-cancel-button:hover,
+.wishlist-search::-ms-clear:hover,
+.wishlist-search::-moz-search-clear-button:hover {
+    opacity: 0.85;
+}
+
 .wishlist-search__icon {
     font-size: 20px;
     color: var(--color-slate-12);
