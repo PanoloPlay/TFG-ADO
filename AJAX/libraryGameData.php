@@ -58,7 +58,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'get_library') {
     $stmt = $BBDD->prepare("SELECT j.`id_juego`, j.`nombre_juego`, j.`descripcion`, j.`fecha_publicacion`, j.`desarrollador`, j.`precio`, j.`descuento`, COUNT(v.`id_valoracion`) AS valoraciones, COUNT(CASE WHEN v.`valoracion` = 'positiva' THEN 1 END) AS valoraciones_positivas, AVG(CASE WHEN v.`valoracion` = 'positiva' THEN 1 ELSE 0 END) AS valoracion_media
                             FROM `Biblioteca` AS b 
                             JOIN `Juegos` AS j ON b.`id_juego` = j.`id_juego` 
-                            JOIN `Valoraciones` AS v ON b.`nombre_juego` = v.`nombre_juego`
+                            LEFT JOIN `Valoraciones` AS v ON b.`nombre_juego` = v.`nombre_juego`
                             WHERE b.`nickname` = :nick 
                             GROUP BY j.`nombre_juego`");
     $stmt->bindParam(":nick", $nickname);
