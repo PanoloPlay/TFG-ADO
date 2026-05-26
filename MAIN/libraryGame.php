@@ -2,18 +2,10 @@
 
 <?php require_once '../GENERAL/[html_START - head_START].php'; ?>
 
+<link rel="stylesheet" href="../CSS/libraryGame.css">
 <script src="../JS/checkIfXExists.js" defer></script>
 <script src="../JS/libraryGame.js" defer></script>
 
-<style>
-    .curSelected {
-        background-color: #000000;
-        color: white;
-    }
-    .grayscale {
-        filter : grayscale(100%);
-    }
-</style>
 
 <?php 
 include_once '../GENERAL/auth_guard.php';
@@ -38,13 +30,13 @@ include_once '../GENERAL/auth_guard.php';
     </section>
 </div>
 
-<div class="row hero-library-game" style="height: 82vh;">
-    <side id="library-side" class="col-3" style="overflow-y: auto; height: 100%;">
+<div class="row hero-library-game">
+    <side id="library-side" class="col-3 library-side">
         <div id="library-side-body">
         </div>
     </side>
 
-    <div id="library-main" class="col-9" style="overflow-y: auto; height: 100%;">
+    <div id="library-main" class="col-9 library-main">
         <div id="library-main-header">
         </div>
         <div id="library-main-body">

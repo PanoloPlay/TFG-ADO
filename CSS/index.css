@@ -567,16 +567,6 @@
     background: linear-gradient(180deg, var(--color-blue-9), var(--color-blue-7));
 }
 
-@media (max-width: 768px) {
-    .wishlist-search-form__group {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .wishlist-search__button {
-        width: 100%;
-    }
-}
 
 .quick-grid {
     display: grid;
@@ -683,7 +673,7 @@
     }
 
     .search-form__button {
-        width: 100%;
+        width: 50%;
         min-width: 0;
     }
 

@@ -1,142 +1,126 @@
-<?php require_once '../GENERAL/[General_REQUIRES].php'; ?>
 <?php
-require_once "../BBDD/profile_queries.php";
+require_once '../GENERAL/[General_REQUIRES].php';
+require_once '../BBDD/library_queries.php';
 
-// Verificar que el usuario está autenticado
-$idSesion = (int) ($_SESSION['id_usuario'] ?? 0);
-$nicknameSesion = $_SESSION['nickname'] ?? '';
+require_once '../GENERAL/auth_guard.php';
 
-// Si no hay sesión válida, redirigir al loginy salir
-if (empty($idSesion) || empty($nicknameSesion)) {
-    header("Location: ../AUTH/login.php");
-    exit;
+$usuario = ['id_usuario' => $_SESSION['id_usuario'], 'nickname' => $_SESSION['nickname']];
+$avatarData = getProfileAvatarData($usuario['nickname']);
+$initial = $avatarData['initial'];
+$avatarPath = $avatarData['avatarPath'];
+$avatarClass = $avatarData['avatarClass'];
+
+$idUsuario = (int) $_SESSION['id_usuario'];
+$nickname  = (string) $_SESSION['nickname'];
+$orden = $_GET['orden'] ?? 'nombre';
+$errorLibrary = '';
+
+try {
+    // No hay reordenación personalizada en biblioteca.
+} catch (Throwable $e) {
+    $errorLibrary = $e->getMessage();
 }
-// Obtener los datos del usuario para mostrar en el perfil
-$usuarioPerfil = getProfileUserByIdAndNickname($BBDD, $idSesion, $nicknameSesion);
 
-// Si no se encuentra el usuario, redirigir al login y salir
-if (!$usuarioPerfil) {
-    header("Location: ../AUTH/login.php");
-    exit;
-}
-
-// Obtener todos los juegos de la biblioteca del usuario y las categorías disponibles para los filtros
-$todosJuegos = getAllLibraryGames($BBDD, $idSesion, $nicknameSesion);
-$todasCategorias = getAllCategories($BBDD);
-
-// Inicialmente, se muestran todos los juegos sin aplicar ningún filtro
-$juegosActuales = $todosJuegos;
+$library = library_get_items($BBDD, $idUsuario, $nickname, $orden);
 ?>
 
-<?php require_once '../GENERAL/[html_START - head_START].php'; ?>
-
+<?php include '../GENERAL/[html_START - head_START].php'; ?>
 <link rel="stylesheet" href="../CSS/library.css">
 
-<?php require_once '../GENERAL/[head_END - body_START - header - main_START].php'; ?>
-
-<section class="profile-topbar">
-    <div class="profile-brand">
-        <div class="brand-mark small">
-            <span class="material-symbols-outlined">library_books</span>
-        </div>
-        <div>
-            <strong>Mi Biblioteca</strong>
-            <span><?= count($todosJuegos) ?> juegos</span>
+<?php include '../GENERAL/[head_END - body_START - header - main_START].php'; ?>
+<div class="library-container">
+    <div class="library-hero">
+        <div class="library-hero-content">
+            <div class="library-profile">
+                <div class="profile-badge">
+                    <div
+                        class="profile-avatar <?= e($avatarClass) ?>"
+                        <?php if ($avatarPath): ?>
+                            style="background-image: url('<?= e($avatarPath) ?>'); background-size: cover; background-position: center;"
+                        <?php endif; ?>
+                    >
+                        <?php if (!$avatarPath): ?>
+                            <?= e($initial) ?>
+                        <?php endif; ?>
+                    </div>
+                </div>
+                <div class="profile-info">
+                    <h1>Biblioteca de <?= e($nickname) ?></h1>
+                    <div class="profile-badges">
+                        <span class="badge badge-dark"><?= count($library) ?> juegos</span>
+                    </div>
+                </div>
+            </div>
+            <form method="get" class="library-sort-form">
+                <label for="orden">Ordenar por:</label>
+                <select name="orden" id="orden" class="library-select" onchange="this.form.submit()">
+                    <option value="nombre(↑)" <?= $orden === 'nombre(↑)' ? 'selected' : '' ?>>Nombre ↑</option>
+                    <option value="nombre(↓)" <?= $orden === 'nombre(↓)' ? 'selected' : '' ?>>Nombre ↓</option>
+                    <option value="fecha(↑)" <?= $orden === 'fecha(↑)' ? 'selected' : '' ?>>Lanzamiento ↑</option>
+                    <option value="fecha(↓)" <?= $orden === 'fecha(↓)' ? 'selected' : '' ?>>Lanzamiento ↓</option>
+                    <option value="resenas(↑)" <?= $orden === 'resenas(↑)' ? 'selected' : '' ?>>Reseñas ↑</option>
+                    <option value="resenas(↓)" <?= $orden === 'resenas(↓)' ? 'selected' : '' ?>>Reseñas ↓</option>
+                    <option value="positivas" <?= $orden === 'positivas' ? 'selected' : '' ?>>Reseñas +</option>
+                    <option value="negativas" <?= $orden === 'negativas' ? 'selected' : '' ?>>Reseñas -</option>
+                </select>
+            </form>
         </div>
     </div>
-</section>
 
-<section class="site-main__shell">
-    <article class="panel full">
-        <div class="panel-head">
-            <h2>
-                <span class="material-symbols-outlined">sports_esports</span>
-                Mis Juegos
-            </h2>
+    <?php if ($errorLibrary): ?>
+        <div class="library-alert alert-info">
+            <?= e($errorLibrary) ?>
         </div>
+    <?php endif; ?>
 
-        <div class="filter-section">
-            <div class="filter-header">
-                <h3>Filtrar por categoría</h3>
-                <button class="btn-clear-filters" id="btnLimpiarFiltros">
-                    <span class="material-symbols-outlined">close</span>
-                    Limpiar filtros
-                </button>
-            </div>
-            <div class="filter-categories">
-                <!-- Se generan las categorías disponibles para filtrar los juegos de la biblioteca -->
-                <?php foreach ($todasCategorias as $categoria): ?>
-                    <label class="checkbox-filter">
-                        <input type="checkbox" class="categoria-checkbox" value="<?= (int) $categoria['id_categoria'] ?>"
-                            data-categoria="<?= e($categoria['categoria']) ?>">
-                        <span><?= e($categoria['categoria']) ?></span>
-                    </label>
-                <?php endforeach; ?>
-            </div>
+    <form class="library-search-form" onsubmit="return false;">
+        <label for="library-search">Buscar juego:</label>
+        <input
+            type="search"
+            id="library-search"
+            class="library-search"
+            placeholder="Escribe el nombre del juego..."
+            autocomplete="off"
+        >
+    </form>
+
+    <div id="library-empty-search" class="library-alert alert-info" hidden>
+        No se han encontrado juegos con ese nombre.
+    </div>
+
+    <?php if (empty($library)): ?>
+        <div class="library-alert alert-info">
+            Tu biblioteca está vacía. ¡Añade juegos desde la tienda para verlos aquí!
         </div>
-        <!-- Se muestran los juegos de la biblioteca, inicialmente sin aplicar filtros -->
-        <?php if (!empty($juegosActuales)): ?>
-            <div class="game-grid game-grid-library">
-                <?php foreach ($juegosActuales as $juego): ?>
-                    <?php
-                    $precioFinal = (float) $juego['precio'];
-                    if ($juego['descuento'] !== null && (float) $juego['descuento'] > 0) {
-                        $precioFinal = (float) $juego['precio'] * (1 - ((float) $juego['descuento'] / 100));
-                    }
-                    // Se muestra una descripción corta del juego, limitando a 150 caracteres
-                    $descripcion = !empty($juego['descripcion'])
-                        ? mb_substr($juego['descripcion'], 0, 150, 'UTF-8')
-                        : 'Sin descripción';
-                    if (strlen($juego['descripcion']) > 150) {
-                        $descripcion .= '...';
-                    }
-                    // Se formatea la fecha de publicación del juego, mostrando "N/A" si no está disponible
-                    $fecha = !empty($juego['fecha_publicacion'])
-                        ? date('d/m/Y', strtotime($juego['fecha_publicacion']))
-                        : 'N/A';
-                    ?>
-                    <!-- Tarjeta de juego que muestra la información básica del juego, como nombre, desarrollador, descripción corta, fecha de publicación, descuento y precio final -->
-                    <form action="../MAIN/libraryGame.php" method="post">
-                        <input type="hidden" name="name" value="<?= e($juego['nombre_juego'])?>">
-                        <button class="game-card game-card-library" data-juego-id="<?= (int) $juego['id_juego'] ?>" style="width:100%">
-                            <div class="game-thumb">
-                                <?= e(mb_substr($juego['nombre_juego'], 0, 1, 'UTF-8')) ?>
+    <?php else: ?>
+        <div id="library-list" class="library-list">
+            <?php foreach ($library as $juego): ?>
+                <?php $imgUrl = getGameImageUrl($juego['id_juego'], 'wide-cover'); ?>
+                <div class="library-item" data-library-id="<?= (int)$juego['id_Biblioteca'] ?>"
+                    data-search="<?= e($juego['nombre_juego'] . ' ' . ($juego['desarrollador'] ?? '')) ?>">
+
+                    <a href="../MAIN/game.php?id=<?= (int)$juego['id_juego'] ?>" class="library-link" aria-label="Ver <?= e($juego['nombre_juego']) ?>">
+                        <div class="library-capsule" style="background-image: url('<?= e($imgUrl) ?>');"></div>
+
+                        <div class="library-info">
+                            <h2><?= e($juego['nombre_juego']) ?></h2>
+                            <div class="library-meta">
+                                <span>Lanzamiento: <?= date('d M Y', strtotime($juego['fecha_publicacion'])) ?></span>
+                                <span class="developer"><?= e($juego['desarrollador'] ?? 'Desconocido') ?></span>
                             </div>
-
-                            <div class="game-content">
-                                <!-- Se muestra el nombre del juego, el desarrollador, una descripción corta, la fecha de publicación, el descuento aplicado (si lo hay) y el precio final después de aplicar el descuento -->
-                                <h3><?= e($juego['nombre_juego']) ?></h3>
-                                <p class="game-developer"><?= e($juego['desarrollador']) ?></p>
-                                <p class="game-description"><?= e($descripcion) ?></p>
-
-                                <div class="game-meta">
-                                    <span class="game-date">
-                                        <span class="material-symbols-outlined">event</span>
-                                        <?= e($fecha) ?>
-                                    </span>
-                                    <span class="game-discount">
-                                        <span class="material-symbols-outlined">local_fire_department</span>
-                                        <?= !empty($juego['descuento']) ? e($juego['descuento']) . '% dto.' : 'Sin descuento' ?>
-                                    </span>
-                                    <span class="game-price">
-                                        <?= number_format((float) $precioFinal, 2, ',', '.') ?> €
-                                    </span>
-                                </div>
+                            <div class="library-reviews">
+                                <?= renderReviewBadge($juego) ?>
+                                <span class="review-count">(<?= (int)$juego['total_resenas'] ?>)</span>
                             </div>
-                        </button>
-                    </form>
-                    <?php endforeach; ?>
-            </div>
-        <?php else: ?>
-            <div class="empty-state">
-                <span class="material-symbols-outlined">inventory_2</span>
-                <p>No hay juegos en tu biblioteca o no coinciden con los filtros seleccionados.</p>
-            </div>
-        <?php endif; ?>
-    </article>
-</section>
+                        </div>
+                    </a>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
+</div>
 
-<script src="../JS/library-filtro.js" defer></script>
+<script src="../JS/library.js" defer></script>
 
-<?php require_once '../GENERAL/[main_END - footer].php'; ?>
-<?php require_once '../GENERAL/[Page_END].php'; ?>
+<?php include '../GENERAL/[main_END - footer].php'; ?>
+<?php include '../GENERAL/[Page_END].php'; ?>

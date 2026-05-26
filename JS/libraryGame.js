@@ -239,13 +239,13 @@ async function setUpSideLibrary() {
         gameSideImg.alt = gameSideName;
         gameSideImg.width = 25;
         gameSideImg.height = 25;
-        gameSideImg.style.marginRight = "5px";
+        gameSideImg.className = "game-side-img";
 
         gameSide.appendChild(gameSideImg);
 
         let gameSideP = document.createElement("b");
         gameSideP.textContent = gameSideName;
-        gameSideP.style.fontSize = "13px";
+        gameSideP.className = "game-side-name";
 
         gameSide.appendChild(gameSideP);
 
@@ -263,9 +263,11 @@ async function setUpMainLibrary() {
     let curSelected = document.getElementsByClassName("curSelected");
 
     if (curSelected.length > 0) {
+        libraryMainHeader.style.display = "grid";
         await setUpGame(curSelected[0]);
     }
     else {
+        libraryMainHeader.style.display = "none";
         await setUpMainLibraryList();
     }
 }
@@ -279,28 +281,52 @@ async function setUpGame(game) {
     gameMainIco = await gameMainIco.replaceAll(":", "");
     gameMainIco = await gameMainIco.replaceAll(";", "");
 
-    let mainGameIMG = document.createElement("img");
-    let ico = "../MEDIA/IMG/juegos/" + library[game.id]["id_juego"] + "/" + "/icons/wide-cover";
-    isValidImage(ico + ".jpg")
+    let coverWrapper = document.createElement("div");
+    coverWrapper.className = "library-main-cover-wrapper";
+
+    let bgImg = document.createElement("img");
+    let bgIco = "../MEDIA/IMG/juegos/" + library[game.id]["id_juego"] + "/icons/background";
+    isValidImage(bgIco + ".jpg")
     .then(isValid => {
         if (isValid) {
-            mainGameIMG.src = ico + ".jpg";
+            bgImg.src = bgIco + ".jpg";
         } else {
-            isValidImage(ico + ".jpeg")
+            isValidImage(bgIco + ".jpeg")
             .then(isValid => {
                 if (isValid) {
-                    mainGameIMG.src = ico + ".jpeg";
+                    bgImg.src = bgIco + ".jpeg";
                 } else {
-                    mainGameIMG.src = "../MEDIA/IMG/juegos/fallback/default.jpg";
+                    bgImg.src = "../MEDIA/IMG/juegos/fallback/default.jpg";
                 }
             });
         }
     });
-    mainGameIMG.alt = library[game.id]["nombre_juego"];
-    mainGameIMG.className = "d-block w-100";
-    mainGameIMG.height = 450;
-    
-    libraryMainHeader.appendChild(mainGameIMG);
+    bgImg.alt = library[game.id]["nombre_juego"] + " background";
+    bgImg.className = "library-main-cover-bg";
+
+    let logoImg = document.createElement("img");
+    let logoIco = "../MEDIA/IMG/juegos/" + library[game.id]["id_juego"] + "/icons/logo";
+    isValidImage(logoIco + ".png")
+    .then(isValid => {
+        if (isValid) {
+            logoImg.src = logoIco + ".png";
+        } else {
+            isValidImage(logoIco + ".jpg")
+            .then(isValid => {
+                if (isValid) {
+                    logoImg.src = logoIco + ".jpg";
+                } else {
+                    logoImg.style.display = "none";
+                }
+            });
+        }
+    });
+    logoImg.alt = library[game.id]["nombre_juego"] + " logo";
+    logoImg.className = "library-main-cover-logo";
+
+    coverWrapper.appendChild(bgImg);
+    coverWrapper.appendChild(logoImg);
+    libraryMainHeader.appendChild(coverWrapper);
 
     let mainDowlaodButton = document.createElement("button");
     mainDowlaodButton.id = "download-button";
@@ -412,7 +438,7 @@ async function setUpAchivements(game) {
             });
             achivementIMG.width = 85;
             achivementIMG.height = 85;
-            achivementIMG.style.marginRight = "2px";
+            achivementIMG.className = "achievement-img";
 
             libraryMainAllAchievements.appendChild(achivementIMG);
         }
@@ -459,7 +485,7 @@ async function setUpAchivements(game) {
             achievementObtainedImg.alt = achievements_obtainedRecent[i]["nombre_logro"] + " (" + rarity + ")";
             achievementObtainedImg.width = 100;
             achievementObtainedImg.height = 100;
-            achievementObtainedImg.style.marginRight = "7px";
+            achievementObtainedImg.className = "achievement-obtained-img";
 
             achievementObtained.appendChild(achievementObtainedImg);
 
@@ -487,11 +513,10 @@ async function setUpAchivements(game) {
 
 async function setUpMainLibraryList() {
 
-    libraryMainAllGames.innerHTML = "<h1><u><em><strong>Librería</strong></em></u></h1>";
+    libraryMainAllGames.innerHTML = "<h1><em><strong>Biblioteca</strong></em></h1>";
 
     let libraryMainAllGamesHeader = document.createElement("div");
     libraryMainAllGamesHeader.className = "library-main-all-games-header d-flex justify-content-start align-items-center";
-    libraryMainAllGamesHeader.style.marginBottom = "10px";
 
     let libraryMainAllGamesHeaderOrder = document.createElement("div");
     libraryMainAllGamesHeaderOrder.className = "library-main-all-games-header-order dropdown";
@@ -535,16 +560,14 @@ async function setUpMainLibraryList() {
 
     let libraryMainAllGamesHeaderP = document.createElement("b");
     libraryMainAllGamesHeaderP.textContent = "Ordenar por: " + orderType;
-    libraryMainAllGamesHeaderP.style.margin = "0px";
-    libraryMainAllGamesHeaderP.style.fontSize = "14px";
-    libraryMainAllGamesHeaderP.style.marginLeft = "10px";
+    libraryMainAllGamesHeaderP.className = "library-main-all-games-header-label";
 
     libraryMainAllGamesHeader.appendChild(libraryMainAllGamesHeaderP);
 
     libraryMainAllGames.appendChild(libraryMainAllGamesHeader);
 
     let libraryMainAllGamesList = document.createElement("div");
-    libraryMainAllGamesList.className = "library-main-all-games-list d-flex flex-wrap justify-content-start";
+    libraryMainAllGamesList.className = "library-main-all-games-list";
 
     for (let i = 0; i < librarySorted.length; i++) {
 
@@ -557,9 +580,6 @@ async function setUpMainLibraryList() {
         let gameList = document.createElement("button");
         gameList.id = i;
         gameList.className = "game-list card";
-        gameList.style.margin = "2px";
-        gameList.style.width = "250px";
-        gameList.style.height = "350px";
 
         gameList.addEventListener("click", async function() {
             gameName = librarySorted[i]["nombre_juego"];
@@ -568,7 +588,7 @@ async function setUpMainLibraryList() {
         });
 
         let gameListImg = document.createElement("img");
-        let ico = "../MEDIA/IMG/juegos/" + librarySorted[i]["id_juego"] + "/" + "/icons/cover";
+        let ico = "../MEDIA/IMG/juegos/" + librarySorted[i]["id_juego"] + "/icons/cover";
         isValidImage(ico + ".jpg")
         .then(isValid => {
             if (isValid) {
@@ -586,8 +606,6 @@ async function setUpMainLibraryList() {
         });
         gameListImg.className = "game-list-img card-img-top";
         gameListImg.alt = librarySorted[i]["nombre_juego"];
-        gameListImg.width = 120;
-        gameListImg.height = 280;
 
         gameList.appendChild(gameListImg);
 

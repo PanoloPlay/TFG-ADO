@@ -123,10 +123,19 @@ function renderPrecioFinal($precio, $descuento) {
                 <label for="orden">Ordenar por:</label>
                 <select name="orden" id="orden" class="wishlist-select" onchange="this.form.submit()">
                     <option value="usuario" <?= $orden === 'usuario' ? 'selected' : '' ?>>Tu clasificación</option>
-                    <option value="nombre" <?= $orden === 'nombre' ? 'selected' : '' ?>>Nombre</option>
-                    <option value="precio" <?= $orden === 'precio' ? 'selected' : '' ?>>Precio</option>
-                    <option value="descuento" <?= $orden === 'descuento' ? 'selected' : '' ?>>Descuento</option>
-                    <option value="fecha" <?= $orden === 'fecha' ? 'selected' : '' ?>>Lanzamiento</option>
+                    <option value="aleatorio" <?= $orden === 'aleatorio' ? 'selected' : '' ?>>Aleatorio</option>
+                    <option value="nombre(↑)" <?= $orden === 'nombre(↑)' ? 'selected' : '' ?>>Nombre ↑</option>
+                    <option value="nombre(↓)" <?= $orden === 'nombre(↓)' ? 'selected' : '' ?>>Nombre ↓</option>
+                    <option value="precio(↑)" <?= $orden === 'precio(↑)' ? 'selected' : '' ?>>Precio ↑</option>
+                    <option value="precio(↓)" <?= $orden === 'precio(↓)' ? 'selected' : '' ?>>Precio ↓</option>
+                    <option value="descuento(↑)" <?= $orden === 'descuento(↑)' ? 'selected' : '' ?>>Descuento ↑</option>
+                    <option value="descuento(↓)" <?= $orden === 'descuento(↓)' ? 'selected' : '' ?>>Descuento ↓</option>
+                    <option value="fecha(↑)" <?= $orden === 'fecha(↑)' ? 'selected' : '' ?>>Lanzamiento ↑</option>
+                    <option value="fecha(↓)" <?= $orden === 'fecha(↓)' ? 'selected' : '' ?>>Lanzamiento ↓</option>
+                    <option value="resenas(↑)" <?= $orden === 'resenas(↑)' ? 'selected' : '' ?>>Reseñas ↑</option>
+                    <option value="resenas(↓)" <?= $orden === 'resenas(↓)' ? 'selected' : '' ?>>Reseñas ↓</option>
+                    <option value="positivas" <?= $orden === 'positivas' ? 'selected' : '' ?>>Reseñas +</option>
+                    <option value="negativas" <?= $orden === 'negativas' ? 'selected' : '' ?>>Reseñas -</option>
                 </select>
             </form>
         </div>
@@ -229,7 +238,7 @@ function renderPrecioFinal($precio, $descuento) {
                                     </div>
                                 <?php else: ?>
                                     <div class="price-values no-discount">
-                                        <span class="price-final"><?= number_format($juego['precio'], 2) ?>€</span>
+                                        <span class="price-final"><?= ((float) $juego['precio'] <= 0 ? 'Gratis' : number_format($juego['precio'], 2, ',', '.') . '€') ?></span>
                                     </div>
                                 <?php endif; ?>
                             </div>

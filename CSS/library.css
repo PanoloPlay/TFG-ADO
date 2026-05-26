@@ -1,368 +1,291 @@
-/* library.css */
+﻿/* =========================================================
+   CONTENEDOR PRINCIPAL
+   ========================================================= */
+.library-container {
+    width: min(1280px, calc(100% - 32px));
+    margin: 24px auto 40px;
+    color: var(--color-slate-12);
+}
 
-/* =========================
-   TOP BAR
-   ========================= */
+/* =========================================================
+   CABECERA (HERO)
+   ========================================================= */
+.library-hero {
+    background: linear-gradient(180deg, var(--color-greyneutral-5), var(--color-greyneutral-2));
+    border: 1px solid var(--color-greyneutral-7);
+    border-radius: 4px;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
+    margin-bottom: 24px;
+}
 
-.profile-topbar {
-    position: sticky;
-    top: 0;
-    z-index: 20;
+.library-hero-content {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 18px;
-    padding: 16px 24px;
-    border-bottom: 1px solid var(--color-greyneutral-7);
-    background: rgba(21, 72, 109, 0.1) ;
-    backdrop-filter: blur(14px);
+    padding: 24px;
+    gap: 16px;
+    flex-wrap: wrap;
 }
 
-.profile-brand {
+.library-profile {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 16px;
 }
 
-.profile-brand strong {
-    display: block;
-    font-size: 1rem;
-    color: var(--color-slate-12);
-    line-height: 1.1;
+.profile-badge {
+    display: flex;
+    align-items: center;
 }
 
-.profile-brand span {
-    display: block;
-    font-size: .85rem;
-    color: var(--color-greyneutral-11);
-    margin-top: 2px;
-}
-
-.brand-mark.small {
-    width: 46px;
-    height: 46px;
+.profile-avatar {
+    width: 64px;
+    height: 64px;
     border-radius: 4px;
     display: grid;
     place-items: center;
+    color: var(--color-slate-12);
+    border: 2px solid var(--color-greyneutral-4);
+    flex: none;
+    background-size: cover;
+    background-position: center;
+    font-size: 1.5rem;
     font-weight: 800;
-    background: linear-gradient(180deg, var(--color-greyneutral-7), var(--color-greyneutral-4));
-    border: 1px solid var(--color-greyneutral-8);
-    color: var(--color-blue-10);
 }
 
-.brand-mark.small .material-symbols-outlined {
-    font-size: 24px;
+.profile-info h1 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: var(--color-slate-12);
+    margin: 0 0 8px 0;
 }
 
-/* =========================
-   CONTAINER
-   ========================= */
-
-.site-main__shell {
-    width: min(1200px, calc(100% - 32px));
-    margin: 24px auto 40px;
-}
-
-/* =========================
-   PANEL PRINCIPAL
-   ========================= */
-
-.panel.full {
-    padding: 20px;
-    border-radius: 4px;
-    background: linear-gradient(180deg, var(--color-greyneutral-4), rgba(14, 20, 27, 0.92));
-    border: 1px solid var(--color-greyneutral-7);
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.16);
-}
-
-.panel-head {
+.profile-badges {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 14px;
-    margin-bottom: 16px;
+    gap: 8px;
 }
 
-.panel-head h2 {
-    margin: 0;
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 1.15rem;
+.badge {
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+.badge-dark {
+    background-color: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--color-greyneutral-7);
+}
+
+.badge-primary {
+    background-color: var(--color-greyneutral-5);
     color: var(--color-slate-12);
 }
 
-.panel-head .material-symbols-outlined {
-    color: var(--color-blue-10);
-    font-size: 22px;
-}
+/* =========================================================
+   BUSCADOR
+   ========================================================= */
 
-/* =========================
-   FILTROS
-   ========================= */
-
-.filter-section {
-    margin-bottom: 18px;
-    padding: 0;
-}
-
-.filter-header {
+.library-sort-form {
     display: flex;
-    justify-content: space-between;
     align-items: center;
     gap: 12px;
-    margin-bottom: 12px;
-    flex-wrap: wrap;
+    background-color: rgba(0, 0, 0, 0.25);
+    padding: 12px 16px;
+    border-radius: 4px;
 }
 
-.filter-header h3 {
-    margin: 0;
+.library-sort-form label {
     font-size: 1rem;
-    color: var(--color-slate-12);
+    color: var(--color-greyneutral-11);
+    font-weight: bold;
+    min-width: 99px;
 }
 
-.btn-clear-filters {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 14px;
-    border-radius: 4px;
-    background: rgba(255, 255, 255, 0.03);
+.library-select {
+    width: 100%;
+    max-width: 320px;
+    background-color: var(--color-greyneutral-4);
+    color: var(--color-slate-12);
     border: 1px solid var(--color-greyneutral-7);
-    color: var(--color-slate-12);
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 0.95rem;
     cursor: pointer;
-    transition: background .15s ease, border-color .15s ease, transform .15s ease;
+    outline: none;
 }
 
-.btn-clear-filters:hover {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: var(--color-greyneutral-8);
-    transform: translateY(-1px);
+.library-select:focus {
+    border-color: var(--color-blue-8);
 }
 
-.btn-clear-filters .material-symbols-outlined {
-    font-size: 18px;
-    color: var(--color-blue-10);
+.library-search {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 4px;
+    border: 1px solid var(--color-greyneutral-7);
+    background: var(--color-greyneutral-4);
+    color: var(--color-slate-12);
+    outline: none;
 }
 
-.filter-categories {
+.library-search:focus {
+    border-color: var(--color-blue-8);
+    box-shadow: 0 0 0 2px rgba(26, 159, 255, 0.15);
+}
+/* Buscador */
+.library-search-form {
     display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-.checkbox-filter {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 12px;
-    border-radius: 4px;
-    background: rgba(255, 255, 255, 0.03);
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 20px;
+    padding: 16px;
+    background: linear-gradient(180deg, var(--color-greyneutral-3), var(--color-greyneutral-2));
     border: 1px solid var(--color-greyneutral-7);
-    color: var(--color-slate-12);
-    cursor: pointer;
-    user-select: none;
-    transition: background .15s ease, border-color .15s ease, transform .15s ease;
-    font-size: .9rem;
-    line-height: 1;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
-.checkbox-filter:hover {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: var(--color-greyneutral-8);
-    transform: translateY(-1px);
+.library-search-form label {
+    font-size: 1rem;
+    font-weight: bold;
+    color: var(--color-greyneutral-11);
 }
-
-.checkbox-filter input[type="checkbox"] {
-    width: 16px;
-    height: 16px;
-    cursor: pointer;
-    accent-color: var(--color-blue-9);
-}
-
-.checkbox-filter span {
-    color: var(--color-slate-12);
-    white-space: nowrap;
-}
-
-/* estado activo visual */
-.checkbox-filter:has(input[type="checkbox"]:checked) {
-    border-color: rgba(26, 159, 255, 0.35);
-    background: rgba(26, 159, 255, 0.10);
-}
-
-/* =========================
-   GRID DE JUEGOS
-   ========================= */
-
-.game-grid.game-grid-library {
+/* =========================================================
+   LISTA DE JUEGOS
+   ========================================================= */
+.library-list {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 14px;
-}
-
-/* =========================
-   TARJETAS
-   ========================= */
-
-.game-card.game-card-library {
-    display: grid;
-    grid-template-columns: 58px 1fr;
-    gap: 14px;
-    padding: 14px;
-    border-radius: 4px;
-    background: rgba(255, 255, 255, 0.03);
+    padding: 10px;
+    background: linear-gradient(180deg, var(--color-greyneutral-3), var(--color-greyneutral-2));
     border: 1px solid var(--color-greyneutral-7);
-    transition: background .15s ease, border-color .15s ease, transform .15s ease, box-shadow .15s ease;
-}
-
-.game-card.game-card-library:hover {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: var(--color-greyneutral-8);
-    transform: translateY(-2px);
-    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
-}
-
-.game-thumb {
-    width: 58px;
-    height: 58px;
     border-radius: 4px;
-    display: grid;
-    place-items: center;
-    font-weight: 800;
-    font-size: 1.05rem;
-    color: var(--color-slate-12);
-    background: linear-gradient(180deg, var(--color-greyneutral-8), var(--color-greyneutral-4));
-    border: 1px solid var(--color-greyneutral-7);
+    gap: 20px;
 }
 
-.game-content {
-    min-width: 0;
-}
-
-.game-content h3 {
-    margin: 0 0 4px;
-    font-size: 1rem;
-    color: var(--color-slate-12);
-    line-height: 1.2;
-}
-
-.game-developer {
-    margin: 0 0 6px;
-    color: var(--color-blue-10);
-    font-size: .9rem;
-    font-weight: 600;
-}
-
-.game-description {
-    margin: 0;
-    color: var(--color-greyneutral-11);
-    font-size: .9rem;
-    line-height: 1.45;
-    overflow-wrap: anywhere;
-}
-
-/* meta inferior */
-.game-meta {
+.library-item {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 10px;
-    margin-top: 10px;
-    color: var(--color-greyneutral-12);
-    font-size: .85rem;
-}
-
-.game-meta span {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.game-meta .material-symbols-outlined {
-    font-size: 16px;
-    color: var(--color-blue-10);
-}
-
-.game-price {
-    font-weight: 800;
-    color: var(--color-slate-12);
-}
-
-/* =========================
-   EMPTY STATE
-   ========================= */
-
-.empty-state {
-    display: grid;
-    place-items: center;
-    gap: 10px;
-    padding: 28px 16px;
+    width: 100%;
+    background: linear-gradient(180deg, var(--color-greyneutral-2), var(--color-greyneutral-4));
+    border: 1px solid var(--color-greyneutral-7);
     border-radius: 4px;
-    border: 1px dashed var(--color-greyneutral-7);
-    background: rgba(255, 255, 255, 0.02);
+    overflow: hidden;
+    transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.library-item a {
+    display: flex;
+    flex-grow: 1;
+    text-decoration: none;
+    overflow: hidden;
+    color: inherit;
+}
+
+.library-item:hover {
+    background: linear-gradient(180deg, var(--color-greyneutral-5), var(--color-greyneutral-2));
+    border-color: var(--color-greyneutral-8);
+}
+
+.library-capsule {
+    width: 200px;
+    height: 100px;
+    min-width: 200px;
+    border-right: 1px solid var(--color-greyneutral-7);
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    margin: 20px;
+    transition: 0.2s ease;
+    background-size: cover;
+    background-position: center;
+}
+
+.library-capsule:hover {
+    filter: brightness(1.09);
+    transition: filter 0.2s ease, transform 0.2s ease;
+}
+
+.library-info {
+    flex-grow: 1;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.library-info h2 {
+    font-size: 1.15rem;
+    font-weight: bold;
+    color: var(--color-slate-12);
+    margin: 0 0 6px 0;
+}
+
+.library-meta {
+    font-size: 0.85rem;
     color: var(--color-greyneutral-11);
-    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 8px;
 }
 
-.empty-state .material-symbols-outlined {
-    font-size: 34px;
-    color: var(--color-blue-10);
+.developer {
+    color: var(--color-blue-7);
 }
 
-.empty-state p {
-    margin: 0;
-    line-height: 1.5;
+.library-reviews {
+    font-size: 0.85rem;
+    font-weight: bold;
 }
 
-/* =========================
-   RESPONSIVE
-   ========================= */
+.review-positive { color: var(--color-blue-8); }
+.review-mixed { color: var(--color-greyneutral-11); }
+.review-count { color: var(--color-greyneutral-11); font-weight: normal; margin-left: 4px; }
+.review-negative { color: var(--color-red-9); }
 
-@media (max-width: 900px) {
-    .site-main__shell {
-        width: min(1200px, calc(100% - 20px));
-    }
+/* =========================================================
+   ALERTAS
+   ========================================================= */
+.library-alert {
+    padding: 16px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    font-weight: 500;
+}
 
-    .profile-topbar {
-        padding: 14px 16px;
-    }
+.alert-info {
+    background: linear-gradient(180deg, rgba(26, 159, 255, 0.12), rgba(26, 159, 255, 0.08));
+    border: 1px solid rgba(26, 159, 255, 0.2);
+    color: var(--color-blue-8);
+}
 
-    .game-grid.game-grid-library {
+.hidden {
+    display: none;
+}
+
+/* =========================================================
+   RESPONSIVE (MÓVILES)
+   ========================================================= */
+@media (max-width: 768px) {
+    .library-list {
         grid-template-columns: 1fr;
     }
-}
 
-@media (max-width: 640px) {
-    .profile-topbar {
+    .library-item {
         flex-direction: column;
-        align-items: flex-start;
     }
 
-    .panel.full {
-        padding: 16px;
-    }
-
-    .filter-header {
+    .library-capsule {
         width: 100%;
+        height: 140px;
+        border-right: none;
+        border-bottom: 1px solid var(--color-greyneutral-7);
     }
 
-    .btn-clear-filters {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .game-card.game-card-library {
-        grid-template-columns: 52px 1fr;
-        gap: 12px;
-    }
-
-    .game-thumb {
-        width: 52px;
-        height: 52px;
-    }
-
-    .game-meta {
-        justify-content: flex-start;
+    .library-capsule img {
+        height: 100%;
     }
 }

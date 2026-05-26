@@ -11,12 +11,20 @@ if (!function_exists('wishlist_e')) {
 function wishlist_get_items(PDO $BBDD, int $idUsuario, string $nickname, string $orden = 'usuario'): array
 {
     $ordenesPermitidos = [
-        'usuario'   => 'LD.numero_orden ASC, J.nombre_juego ASC',
-        'nombre'    => 'J.nombre_juego ASC',
-        'precio'    => 'J.precio ASC, J.nombre_juego ASC',
-        'descuento' => 'J.descuento DESC, J.nombre_juego ASC',
-        'fecha'     => 'J.fecha_publicacion DESC, J.nombre_juego ASC',
-        'resenas'   => 'COALESCE(V.total_resenas, 0) DESC, J.nombre_juego ASC',
+        'usuario'      => 'LD.numero_orden ASC, J.nombre_juego ASC',
+        'aleatorio'    => 'RAND()',
+        'nombre(↑)'    => 'J.nombre_juego ASC',
+        'nombre(↓)'    => 'J.nombre_juego DESC',
+        'precio(↑)'    => 'COALESCE(J.precio, 0) DESC, J.nombre_juego ASC',
+        'precio(↓)'    => 'COALESCE(J.precio, 0) ASC, J.nombre_juego ASC',
+        'descuento(↑)' => 'COALESCE(J.descuento, 0) DESC, J.nombre_juego ASC',
+        'descuento(↓)' => 'COALESCE(J.descuento, 0) ASC, J.nombre_juego ASC',
+        'fecha(↑)'     => 'J.fecha_publicacion DESC, J.nombre_juego ASC',
+        'fecha(↓)'     => 'J.fecha_publicacion ASC, J.nombre_juego ASC',
+        'resenas(↑)'   => 'COALESCE(V.total_resenas, 0) DESC, J.nombre_juego ASC',
+        'resenas(↓)'   => 'COALESCE(V.total_resenas, 0) ASC, J.nombre_juego ASC',
+        'positivas'    => 'COALESCE(((V.positivas / V.total_resenas) * 100), 0) DESC, J.nombre_juego ASC',
+        'negativas'    => 'COALESCE(((V.positivas / V.total_resenas) * 100), 0) ASC, J.nombre_juego ASC',
     ];
 
     $orderBy = $ordenesPermitidos[$orden] ?? $ordenesPermitidos['usuario'];

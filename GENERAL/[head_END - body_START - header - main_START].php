@@ -156,6 +156,64 @@
             </div>
         </header>
 
+        <script>
+            (function() {
+                var header = document.querySelector('.site-header');
+                if (!header) return;
+
+                var mq = window.matchMedia('(max-width: 760px)');
+                var lastScroll = 0;
+                var ticking = false;
+                var threshold = 10;
+
+                function onScroll() {
+                    var currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+
+                    if (Math.abs(currentScroll - lastScroll) < threshold) {
+                        ticking = false;
+                        return;
+                    }
+
+                    if (currentScroll > lastScroll && currentScroll > 90) {
+                        header.classList.add('site-header--hidden');
+                    } else {
+                        header.classList.remove('site-header--hidden');
+                    }
+
+                    lastScroll = currentScroll <= 0 ? 0 : currentScroll;
+                    ticking = false;
+                }
+
+                function scrollHandler() {
+                    if (!ticking) {
+                        window.requestAnimationFrame(onScroll);
+                        ticking = true;
+                    }
+                }
+
+                function enable() {
+                    lastScroll = window.pageYOffset || document.documentElement.scrollTop;
+                    window.addEventListener('scroll', scrollHandler, { passive: true });
+                }
+
+                function disable() {
+                    window.removeEventListener('scroll', scrollHandler);
+                    header.classList.remove('site-header--hidden');
+                }
+
+                function mqChange(e) {
+                    if (e.matches) enable(); else disable();
+                }
+
+                if (mq.matches) enable();
+                if (typeof mq.addEventListener === 'function') {
+                    mq.addEventListener('change', mqChange);
+                } else if (typeof mq.addListener === 'function') {
+                    mq.addListener(mqChange);
+                }
+            })();
+        </script>
+
         <!-- Contenedor de la página -->
         <main class="site-main__shell">
             <div style="margin: 10px; height: calc(100% - 10px); overflow-y: auto; scrollbar-width: thin; scrollbar-color: transparent transparent;">
