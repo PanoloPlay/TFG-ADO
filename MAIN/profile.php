@@ -194,8 +194,6 @@ if (!$perfilNoEncontrado && $usuario) {
                     <?= (int)$data['totalBiblioteca'] ?>
                 </span>
             </h2>
-
-            <a href="./library.php" class="panel-link">Ver todo</a>
         </div>
 
         <?php if (!empty($data['biblioteca'])): ?>
