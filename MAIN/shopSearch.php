@@ -1,6 +1,5 @@
 <?php
 require_once '../GENERAL/[General_REQUIRES].php';
-require_once '../BBDD/wishlist_queries.php';
 require_once '../BBDD/gameSearch_queries.php';
 
 $orden = $_POST['orden'] ?? 'ninguno';

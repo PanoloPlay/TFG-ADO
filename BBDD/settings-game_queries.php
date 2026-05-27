@@ -299,8 +299,16 @@ function saveCarouselMedia(PDO $BBDD, array $file, int $idJuego, string $nombreJ
     $safeBase = 'media_' . $idJuego . '_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
     $destinoFisico = $subdir . $safeBase;
 
+    if (!is_uploaded_file($file['tmp_name'])) {
+        $tmp = $file['tmp_name'] ?? 'n/a';
+        throw new RuntimeException('El archivo no parece haber sido subido correctamente (tmp: ' . $tmp . ').');
+    }
+
     if (!move_uploaded_file($file['tmp_name'], $destinoFisico)) {
-        throw new RuntimeException('No se ha podido guardar el archivo del carrusel.');
+        $tmp = $file['tmp_name'] ?? 'n/a';
+        $errCode = $file['error'] ?? 'n/a';
+        $dirWritable = is_writable($subdir) ? 'writable' : 'not_writable';
+        throw new RuntimeException('No se ha podido guardar el archivo del carrusel. Detalles: tmp=' . $tmp . ', dest=' . $destinoFisico . ', upload_error=' . $errCode . ', dir_writable=' . $dirWritable);
     }
 
     $urlRelativa = ($tipo === 'video')

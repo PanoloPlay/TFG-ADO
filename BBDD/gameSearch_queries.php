@@ -11,66 +11,54 @@ if (!function_exists('wishlist_e')) {
 function shop_get_games(PDO $BBDD, string $search, string $order, array $genre, array $languages, float $minPrice, float $maxPrice, bool $discount, bool $recent, string $minDate, string $maxDate): array
 {
     $allowedOrders = [
-        'ninguno'        => '',
-        'aleatorio'       => 'ORDER BY rand()',
+        'ninguno'      => '',
+        'aleatorio'    => 'ORDER BY RAND()',
         'nombre(↑)'    => 'ORDER BY J.nombre_juego ASC',
         'precio(↑)'    => 'ORDER BY COALESCE(J.precio, 0) DESC, J.nombre_juego ASC',
         'descuento(↑)' => 'ORDER BY COALESCE(J.descuento, 0) DESC, J.nombre_juego ASC',
         'fecha(↑)'     => 'ORDER BY J.fecha_publicacion DESC, J.nombre_juego ASC',
         'resenas(↑)'   => 'ORDER BY COALESCE(V.total_resenas, 0) DESC, J.nombre_juego ASC',
-        'positivas'    => 'ORDER BY COALESCE(((V.positivas / V.total_resenas) * 100), 0) DESC, J.nombre_juego ASC',
-        'nombre(↓)'   => 'ORDER BY J.nombre_juego DESC',
-        'precio(↓)'   => 'ORDER BY COALESCE(J.precio, 0) ASC, J.nombre_juego ASC',
-        'descuento(↓)'=> 'ORDER BY COALESCE(J.descuento, 0) ASC, J.nombre_juego ASC',
-        'fecha(↓)'    => 'ORDER BY J.fecha_publicacion ASC, J.nombre_juego ASC',
-        'resenas(↓)'  => 'ORDER BY COALESCE(V.total_resenas, 0) ASC, J.nombre_juego ASC',
-        'negativas'    => 'ORDER BY COALESCE(((V.positivas / V.total_resenas) * 100), 0) ASC, J.nombre_juego ASC',
+        'positivas'    => 'ORDER BY COALESCE(((V.positivas / NULLIF(V.total_resenas, 0)) * 100), 0) DESC, J.nombre_juego ASC',
+        'nombre(↓)'    => 'ORDER BY J.nombre_juego DESC',
+        'precio(↓)'    => 'ORDER BY COALESCE(J.precio, 0) ASC, J.nombre_juego ASC',
+        'descuento(↓)' => 'ORDER BY COALESCE(J.descuento, 0) ASC, J.nombre_juego ASC',
+        'fecha(↓)'     => 'ORDER BY J.fecha_publicacion ASC, J.nombre_juego ASC',
+        'resenas(↓)'   => 'ORDER BY COALESCE(V.total_resenas, 0) ASC, J.nombre_juego ASC',
+        'negativas'    => 'ORDER BY COALESCE(((V.positivas / NULLIF(V.total_resenas, 0)) * 100), 0) ASC, J.nombre_juego ASC',
     ];
-
-    $allowedGenre = '';
-    $allowedLanguage = '';
-    $anyForcedGenre = false;
-    $anyForcedLanguage = false;
 
     if ($minPrice > $maxPrice) {
         $maxPrice = $minPrice;
     }
 
-    if ($discount) {
-        $onlyGetDiscounts = 'AND COALESCE(J.descuento, 0) > 0';
-    }
-    else {
-        $onlyGetDiscounts = '';
-    }
+    $onlyGetDiscounts = $discount ? 'AND COALESCE(J.descuento, 0) > 0' : '';
 
     if ($recent) {
         $lastMonth = (int) date('n') - 1;
         $lastYear = (int) date('Y');
+
         if ($lastMonth == 0) {
             $lastMonth = 12;
             $lastYear -= 1;
         }
-        $daysInPreviousMonth = cal_days_in_month(CAL_GREGORIAN,$lastMonth,$lastYear);
 
+        $daysInPreviousMonth = cal_days_in_month(CAL_GREGORIAN, $lastMonth, $lastYear);
         $daysToReduce = (int) date('d') + $daysInPreviousMonth - 1;
 
         $date = date("Y-m-d H:i:s", time() - ($daysToReduce * 24 * 3600));
-        
+
         $minDate2 = "AND J.fecha_publicacion >= '" . $date . "'";
         $maxDate2 = '';
-    }
-    else {
-        if ($minDate != null && $minDate != "") {
+    } else {
+        if ($minDate !== null && $minDate !== "") {
             $minDate2 = "AND J.fecha_publicacion >= '" . $minDate . " 00:00:00'";
-        }
-        else {
+        } else {
             $minDate2 = '';
         }
 
-        if ($maxDate != null && $maxDate != "") {
-            $maxDate2 = "AND J.fecha_publicacion <= '" . $maxDate . " 00:00:00'";;
-        }
-        else {
+        if ($maxDate !== null && $maxDate !== "") {
+            $maxDate2 = "AND J.fecha_publicacion <= '" . $maxDate . " 23:59:59'";
+        } else {
             $maxDate2 = '';
         }
     }
@@ -105,8 +93,6 @@ function shop_get_games(PDO $BBDD, string $search, string $order, array $genre, 
 
     $orderBy = $allowedOrders[$order] ?? $allowedOrders['ninguno'];
 
-    $searchTerm = '%' . $search . '%';
-
     $sqlSearchGames = "
         SELECT DISTINCT
             J.id_juego,
@@ -119,7 +105,7 @@ function shop_get_games(PDO $BBDD, string $search, string $order, array $genre, 
             COALESCE(V.total_resenas, 0) AS total_resenas,
             COALESCE(V.positivas, 0) AS positivas,
             COALESCE(V.negativas, 0) AS negativas,
-            COALESCE(((V.positivas / V.total_resenas) * 100), 0) AS ratioPositivas
+            COALESCE(((V.positivas / NULLIF(V.total_resenas, 0)) * 100), 0) AS ratioPositivas
         FROM Juegos AS J
         LEFT JOIN (
             SELECT
@@ -130,8 +116,8 @@ function shop_get_games(PDO $BBDD, string $search, string $order, array $genre, 
             FROM Valoraciones
             GROUP BY nombre_juego
         ) V ON V.nombre_juego = J.nombre_juego
-        LEFT JOIN Categoriasjuego AS C ON C.nombre_juego = J.nombre_juego
-        LEFT JOIN Idiomasjuego AS I ON I.nombre_juego = J.nombre_juego
+        LEFT JOIN CategoriasJuego AS C ON C.nombre_juego = J.nombre_juego
+        LEFT JOIN IdiomasJuego AS I ON I.nombre_juego = J.nombre_juego
         WHERE (J.nombre_juego LIKE :search OR J.desarrollador LIKE :search)
           {$genreConditions}
           {$languageConditions}
@@ -142,11 +128,11 @@ function shop_get_games(PDO $BBDD, string $search, string $order, array $genre, 
           {$maxDate2}
         {$orderBy}
     ";
-    $stmt = $BBDD->prepare($sqlSearchGames);
 
+    $stmt = $BBDD->prepare($sqlSearchGames);
     $stmt->execute($queryParams);
 
-    return ($games = $stmt->fetchAll(PDO::FETCH_ASSOC));
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
 function get_genres(PDO $BBDD): array
@@ -154,15 +140,14 @@ function get_genres(PDO $BBDD): array
     $sqlSearchCategories = "
         SELECT
             C.id_categoria,
-            C.Categoria
+            C.categoria AS Categoria
         FROM Categorias AS C
     ";
 
     $stmt = $BBDD->prepare($sqlSearchCategories);
-        
     $stmt->execute();
 
-    return ($categories = $stmt->fetchAll(PDO::FETCH_ASSOC));
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
 function get_languages(PDO $BBDD): array
@@ -170,15 +155,13 @@ function get_languages(PDO $BBDD): array
     $sqlSearchCategories = "
         SELECT
             I.id_idioma,
-            I.Idioma
+            I.idioma AS Idioma
         FROM Idiomas AS I
     ";
 
     $stmt = $BBDD->prepare($sqlSearchCategories);
-        
     $stmt->execute();
 
-    return ($categories = $stmt->fetchAll(PDO::FETCH_ASSOC));
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
-
 ?>

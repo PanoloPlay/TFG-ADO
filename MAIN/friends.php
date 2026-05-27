@@ -116,7 +116,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['buscar_nickname'])) {
                                 <div class="friend-details">
                                     <strong><?= e($usuario['nombre_usuario']) ?></strong>
                                     <small><?= e($usuario['nickname']) ?></small>
-                                    <div class="friend-extra"><?= e($usuario['descripcion'] ?? 'Sin descripción') ?></div>
                                 </div>
                             </a>
                             <div class="friend-actions">

@@ -59,7 +59,6 @@ $amigos = getFriendUsers($BBDD, $idSesion, $nicknameSesion);
                                     <strong><?= e($amigo['nombre_usuario']) ?></strong>
                                     <small><?= e($amigo['nickname']) ?></small>
                                     <?php if (!empty($amigo['descripcion'])): ?>
-                                        <div class="friend-extra"><?= e($amigo['descripcion']) ?></div>
                                     <?php endif; ?>
                                 </div>
                             </a>
