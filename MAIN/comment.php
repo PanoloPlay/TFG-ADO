@@ -219,7 +219,11 @@ if ($gameId > 0) {
                                     data-search-text="<?php echo e($searchText); ?>"
                                 >
                                     <div class="comment-author-row d-flex align-items-start gap-2 mb-2">
-                                        <div class="avatar-32px <?php echo e($commentAvatarData['avatarClass']); ?>"<?php if (!empty($commentAvatarData['avatarPath'])): ?> style="background-image: url('<?php echo e($commentAvatarData['avatarPath']); ?>');"<?php endif; ?>></div>
+                                        <div class="avatar-32px <?php echo e($commentAvatarData['avatarClass']); ?>"<?php if (!empty($commentAvatarData['avatarPath'])): ?> style="background-image: url('<?php echo e($commentAvatarData['avatarPath']); ?>');"<?php endif; ?>>
+                                            <?php if (empty($commentAvatarData['avatarPath'])): ?>
+                                                <?= e($commentAvatarData['initial'] ?? '') ?>
+                                            <?php endif; ?>
+                                        </div>
                                         <div class="comment-author-details">
                                             <p class="mb-1"><strong><?php echo e($comment['nombre_usuario']); ?></strong></p>
                                             <p class="mb-0 comment-meta">Valoración: <span class="rating-<?php echo e($comment['valoracion']); ?>"><?php echo e(ucfirst($comment['valoracion'])); ?></span></p>
