@@ -70,13 +70,13 @@ if (isset($_GET["file"]) && isset($_GET["id"])) {
         $stmt = $BBDD->prepare("SELECT j.`id_juego`, j.`nombre_juego`, j.`descripcion`, j.`fecha_publicacion`, j.`desarrollador`, j.`precio`, j.`descuento`, COUNT(v.`id_valoracion`) AS valoraciones, COUNT(CASE WHEN v.`valoracion` = 'positiva' THEN 1 END) AS valoraciones_positivas, AVG(CASE WHEN v.`valoracion` = 'positiva' THEN 1 ELSE 0 END) AS valoracion_media
                             FROM `Biblioteca` AS b 
                             JOIN `Juegos` AS j ON b.`id_juego` = j.`id_juego` 
-                            JOIN `Valoraciones` AS v ON b.`nombre_juego` = v.`nombre_juego`
+                            LEFT JOIN `Valoraciones` AS v ON b.`nombre_juego` = v.`nombre_juego`
                             WHERE b.`nickname` = :nick 
                             AND j.`id_juego` = :idJuego
                             GROUP BY j.`nombre_juego`");
-    $stmt->bindParam(":nick", $_SESSION["nickname"]);
-    $stmt->bindParam(":idJuego", $id);
-    $stmt->execute();
+        $stmt->bindParam(":nick", $_SESSION["nickname"]);
+        $stmt->bindParam(":idJuego", $id);
+        $stmt->execute();
 
         if ($stmt->rowCount() > 0) {
             $path = $id . "/" . $game;
