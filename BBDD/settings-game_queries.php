@@ -411,6 +411,20 @@ if ($accion === 'guardar_juego') {
             $categoriasPost = $_POST['categorias'] ?? [];
             $idiomasPost = $_POST['idiomas'] ?? [];
 
+            // Validación de precio y descuento
+            $precioFloat = (float) $precio;
+            $descuentoFloat = (float) $descuento;
+
+            // Si el precio es 0, el descuento debe ser 0
+            if ($precioFloat === 0.0) {
+                $descuento = '0.00';
+            } else {
+                // Si el precio es mayor que 0, el descuento máximo es 100
+                if ($descuentoFloat > 100) {
+                    $descuento = '100.00';
+                }
+            }
+
             if ($nombreJuego === '') {
                 throw new RuntimeException('El nombre del juego es obligatorio.');
             }

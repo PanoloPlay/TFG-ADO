@@ -443,6 +443,66 @@ if (carouselList) {
         });
     });
 
+    // Validaciones de precio y descuento
+    const precioInput = document.getElementById('precio');
+    const descuentoInput = document.getElementById('descuento');
+
+    function validatePriceAndDiscount() {
+        if (!precioInput || !descuentoInput) return;
+
+        const precio = parseFloat(precioInput.value) || 0;
+        const descuento = parseFloat(descuentoInput.value) || 0;
+
+        if (precio === 0) {
+            // Si el precio es 0, el descuento debe ser 0 y deshabilitado
+            descuentoInput.value = '0.00';
+            descuentoInput.disabled = true;
+            descuentoInput.title = 'El descuento debe ser 0 cuando el precio es 0';
+        } else {
+            // Si el precio es mayor que 0, el descuento máximo es 100
+            descuentoInput.disabled = false;
+            descuentoInput.title = 'Máximo descuento: 100';
+            if (descuento > 100) {
+                descuentoInput.value = '100';
+            }
+        }
+    }
+
+    if (precioInput) {
+        precioInput.addEventListener('change', validatePriceAndDiscount);
+        precioInput.addEventListener('input', validatePriceAndDiscount);
+    }
+
+    if (descuentoInput) {
+        descuentoInput.addEventListener('change', () => {
+            if (!precioInput) return;
+            const precio = parseFloat(precioInput.value) || 0;
+            const descuento = parseFloat(descuentoInput.value) || 0;
+
+            if (precio === 0 && descuento !== 0) {
+                descuentoInput.value = '0.00';
+                alert('El descuento debe ser 0 cuando el precio es 0');
+            } else if (descuento > 100) {
+                descuentoInput.value = '100';
+                alert('El descuento máximo permitido es 100');
+            }
+        });
+        descuentoInput.addEventListener('input', () => {
+            if (!precioInput) return;
+            const precio = parseFloat(precioInput.value) || 0;
+            const descuento = parseFloat(descuentoInput.value) || 0;
+
+            if (precio === 0 && descuento !== 0) {
+                descuentoInput.value = '0.00';
+            } else if (descuento > 100) {
+                descuentoInput.value = '100';
+            }
+        });
+    }
+
+    // Ejecutar validación al cargar la página
+    validatePriceAndDiscount();
+
     document.querySelectorAll('.js-filter-input').forEach((input) => {
         input.addEventListener('input', () => {
             const targetId = input.dataset.filterTarget;
